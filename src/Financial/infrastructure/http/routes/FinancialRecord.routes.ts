@@ -24,7 +24,10 @@ financialRecordRoutes.post(
 
 financialRecordRoutes.get("", PermissionMiddleware, async (req, res) => {
   const params = req.query as unknown as FilterFinanceRecordRequest
-  await FinanceRecordListController(params, res)
+  await FinanceRecordListController(
+    { ...params, churchId: req["user"].churchId },
+    res
+  )
 })
 
 export default financialRecordRoutes

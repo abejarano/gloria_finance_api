@@ -1,11 +1,12 @@
-import cors = require("cors")
-import express = require("express")
-import fileUpload = require("express-fileupload")
-import bodyParser = require("body-parser")
+import helmet from "helmet"
 import rateLimit from "express-rate-limit"
 import { Logger, RequestContext } from "../../adapter/CustomLogger"
 import { v4 } from "uuid"
 import { Express } from "express"
+import cors = require("cors")
+import express = require("express")
+import fileUpload = require("express-fileupload")
+import bodyParser = require("body-parser")
 
 const requestContextMiddleware = (req, res, next) => {
   const requestId = (req.headers["x-request-id"] as string) || v4()
@@ -20,6 +21,12 @@ export function server(port: number) {
   app.use(express.json())
   app.use(bodyParser.urlencoded({ extended: true }))
   app.disable("x-powered-by")
+
+  app.use(
+    helmet({
+      xXssProtection: true,
+    })
+  )
 
   const corsOptions = {
     origin: "*",
