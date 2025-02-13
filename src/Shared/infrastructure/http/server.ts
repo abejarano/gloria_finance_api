@@ -22,12 +22,6 @@ export function server(port: number) {
   app.use(bodyParser.urlencoded({ extended: true }))
   app.disable("x-powered-by")
 
-  app.use(
-    helmet({
-      xXssProtection: true,
-    })
-  )
-
   const corsOptions = {
     origin: "*",
     preflightContinue: false,
@@ -36,7 +30,11 @@ export function server(port: number) {
 
   app.use(cors(corsOptions))
 
-  app.options("*", cors(corsOptions))
+  app.use(
+    helmet({
+      xXssProtection: true,
+    })
+  )
 
   const limiter = rateLimit({
     windowMs: 8 * 60 * 1000, // 15 minutes

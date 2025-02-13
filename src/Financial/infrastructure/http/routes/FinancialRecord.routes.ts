@@ -8,7 +8,7 @@ import { FinanceRecordListController } from "../controllers/FinanceRecordList.co
 const financialRecordRoutes = Router()
 
 financialRecordRoutes.post(
-  "",
+  "/",
   [PermissionMiddleware, FinancialRecordValidator],
   async (req, res) => {
     await FinancialRecordController(
@@ -22,7 +22,7 @@ financialRecordRoutes.post(
   }
 )
 
-financialRecordRoutes.get("", PermissionMiddleware, async (req, res) => {
+financialRecordRoutes.get("/", PermissionMiddleware, async (req, res) => {
   const params = req.query as unknown as FilterFinanceRecordRequest
   await FinanceRecordListController(
     { ...params, churchId: req["user"].churchId },
