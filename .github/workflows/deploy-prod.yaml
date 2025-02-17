@@ -50,19 +50,22 @@ jobs:
           npm ci
           npm run build
           
-          docker ps -a --filter "name=church_financial_api" -q | xargs -r docker stop
-          docker ps -a --filter "name=church_financial_api" -q | xargs -r docker rm
+          # Instalar PM2 globalmente si no está instalado
+          if ! command -v pm2 &> /dev/null; then
+            npm install -g pm2
+          fi
           
-          docker images -q --filter "reference=church_financial_api*" | xargs -r docker rmi
+          # Configurar PM2 para ejecutar la aplicación
+          pm2 stop church_financial_api || true
+          pm2 delete church_financial_api || true
           
-          docker build -t church_financial_api . -f Dockerfile
+          # Iniciar la aplicación con PM2
+          pm2 start dist/app.js --name church_financial_api --env production
           
-          docker run --network church_sion -d --restart=on-failure --env-file ~/env_variables.txt \
-          -e GOOGLE_APPLICATION_CREDENTIALS=/google_credentials.json \
-          -v ~/google_credentials.json:/google_credentials.json \
-          --name church_financial_api -p 5750:8080 church_financial_api
+          # Configurar PM2 para reiniciar la aplicación automáticamente en caso de reinicio del servidor
+          pm2 save
+          pm2 startup | bash
           
-          sudo systemctl restart nginx
           "
 
     env:
