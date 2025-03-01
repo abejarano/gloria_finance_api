@@ -49,7 +49,7 @@ export class SearchFinanceRecord {
     if (request.financialConceptId) {
       filters.push(
         new Map([
-          ["field", "financialConceptId"],
+          ["field", "financialConcept.financialConceptId"],
           ["operator", Operator.EQUAL],
           ["value", request.financialConceptId],
         ])
@@ -61,7 +61,7 @@ export class SearchFinanceRecord {
         new Map<string, string | Date>([
           ["field", "date"],
           ["operator", Operator.GTE],
-          ["value", new Date(request.startDate)],
+          ["value", request.startDate],
         ])
       )
     }
@@ -71,7 +71,7 @@ export class SearchFinanceRecord {
         new Map<string, string | Date>([
           ["field", "date"],
           ["operator", Operator.LTE],
-          ["value", new Date(request.endDate)],
+          ["value", request.endDate],
         ])
       )
     }
