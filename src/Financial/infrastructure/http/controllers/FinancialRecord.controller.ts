@@ -1,15 +1,9 @@
-import {
-  GenericException,
-  HttpStatus,
-  QueueName,
-} from "../../../../Shared/domain"
+import { GenericException, HttpStatus } from "../../../../Shared/domain"
 import domainResponse from "../../../../Shared/helpers/domainResponse"
 import {
   AccountType,
-  AvailabilityAccount,
   ConceptType,
   CostCenter,
-  FinancialConcept,
   FinancialRecordRequest,
   TypeOperationMoney,
 } from "../../../domain"
@@ -24,6 +18,7 @@ import {
 } from "../../persistence"
 import {
   DispatchUpdateAvailabilityAccountBalance,
+  DispatchUpdateCostCenterMaster,
   FindAvailabilityAccountByAvailabilityAccountId,
   FindCostCenterByCostCenterId,
   FindFinancialConceptByChurchIdAndFinancialConceptId,
@@ -76,18 +71,27 @@ export const FinancialRecordController = async (
     ).handle(request, financialConcept, costCenter)
 
     if (availabilityAccount.getType() === AccountType.BANK) {
-      await recordMovementBank(request, availabilityAccount, financialConcept)
+      new DispatchUpdateAvailabilityAccountBalance(
+        QueueBullService.getInstance()
+      ).execute({
+        availabilityAccount: availabilityAccount,
+        amount: request.amount,
+        concept: financialConcept.getName(),
+        operationType:
+          financialConcept.getType() === ConceptType.INCOME
+            ? TypeOperationMoney.MONEY_IN
+            : TypeOperationMoney.MONEY_OUT,
+      })
     }
 
     if (costCenter) {
-      QueueBullService.getInstance().dispatch(
-        QueueName.UpdateCostCenterMaster,
-        {
-          churchId: request.churchId,
-          amount: request.amount,
-          costCenterId: costCenter.getCostCenterId(),
-        }
-      )
+      new DispatchUpdateCostCenterMaster(
+        QueueBullService.getInstance()
+      ).execute({
+        churchId: request.churchId,
+        amount: request.amount,
+        costCenterId: costCenter.getCostCenterId(),
+      })
     }
 
     res.status(HttpStatus.CREATED).send({
@@ -124,22 +128,4 @@ const searchFinancialConcept = async (request: FinancialRecordRequest) => {
   }
 
   return financialConcept
-}
-
-const recordMovementBank = async (
-  request: FinancialRecordRequest,
-  availabilityAccount: AvailabilityAccount,
-  financialConcept: FinancialConcept
-) => {
-  new DispatchUpdateAvailabilityAccountBalance(
-    QueueBullService.getInstance()
-  ).execute({
-    availabilityAccount: availabilityAccount,
-    amount: request.amount,
-    concept: financialConcept.getName(),
-    operationType:
-      financialConcept.getType() === ConceptType.INCOME
-        ? TypeOperationMoney.MONEY_IN
-        : TypeOperationMoney.MONEY_OUT,
-  })
 }
