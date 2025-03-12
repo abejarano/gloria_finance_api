@@ -19,6 +19,11 @@ services:
     environment:
       NODE_ENV: local
 
+      MONGO_PASS: Ljm5aB8h7vOTeDeA
+      MONGO_USER: user_sion
+      MONGO_DB: dbsionfinancial
+      MONGO_SERVER: freesionfinancial.cmomlts.mongodb.net
+
       JWT_SECRET: MG9hNm4xdTFlbGJ6c2a10N7trhjhBwEYj9l7VGDT9e5sc2s4WnEwY2I0dEROeS1uVC1Nd2Rhe7rWG3rfWXX
 
       BUCKET_FILES: churchs3

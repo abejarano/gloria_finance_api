@@ -65,10 +65,11 @@ class CustomLogger {
 
   private createLogMessage(message: string, context?: object): object {
     const requestId = RequestContext.requestId || "N/A" // Recuperar el requestId
+
     return {
-      message: `[${this.name}] ${message}`,
-      requestId,
-      ...context,
+      message: ` ${message}`,
+      data: context,
+      ...{ name: `${this.name} ${requestId}` },
     }
   }
 }

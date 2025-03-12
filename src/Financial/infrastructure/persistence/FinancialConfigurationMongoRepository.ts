@@ -142,6 +142,7 @@ export class FinancialConfigurationMongoRepository
       banks: Bank[]
       churchId: string
     }>()
+
     const result = await collection.findOne(
       { "banks.bankId": bankId },
       { projection: { _id: 1, churchId: 1, "banks.$": 1 } }

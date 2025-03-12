@@ -39,7 +39,7 @@ export class FinancialConfigurationController {
         FinancialConfigurationMongoRepository.getInstance()
       ).execute(bankId)
 
-      res.status(HttpStatus.OK).send({ data: bank })
+      res.status(HttpStatus.OK).send(bank)
     } catch (e) {
       domainResponse(e, res)
     }
