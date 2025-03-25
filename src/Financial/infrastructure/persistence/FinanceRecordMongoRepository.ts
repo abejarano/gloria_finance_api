@@ -33,6 +33,7 @@ export class FinanceRecordMongoRepository
   }
 
   async fetch(criteria: Criteria): Promise<Paginate<FinanceRecord>> {
+    this.dbCollectionName = "financial_records"
     const result: FinanceRecord[] =
       await this.searchByCriteria<FinanceRecord>(criteria)
 
@@ -40,6 +41,7 @@ export class FinanceRecordMongoRepository
   }
 
   async upsert(financialRecord: FinanceRecord): Promise<void> {
+    this.dbCollectionName = "financial_records"
     await this.persist(financialRecord.getId(), financialRecord)
   }
 
@@ -48,6 +50,7 @@ export class FinanceRecordMongoRepository
     year: number
     month: number
   }): Promise<{ total: number; tithesOfTithes: number; records: any[] }> {
+    this.dbCollectionName = "financial_records"
     const { churchId, year, month } = filter
 
     const startDate = new Date(year, month - 1, 1)
