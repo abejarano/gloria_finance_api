@@ -40,7 +40,7 @@ export class FirstLoadFinancialConcepts {
 
   private readFinancialConcepts(): rawFinancialConcept[] {
     const rawData = fs.readFileSync(
-      path.resolve(__dirname, "../../../fixtures/financialConcepts.json"),
+      path.resolve(__dirname, "@/fixtures/financialConcepts.json"),
       "utf-8"
     )
     return JSON.parse(rawData) as rawFinancialConcept[]
