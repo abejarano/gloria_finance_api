@@ -4,10 +4,10 @@
   "description": "API Church Financial System",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon src/app.ts",
+    "dev": "nodemon -r tsconfig-paths/register src/app.ts",
     "test": "jest --forceExit --runInBand --detectOpenHandles",
-    "start:prod": "node dist/app.js",
-    "build": "tsc -p tsconfig.build.json && npm run copy-static-assets",
+    "start:prod": "node -r tsconfig-paths/register dist/app.js",
+    "build": "tsc -p tsconfig.build.json && tsc-alias && npm run copy-static-assets",
     "format": "prettier --write \"src/**/*.{ts,hbs}\" ",
     "format:check": "prettier --check \"src/**/*.ts\"",
     "copy-static-assets": "ts-node src/copyStaticAssets.ts"
@@ -45,6 +45,7 @@
     "pino": "^8.19.0",
     "pino-pretty": "^11.0.0",
     "shelljs": "^0.9.2",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
@@ -61,20 +62,7 @@
     "nodemon": "^3.1.0",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.13",
     "typescript": "^5.8.2"
-  },
-  "jest": {
-    "setupFiles": [
-      "./test/jest/config.ts"
-    ],
-    "testTimeout": 90000,
-    "transform": {
-      ".(ts|tsx)": "ts-jest"
-    },
-    "moduleNameMapper": {
-      "^src/(.*)": "<rootDir>/$1",
-      "^test/(.*)": "<rootDir>/../test/$1"
-    },
-    "testRegex": ".test.ts$"
   }
 }
