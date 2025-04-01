@@ -1,5 +1,6 @@
 import { Logger } from "@/Shared/adapter"
 import {
+  AccountReceivable,
   AccountReceivablePaid,
   IAccountsReceivableRepository,
   InstallmentNotFound,
@@ -18,28 +19,28 @@ export class PayAccountReceivable {
   async execute(req: PayAccountReceivableRequest) {
     this.logger.info(`Start Pay Account Receivable`, req)
 
-    const accountReceivable = await this.accountReceivableRepository.one(
-      req.accountReceivableId
-    )
+    const accountReceivable: AccountReceivable =
+      await this.accountReceivableRepository.one(req.accountReceivableId)
     if (!accountReceivable) {
+      this.logger.debug(`Account Receivable not found`)
       throw new PayAccountReceivableNotFound()
     }
 
     const installment = accountReceivable.getInstallment(req.installmentId)
 
     if (!installment) {
-      this.logger.info(`Installment ${req.installmentId} not found`)
+      this.logger.debug(`Installment ${req.installmentId} not found`)
       throw new InstallmentNotFound(req.installmentId)
     }
 
     if (installment.status === InstallmentsStatus.PAID) {
-      this.logger.info(`Installment ${req.installmentId} already paid`)
+      this.logger.debug(`Installment ${req.installmentId} already paid`)
       throw new AccountReceivablePaid()
     }
 
     if (installment.status === InstallmentsStatus.PENDING) {
       installment.status =
-        req.amount === installment.amount
+        req.amount.getValue() === installment.amount
           ? InstallmentsStatus.PAID
           : InstallmentsStatus.PARTIAL
     } else if (installment.status === InstallmentsStatus.PARTIAL) {
@@ -48,18 +49,18 @@ export class PayAccountReceivable {
       )
 
       installment.status =
-        req.amount === installment.amountPending
+        req.amount.getValue() === installment.amountPending
           ? InstallmentsStatus.PAID
           : InstallmentsStatus.PARTIAL
     }
 
-    installment.amountPaid = req.amount
-    installment.amountPending = installment.amount - req.amount
+    installment.amountPaid = req.amount.getValue()
+    installment.amountPending = installment.amount - req.amount.getValue()
     installment.financialTransactionId = req.financialTransactionId
 
     this.logger.info(`Installment ${req.installmentId} updated`, installment)
 
-    accountReceivable.updateAmount(installment, req.amount)
+    accountReceivable.updateAmount(req.amount)
 
     this.logger.info(
       `Account Receivable ${req.accountReceivableId} updated, amount pending ${accountReceivable.getAmountPending()} 
