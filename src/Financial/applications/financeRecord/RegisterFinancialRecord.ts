@@ -16,7 +16,7 @@ import {
 import { FindFinancialConceptByChurchIdAndFinancialConceptId } from "@/Financial/applications"
 import { Logger } from "@/Shared/adapter"
 
-export class RegisterFinancialRecord implements IQueue<FinanceRecord> {
+export class RegisterFinancialRecord implements IQueue {
   private logger = Logger("RegisterFinancialRecord")
 
   constructor(

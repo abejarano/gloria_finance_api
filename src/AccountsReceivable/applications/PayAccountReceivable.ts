@@ -1,9 +1,8 @@
 import { Logger } from "@/Shared/adapter"
 import {
   AccountReceivable,
-  AccountReceivablePaid,
   IAccountsReceivableRepository,
-  InstallmentNotFound,
+  Installments,
   InstallmentsStatus,
   PayAccountReceivableNotFound,
   PayAccountReceivableRequest,
@@ -26,39 +25,20 @@ export class PayAccountReceivable {
       throw new PayAccountReceivableNotFound()
     }
 
-    const installment = accountReceivable.getInstallment(req.installmentId)
+    let amountPay = req.amount.getValue()
 
-    if (!installment) {
-      this.logger.debug(`Installment ${req.installmentId} not found`)
-      throw new InstallmentNotFound(req.installmentId)
-    }
-
-    if (installment.status === InstallmentsStatus.PAID) {
-      this.logger.debug(`Installment ${req.installmentId} already paid`)
-      throw new AccountReceivablePaid()
-    }
-
-    if (installment.status === InstallmentsStatus.PENDING) {
-      installment.status =
-        req.amount.getValue() === installment.amount
-          ? InstallmentsStatus.PAID
-          : InstallmentsStatus.PARTIAL
-    } else if (installment.status === InstallmentsStatus.PARTIAL) {
-      this.logger.info(
-        `Installment ${req.installmentId} is was partial payment`
+    for (const installmentId of req.installmentIds) {
+      const installment = accountReceivable.getInstallment(installmentId)
+      if (!installment) {
+        this.logger.debug(`Installment ${installmentId} not found`)
+        continue
+      }
+      amountPay = this.payInstallment(
+        installment,
+        amountPay,
+        req.financialTransactionId
       )
-
-      installment.status =
-        req.amount.getValue() === installment.amountPending
-          ? InstallmentsStatus.PAID
-          : InstallmentsStatus.PARTIAL
     }
-
-    installment.amountPaid = req.amount.getValue()
-    installment.amountPending = installment.amount - req.amount.getValue()
-    installment.financialTransactionId = req.financialTransactionId
-
-    this.logger.info(`Installment ${req.installmentId} updated`, installment)
 
     accountReceivable.updateAmount(req.amount)
 
@@ -70,5 +50,52 @@ export class PayAccountReceivable {
     await this.accountReceivableRepository.upsert(accountReceivable)
 
     this.logger.info(`Finish Pay Account Receivable`)
+  }
+
+  private payInstallment(
+    installment: Installments,
+    amountTransferred: number,
+    financialTransactionId: string
+  ): number {
+    if (installment.status === InstallmentsStatus.PAID) {
+      this.logger.debug(`Installment ${installment.installmentId} already paid`)
+      return
+    }
+
+    this.logger.info(
+      `Installment ${installment.installmentId} is was ${installment.status.toLowerCase()} payment`
+    )
+
+    const amountToCompare =
+      installment.status === InstallmentsStatus.PENDING
+        ? installment.amount
+        : installment.amountPending
+
+    installment.status =
+      amountTransferred >= amountToCompare
+        ? InstallmentsStatus.PAID
+        : InstallmentsStatus.PARTIAL
+
+    const amountPending = installment.amountPending ?? installment.amount
+
+    const newAmountPending = amountPending - amountTransferred
+
+    if (newAmountPending < 0) {
+      installment.amountPending = 0
+      installment.amountPaid = installment.amount
+    } else {
+      installment.amountPending = newAmountPending
+      installment.amountPaid =
+        amountTransferred + (installment.amountPending || 0)
+    }
+
+    installment.financialTransactionId = financialTransactionId
+
+    this.logger.info(
+      `Installment ${installment.installmentId} updated`,
+      installment
+    )
+
+    return amountTransferred - amountPending
   }
 }
