@@ -27,9 +27,19 @@ accountReceivableRoutes.post(
   "/pay",
   [PermissionMiddleware, PayAccountReceivableValidator],
   async (req, res) => {
+    const installmentId = req.body.installmentId
+    let installmentIds: string[] = []
+
+    if (installmentId.includes(",")) {
+      installmentIds = installmentId.split(",")
+    } else {
+      installmentIds = [installmentId]
+    }
+
     await PayAccountReceivableController(
       {
         ...req.body,
+        installmentIds,
         amount: AmountValue.create(req.body.amount),
         file: req?.files?.file,
       },

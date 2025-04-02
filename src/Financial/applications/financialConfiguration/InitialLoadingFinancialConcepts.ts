@@ -7,7 +7,7 @@ import { Logger } from "@/Shared/adapter"
 // @ts-ignore
 import conceptBase from "@/fixtures/financialConcepts.json"
 
-export class InitialLoadingFinancialConcepts implements IQueue<void> {
+export class InitialLoadingFinancialConcepts implements IQueue {
   private logger = Logger("InitialLoadingFinancialConcepts")
 
   constructor(
