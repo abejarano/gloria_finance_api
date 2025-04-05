@@ -1,8 +1,10 @@
 import { GenericException, HttpStatus } from "@/Shared/domain"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import {
+  AccountType,
   ConceptType,
   CostCenter,
+  FinancialConcept,
   FinancialRecordRequest,
   TypeOperationMoney,
 } from "../../../domain"
@@ -35,11 +37,14 @@ export const FinancialRecordController = async (
       ).uploadFile(request.file)
     }
 
-    const availabilityAccount = await searchAvailabilityAccount(request)
+    const financialConcept = await searchFinancialConcept(request)
+
+    const availabilityAccount = await searchAvailabilityAccount(
+      request,
+      financialConcept
+    )
 
     let costCenter: CostCenter = undefined
-
-    const financialConcept = await searchFinancialConcept(request)
 
     if (
       financialConcept.getType() === ConceptType.DISCHARGE &&
@@ -103,10 +108,21 @@ export const FinancialRecordController = async (
   }
 }
 
-const searchAvailabilityAccount = async (request: FinancialRecordRequest) => {
-  return await new FindAvailabilityAccountByAvailabilityAccountId(
+const searchAvailabilityAccount = async (
+  request: FinancialRecordRequest,
+  financialConcept: FinancialConcept
+) => {
+  const account = await new FindAvailabilityAccountByAvailabilityAccountId(
     AvailabilityAccountMongoRepository.getInstance()
   ).execute(request.availabilityAccountId)
+
+  if (account.getType() === AccountType.INVESTMENT) {
+    throw new GenericException(
+      `Selected availability account does not allow this ${financialConcept.getName()}`
+    )
+  }
+
+  return account
 }
 
 const searchFinancialConcept = async (request: FinancialRecordRequest) => {

@@ -1,5 +1,17 @@
 [
   {
+    "name": "Perda de investimento",
+    "description": "Diminuição do valor de um fundo de investimento ou outro instrumento financeiro, registada como ajustamento negativo na conta correspondente.",
+    "type": "OUTGO",
+    "active": true
+  },
+  {
+    "name": "Retornos Financeiros",
+    "description": "Rendimentos gerados por juros ou lucros provenientes de contas de investimento, depósitos a prazo ou outros instrumentos financeiros da igreja.",
+    "type": "INCOME",
+    "active": true
+  },
+  {
     "name": "Conta a Receber",
     "description": "Valor a receber por pagamento de uma conta a receber.",
     "type": "INCOME",
