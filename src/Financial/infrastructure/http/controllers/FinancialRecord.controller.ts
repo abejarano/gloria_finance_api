@@ -84,6 +84,7 @@ export const FinancialRecordController = async (
         financialConcept.getType() === ConceptType.INCOME
           ? TypeOperationMoney.MONEY_IN
           : TypeOperationMoney.MONEY_OUT,
+      createdAt: request.date,
     })
 
     if (costCenter) {

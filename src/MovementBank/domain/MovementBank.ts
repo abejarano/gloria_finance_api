@@ -1,11 +1,11 @@
-import { IdentifyEntity } from "../../Shared/adapter"
-import { Bank } from "../../Financial/domain"
-import { AggregateRoot } from "../../Shared/domain"
+import { IdentifyEntity } from "@/Shared/adapter"
+import { Bank } from "@/Financial/domain"
+import { AggregateRoot } from "@/Shared/domain"
 import {
   OperationImpactType,
   TypeBankingOperation,
 } from "./enums/TypeBankingOperation.enum"
-import { DateBR } from "../../Shared/helpers"
+import { DateBR } from "@/Shared/helpers"
 
 export class MovementBank extends AggregateRoot {
   private id?: string
@@ -22,7 +22,8 @@ export class MovementBank extends AggregateRoot {
     amount: number,
     operationType: TypeBankingOperation,
     concept: string,
-    bank: Bank
+    bank: Bank,
+    createdAt?: Date
   ): MovementBank {
     const movementBank: MovementBank = new MovementBank()
     movementBank.amount = Number(amount)
@@ -32,7 +33,7 @@ export class MovementBank extends AggregateRoot {
     movementBank.movementBankId = IdentifyEntity.get(`movementBank`)
     movementBank.bankId = bank.getBankId()
     movementBank.churchId = bank.getChurchId()
-    movementBank.createdAt = DateBR()
+    movementBank.createdAt = createdAt || DateBR()
 
     return movementBank
   }
