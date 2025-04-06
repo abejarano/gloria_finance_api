@@ -25,7 +25,8 @@ export class MovementBankRecord implements IQueue {
       args.amount,
       args.bankingOperation,
       args.concept,
-      bank
+      bank,
+      args.createdAt
     )
 
     await this.movementBankRepository.upsert(movementBank)
