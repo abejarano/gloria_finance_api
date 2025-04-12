@@ -45,6 +45,7 @@ accountReceivableRoutes.post(
     await PayAccountReceivableController(
       {
         ...req.body,
+        churchId: req["user"].churchId,
         installmentIds,
         amount: AmountValue.create(req.body.amount),
         file: req?.files?.file,
