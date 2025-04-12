@@ -10,7 +10,6 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   logger.info(`Validating  ${JSON.stringify(payload)}`)
 
   const rule = {
-    churchId: "required|string",
     accountReceivableId: "required|string",
     installmentId: "required|string",
     availabilityAccountId: "required|string",
