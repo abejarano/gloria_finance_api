@@ -58,7 +58,7 @@ export class PayAccountReceivable {
     this.logger.info(`Account Receivable ${req.accountReceivableId} updated`)
 
     new DispatchUpdateAvailabilityAccountBalance(this.queueService).execute({
-      operationType: TypeOperationMoney.MONEY_OUT,
+      operationType: TypeOperationMoney.MONEY_IN,
       availabilityAccount:
         await this.availabilityAccountRepository.findAvailabilityAccountByAvailabilityAccountId(
           req.availabilityAccountId
