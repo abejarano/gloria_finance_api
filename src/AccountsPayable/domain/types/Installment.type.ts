@@ -1,12 +1,12 @@
-import { InstallmentsStatus } from "@/AccountsReceivable/domain"
+import { InstallmentStatus } from "../enums/InstallmentStatus"
 
-export type Installments = {
+export type Installment = {
   installmentId?: string
   amount: number
   amountPaid?: number
   amountPending?: number
   dueDate: Date
   paymentDate?: Date
-  status?: InstallmentsStatus
+  status?: InstallmentStatus
   financialTransactionId?: string
 }

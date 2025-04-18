@@ -4,10 +4,10 @@ import {
   FilterAccountReceivableRequest,
 } from "@/AccountsReceivable/domain"
 import { ListAccountReceivable } from "@/AccountsReceivable/applications"
-import { AccountsReceivableMongoRepository } from "../../persistence/AccountsReceivableMongoRepository"
 import { HttpStatus, Paginate } from "@/Shared/domain"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { Logger } from "@/Shared/adapter"
+import { AccountsReceivableMongoRepository } from "@/AccountsReceivable/infrastructure/persistence/AccountsReceivableMongoRepository"
 
 /**
  * @function ListAccountReceivableController
@@ -69,11 +69,11 @@ export const ListAccountReceivableController = async (
   res: Response
 ): Promise<void> => {
   try {
+    const logger = Logger("ListAccountReceivableController")
+
     const list: Paginate<AccountReceivable> = await new ListAccountReceivable(
       AccountsReceivableMongoRepository.getInstance()
     ).execute(req)
-
-    const logger = Logger("ListAccountReceivableController")
 
     logger.info("Response list account receivable", list)
 

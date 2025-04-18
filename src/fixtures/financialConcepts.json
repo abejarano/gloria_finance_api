@@ -18,6 +18,12 @@
     "active": true
   },
   {
+    "name": "Contas a Pagar",
+    "description": "Valor a pagar por conta a pagar.",
+    "type": "OUTGO",
+    "active": true
+  },
+  {
     "name": "Conta a Receber",
     "description": "Valor a receber por pagamento de uma conta a receber.",
     "type": "INCOME",

@@ -7,7 +7,7 @@ export default async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body
   const logger = Logger("CreateAccountReceivableValidator")
 
-  logger.info(`Validando  ${JSON.stringify(payload)}`)
+  logger.info(`Validating  ${JSON.stringify(payload)}`)
 
   const rule = {
     debtor: "required|object",

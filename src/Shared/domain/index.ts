@@ -1,6 +1,8 @@
 export * from "./criteria"
 
 export { Paginate } from "./types/paginate"
+export { ListParams } from "./types/params"
+export { Installments } from "./types/Installments.type"
 
 export { AggregateRoot } from "./aggregate-root"
 
@@ -13,6 +15,7 @@ export { AmountValue } from "./value-object/AmountValue"
 
 export { HttpStatus } from "./enums/HttpStatus.enum"
 export { QueueName } from "./enums/QueueName.enum"
+export { InstallmentsStatus } from "./enums/InstallmentsStatus.enum"
 
 export { IMessageBus } from "./interfaces/MessageBus.interface"
 export { IStorageService } from "./interfaces/StorageService.interface"

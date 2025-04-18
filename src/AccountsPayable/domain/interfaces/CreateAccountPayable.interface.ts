@@ -1,14 +1,15 @@
-import { DebtorType } from "../enums/DebtorType.enum"
+import { SupplierType } from "../enums/SupplierType"
 import { Installments } from "@/Shared/domain"
 
-export interface ICreateAccountReceivable {
-  debtor: {
-    debtorType: DebtorType
-    debtorDNI?: string
+export interface ICreateAccountPayable {
+  supplier: {
+    supplierId: string
+    supplierType: SupplierType
+    supplierDNI: string
     name: string
     phone: string
   }
-  accountReceivableId?: string
+  accountPayableId?: string
   churchId: string
   description: string
   amountTotal: number
