@@ -1,5 +1,5 @@
 import { ProviderType } from "../enums/ProviderType"
-import { Installment } from "@/AccountsPayable/domain"
+import { Installments } from "@/Shared/domain"
 
 export interface ICreateAccountPayable {
   provider: {
@@ -14,5 +14,5 @@ export interface ICreateAccountPayable {
   amountTotal: number
   amountPaid?: number
   amountPending?: number
-  installments?: Installment[]
+  installments?: Installments[]
 }

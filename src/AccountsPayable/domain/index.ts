@@ -8,3 +8,4 @@ export * from "./types/Installment.type"
 
 export * from "./requests/AccountPayable.request"
 export * from "./requests/PayAccountPayable.request"
+export * from "./requests/FilterAccountPayable.request"

@@ -1,10 +1,13 @@
-import { AggregateRoot, AmountValue } from "@/Shared/domain"
+import {
+  AggregateRoot,
+  AmountValue,
+  Installments,
+  InstallmentsStatus,
+} from "@/Shared/domain"
 import { DateBR } from "@/Shared/helpers"
 import { IdentifyEntity } from "@/Shared/adapter"
 import { AccountPayableStatus } from "./enums/AccountPayableStatus"
 import { ProviderType } from "./enums/ProviderType"
-import { InstallmentStatus } from "./enums/InstallmentStatus"
-import { Installment } from "./types/Installment.type"
 import { ICreateAccountPayable } from "./interfaces/CreateAccountPayable.interface"
 
 export class AccountPayable extends AggregateRoot {
@@ -22,7 +25,7 @@ export class AccountPayable extends AggregateRoot {
   private description: string
   private amountPending: number
   private status: AccountPayableStatus
-  private installments: Installment[]
+  private installments: Installments[]
   private createdAt: Date
   private updatedAt: Date
 
@@ -45,7 +48,7 @@ export class AccountPayable extends AggregateRoot {
         ...i,
         dueDate: new Date(i.dueDate),
         installmentId: i.installmentId || IdentifyEntity.get(`installment`),
-        status: InstallmentStatus.PENDING,
+        status: InstallmentsStatus.PENDING,
       }
     })
 
@@ -83,7 +86,7 @@ export class AccountPayable extends AggregateRoot {
     return this.id
   }
 
-  getInstallment(installmentId: string): Installment {
+  getInstallment(installmentId: string): Installments {
     return this.installments.find((i) => i.installmentId === installmentId)
   }
 

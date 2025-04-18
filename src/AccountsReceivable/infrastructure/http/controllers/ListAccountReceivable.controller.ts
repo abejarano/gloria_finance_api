@@ -1,8 +1,5 @@
 import { Response } from "express"
-import {
-  AccountReceivable,
-  FilterAccountReceivableRequest,
-} from "@/AccountsReceivable/domain"
+import { AccountReceivable, FilterAccountReceivableRequest } from "@/AccountsReceivable/domain"
 import { ListAccountReceivable } from "@/AccountsReceivable/applications"
 import { AccountsReceivableMongoRepository } from "../../persistence/AccountsReceivableMongoRepository"
 import { HttpStatus, Paginate } from "@/Shared/domain"
@@ -69,11 +66,11 @@ export const ListAccountReceivableController = async (
   res: Response
 ): Promise<void> => {
   try {
+    const logger = Logger("ListAccountReceivableController")
+
     const list: Paginate<AccountReceivable> = await new ListAccountReceivable(
       AccountsReceivableMongoRepository.getInstance()
     ).execute(req)
-
-    const logger = Logger("ListAccountReceivableController")
 
     logger.info("Response list account receivable", list)
 

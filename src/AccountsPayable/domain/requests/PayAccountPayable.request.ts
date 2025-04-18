@@ -3,6 +3,7 @@ import { FinancialConcept } from "@/Financial/domain"
 
 export type PayAccountPayableRequest = {
   accountPayableId: string
+  costCenterId: string
   installmentId: string
   installmentIds: string[]
   financialTransactionId: string
