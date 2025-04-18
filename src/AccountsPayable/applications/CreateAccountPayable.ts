@@ -1,15 +1,15 @@
 import { Logger } from "@/Shared/adapter"
 import {
   AccountPayable,
-  AccountPayableRepository,
   AccountPayableRequest,
+  IAccountPayableRepository,
 } from "@/AccountsPayable/domain"
 
 export class CreateAccountPayable {
   private logger = Logger(CreateAccountPayable.name)
 
   constructor(
-    private readonly accountPayableRepository: AccountPayableRepository
+    private readonly accountPayableRepository: IAccountPayableRepository
   ) {}
 
   async execute(args: AccountPayableRequest) {

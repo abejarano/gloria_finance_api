@@ -1,4 +1,4 @@
-import { InstallmentsStatus } from "@/AccountsReceivable/domain"
+import { InstallmentsStatus } from "@/Shared/domain"
 
 export type Installments = {
   installmentId?: string

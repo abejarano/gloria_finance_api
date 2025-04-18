@@ -1,11 +1,16 @@
 import { DebtorType } from "./enums/DebtorType.enum"
 import { AccountsReceivableStatus } from "./enums/AccountsReceivableStatus.enum"
-import { Installments } from "./types/Installments.type"
+
 import { IdentifyEntity } from "@/Shared/adapter"
 import { DateBR } from "@/Shared/helpers"
 import { ICreateAccountReceivable } from "./interfaces/CreateAccountReceivable.interface"
-import { InstallmentsStatus } from "./enums/InstallmentsStatus.enum"
-import { AggregateRoot, AmountValue } from "@/Shared/domain"
+
+import {
+  AggregateRoot,
+  AmountValue,
+  Installments,
+  InstallmentsStatus,
+} from "@/Shared/domain"
 
 export class AccountReceivable extends AggregateRoot {
   protected amountTotal: number

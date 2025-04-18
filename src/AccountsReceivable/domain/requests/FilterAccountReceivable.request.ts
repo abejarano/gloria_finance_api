@@ -1,10 +1,6 @@
 import { AccountsReceivableStatus } from "@/AccountsReceivable/domain"
+import { ListParams } from "@/Shared/domain"
 
 export type FilterAccountReceivableRequest = {
-  churchId: string
-  startDate?: Date
-  endDate?: Date
   status?: AccountsReceivableStatus
-  page: number
-  perPage: number
-}
+} & ListParams

@@ -9,17 +9,22 @@ import {
 import { FilterAccountReceivableRequest } from "@/AccountsReceivable/domain"
 import PayAccountReceivableValidator from "@/AccountsReceivable/infrastructure/http/validators/PayAccountReceivable.validator"
 import { AmountValue } from "@/Shared/domain"
+import CreateAccountReceivableValidator from "@/AccountsReceivable/infrastructure/http/validators/CreateAccountReceivable.validator"
 
-const accountReceivableRoutes = Router()
+const accountsReceivableRoutes = Router()
 
-accountReceivableRoutes.post("/", PermissionMiddleware, async (req, res) => {
-  await CreateAccountReceivableController(
-    { ...req.body, churchId: req["user"].churchId },
-    res
-  )
-})
+accountsReceivableRoutes.post(
+  "/",
+  [PermissionMiddleware, CreateAccountReceivableValidator],
+  async (req, res) => {
+    await CreateAccountReceivableController(
+      { ...req.body, churchId: req["user"].churchId },
+      res
+    )
+  }
+)
 
-accountReceivableRoutes.get("", PermissionMiddleware, async (req, res) => {
+accountsReceivableRoutes.get("", PermissionMiddleware, async (req, res) => {
   await ListAccountReceivableController(
     {
       ...(req.query as unknown as FilterAccountReceivableRequest),
@@ -29,7 +34,7 @@ accountReceivableRoutes.get("", PermissionMiddleware, async (req, res) => {
   )
 })
 
-accountReceivableRoutes.post(
+accountsReceivableRoutes.post(
   "/pay",
   [PermissionMiddleware, PayAccountReceivableValidator],
   async (req, res) => {
@@ -55,4 +60,4 @@ accountReceivableRoutes.post(
   }
 )
 
-export default accountReceivableRoutes
+export default accountsReceivableRoutes
