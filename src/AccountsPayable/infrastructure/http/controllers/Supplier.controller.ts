@@ -12,7 +12,7 @@ export class SupplierController {
     try {
       res
         .status(HttpStatus.OK)
-        .json(
+        .send(
           await new AllSupplier(SupplierMongoRepository.getInstance()).execute(
             churchId
           )
