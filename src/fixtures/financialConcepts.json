@@ -96,6 +96,12 @@
     "active": true
   },
   {
+    "name": "Combustível e Transporte",
+    "description": "Despesas relacionadas à compra de combustível, transporte e mobilidade dos veículos da igreja para atividades ministeriais e administrativas",
+    "type": "OUTGO",
+    "active": true
+  },
+  {
     "name": "Programas de Assistência",
     "description": "Despesas destinadas a programas de assistência e caridade, como doações a instituições de caridade e projetos comunitários",
     "type": "OUTGO",
