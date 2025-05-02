@@ -1,0 +1,30 @@
+<div style="width: 100%;margin: 0 auto; text-align: left;">
+
+
+  <p>Conforme conversado previamente, estamos enviando o link para formalização do seu compromisso de pagamento
+    referente ao empréstimo no valor de <strong>{{symbol}} {{amount}}</strong> junto à <strong>{{church.name}}</strong>.
+  </p>
+
+  <h2>Detalhes do Compromisso:</h2>
+  <div class="details">
+    <ul>
+      <li><strong>Valor total:</strong> {{symbol}} {{amount}}</li>
+      <li><strong>Número de parcelas:</strong> {{installments.length}}</li>
+      <li><strong>Descrição:</strong> {{concept}}</li>
+      <li><strong>Data de vencimento:</strong> {{dueDate}}</li>
+    </ul>
+  </div>
+
+  <h2>Próximos Passos:</h2>
+  <div class="steps">
+    <ol>
+      <li>Clique no botão abaixo para visualizar o documento de compromisso</li>
+      <li>Ao abrir o documento, verifique se todos os seus dados estão corretos</li>
+      <li>Leia atentamente todas as cláusulas do contrato</li>
+      <li>Caso esteja de acordo com os termos, clique no botão "ACEITAR E ASSINAR" no final da página</li>
+      <li>Você receberá uma confirmação por e-mail com uma cópia do documento assinado</li>
+    </ol>
+  </div>
+
+  <a href="{{webapp}}/confirm-payment-commitment/{{token}}" class="button">VISUALIZAR E ASSINAR DOCUMENTO</a>
+</div>
