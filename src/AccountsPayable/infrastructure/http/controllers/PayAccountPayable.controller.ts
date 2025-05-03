@@ -50,37 +50,45 @@ export const PayAccountPayableController = async (
 const makeFinanceRecord = async (req: PayAccountPayableRequest) => {
   let voucher: string
 
-  if (req.file) {
-    voucher = await StorageGCP.getInstance(process.env.BUCKET_FILES).uploadFile(
-      req.file
-    )
+  try {
+    if (req.file) {
+      voucher = await StorageGCP.getInstance(
+        process.env.BUCKET_FILES
+      ).uploadFile(req.file)
+    }
+
+    req.concept = await FinancialConceptMongoRepository.getInstance().one({
+      name: "Contas a Pagar",
+      churchId: req.churchId,
+    })
+
+    const costCenter = await new FindCostCenterByCostCenterId(
+      FinancialConfigurationMongoRepository.getInstance()
+    ).execute(req.churchId, req.costCenterId)
+
+    req.financialTransactionId = (
+      await new RegisterFinancialRecord(
+        FinancialYearMongoRepository.getInstance(),
+        FinanceRecordMongoRepository.getInstance(),
+        FinancialConceptMongoRepository.getInstance(),
+        AvailabilityAccountMongoRepository.getInstance()
+      ).handle(
+        {
+          churchId: req.churchId,
+          availabilityAccountId: req.availabilityAccountId,
+          voucher,
+          amount: req.amount.getValue(),
+          date: new Date(),
+        },
+        req.concept,
+        costCenter
+      )
+    ).getFinancialRecordId()
+  } catch (e) {
+    if (voucher) {
+      await StorageGCP.getInstance(process.env.BUCKET_FILES).deleteFile(voucher)
+    }
+
+    throw new Error(e)
   }
-
-  req.concept = await FinancialConceptMongoRepository.getInstance().one({
-    name: "Contas a Pagar",
-    churchId: req.churchId,
-  })
-
-  const costCenter = await new FindCostCenterByCostCenterId(
-    FinancialConfigurationMongoRepository.getInstance()
-  ).execute(req.churchId, req.costCenterId)
-
-  req.financialTransactionId = (
-    await new RegisterFinancialRecord(
-      FinancialYearMongoRepository.getInstance(),
-      FinanceRecordMongoRepository.getInstance(),
-      FinancialConceptMongoRepository.getInstance(),
-      AvailabilityAccountMongoRepository.getInstance()
-    ).handle(
-      {
-        churchId: req.churchId,
-        availabilityAccountId: req.availabilityAccountId,
-        voucher,
-        amount: req.amount.getValue(),
-        date: new Date(),
-      },
-      req.concept,
-      costCenter
-    )
-  ).getFinancialRecordId()
 }
