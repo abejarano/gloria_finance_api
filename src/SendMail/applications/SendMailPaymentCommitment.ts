@@ -1,7 +1,6 @@
 import { Logger } from "@/Shared/adapter"
-import { IQueueService, QueueName } from "@/Shared/domain"
+import { Installments, IQueueService, QueueName } from "@/Shared/domain"
 import { TemplateEmail } from "@/SendMail/enum/templateEmail.enum"
-import { Installment } from "@/AccountsPayable/domain"
 
 export class SendMailPaymentCommitment {
   private logger = Logger(SendMailPaymentCommitment.name)
@@ -11,9 +10,9 @@ export class SendMailPaymentCommitment {
   execute(params: {
     symbol: string
     amount: number
-    installments: Installment[]
+    installments: Installments[]
     concept: string
-    dueDate: string
+    dueDate: Date
     token: string
     debtor: {
       name: string
@@ -23,6 +22,8 @@ export class SendMailPaymentCommitment {
       name: string
     }
   }) {
+    this.logger.info(`Start Send Mail Payment Commitment`, params)
+
     this.queueService.dispatch(QueueName.SendMail, {
       to: params.debtor.email,
       subject: "Compromisso de Pagamento",

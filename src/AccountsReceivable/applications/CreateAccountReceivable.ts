@@ -4,12 +4,14 @@ import {
   IAccountsReceivableRepository,
 } from "@/AccountsReceivable/domain"
 import { Logger } from "@/Shared/adapter"
+import { SendMailPaymentCommitment } from "@/SendMail/applications"
 
 export class CreateAccountReceivable {
-  private logger = Logger("CreateAccountReceivable")
+  private logger = Logger(CreateAccountReceivable.name)
 
   constructor(
-    private readonly accountReceivableRepository: IAccountsReceivableRepository
+    private readonly accountReceivableRepository: IAccountsReceivableRepository,
+    private readonly sendMailPaymentCommitment: SendMailPaymentCommitment
   ) {}
 
   async execute(
@@ -25,5 +27,22 @@ export class CreateAccountReceivable {
     await this.accountReceivableRepository.upsert(account)
 
     this.logger.info(`CreateAccountReceivable finish`)
+
+    //TODO refactor symbol
+    this.sendMailPaymentCommitment.execute({
+      symbol: "R$",
+      amount: account.getAmountPending(),
+      installments: account.getInstallments(),
+      concept: account.getDescription(),
+      dueDate: account.getDueDate(),
+      token: account.getToken(),
+      debtor: {
+        name: account.getDebtor().name,
+        email: account.getDebtor().email,
+      },
+      church: {
+        name: requestAccountReceivable.church.getName(),
+      },
+    })
   }
 }

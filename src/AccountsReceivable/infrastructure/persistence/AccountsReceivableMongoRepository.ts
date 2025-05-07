@@ -26,14 +26,10 @@ export class AccountsReceivableMongoRepository
     return this.buildPaginate<AccountReceivable>(result)
   }
 
-  async one(
-    accountReceivableId: string
-  ): Promise<AccountReceivable | undefined> {
+  async one(filter: object): Promise<AccountReceivable | undefined> {
     const collection = await this.collection()
 
-    const result = await collection.findOne({
-      accountReceivableId,
-    })
+    const result = await collection.findOne(filter)
 
     return result
       ? AccountReceivable.fromPrimitives({

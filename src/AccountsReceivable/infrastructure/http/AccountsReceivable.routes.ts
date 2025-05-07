@@ -2,6 +2,7 @@ import { Router } from "express"
 
 import { PermissionMiddleware } from "@/Shared/infrastructure"
 import {
+  ConfirmOrDenyPaymentCommitmentController,
   CreateAccountReceivableController,
   ListAccountReceivableController,
   PayAccountReceivableController,
@@ -57,6 +58,13 @@ accountsReceivableRoutes.post(
       },
       res
     )
+  }
+)
+
+accountsReceivableRoutes.patch(
+  "/confirm-payment-commitment",
+  async (req, res) => {
+    await ConfirmOrDenyPaymentCommitmentController(req.body, res)
   }
 )
 
