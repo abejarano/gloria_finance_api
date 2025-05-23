@@ -5,6 +5,7 @@ import { AccountsReceivableMongoRepository } from "@/AccountsReceivable/infrastr
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
 import { StorageGCP } from "@/Shared/infrastructure"
+import { HttpStatus } from "@/Shared/domain"
 
 export const ConfirmOrDenyPaymentCommitmentController = async (
   req: ConfirmOrDenyPaymentCommitmentRequest,
@@ -18,7 +19,7 @@ export const ConfirmOrDenyPaymentCommitmentController = async (
     ).execute(req)
 
     if (req.status !== "ACCEPTED") {
-      res.status(200).json({
+      res.status(HttpStatus.OK).json({
         message: "Payment commitment rejected successfully.",
       })
 
@@ -27,7 +28,7 @@ export const ConfirmOrDenyPaymentCommitmentController = async (
 
     const link = store.downloadFile(account.getContract())
 
-    res.status(200).json({
+    res.status(HttpStatus.OK).json({
       message: "Payment commitment accepted successfully.",
       contract: link,
     })

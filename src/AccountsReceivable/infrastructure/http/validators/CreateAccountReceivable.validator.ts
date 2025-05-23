@@ -13,11 +13,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     debtor: "required|object",
     "debtor.debtorType": "required|string|in:MEMBER,GROUP,EXTERNAL",
     "debtor.name": "required|string",
-    churchId: "required|string",
+    "debtor.email": "required|email",
     description: "required|string",
     installments: "required|array",
     "installments.*.amount": "required|numeric",
-    "installments.*.dueDate": "required|Date",
+    "installments.*.dueDate": "required|dateFormat:YYYY-MM-DD",
   }
 
   const v = new Validator(payload, rule)
