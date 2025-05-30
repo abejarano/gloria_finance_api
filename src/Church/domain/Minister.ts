@@ -1,8 +1,8 @@
-import { AggregateRoot } from "../../Shared/domain"
-import { IdentifyEntity } from "../../Shared/adapter"
+import { AggregateRoot } from "@/Shared/domain"
+import { IdentifyEntity } from "@/Shared/adapter"
 import { Church } from "./Church"
 import { MinisterType } from "./enums/MinisterType.enum"
-import { DateBR } from "../../Shared/helpers"
+import { DateBR } from "@/Shared/helpers"
 
 export class Minister extends AggregateRoot {
   private id?: string
@@ -79,6 +79,26 @@ export class Minister extends AggregateRoot {
 
   removeChurch() {
     this.churchId = undefined
+  }
+
+  getName(): string {
+    return this.name
+  }
+
+  getEmail(): string {
+    return this.email
+  }
+
+  getPhone(): string {
+    return this.phone
+  }
+
+  getMinisterType(): MinisterType {
+    return this.ministerType
+  }
+
+  getDNI(): string {
+    return this.dni
   }
 
   toPrimitives(): any {

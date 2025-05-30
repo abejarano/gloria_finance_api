@@ -17,9 +17,14 @@ export class SendMailPaymentCommitment {
     debtor: {
       name: string
       email: string
+      dni: string
     }
     church: {
       name: string
+      legalRepresentative: {
+        name: string
+        role: string
+      }
     }
   }) {
     this.logger.info(`Start Send Mail Payment Commitment`, params)

@@ -1,8 +1,9 @@
 import { IStorageService } from "@/Shared/domain"
 import puppeteer from "puppeteer"
 import { v4 } from "uuid"
-import path from "node:path"
+import * as path from "path"
 import { IHTMLAdapter } from "@/Shared/domain/interfaces/GenerateHTML.interface"
+import { Logger } from "@/Shared/adapter/CustomLogger"
 
 export abstract class GeneratePDFAdapter {
   protected htmlString: string
@@ -18,6 +19,8 @@ export abstract class GeneratePDFAdapter {
 }
 
 export class PuppeteerAdapter extends GeneratePDFAdapter {
+  private logger = Logger(PuppeteerAdapter.name)
+
   constructor(htmlAdapter: IHTMLAdapter, storeService: IStorageService) {
     super(htmlAdapter, storeService)
   }
@@ -29,6 +32,8 @@ export class PuppeteerAdapter extends GeneratePDFAdapter {
   }
 
   async toPDF(upload: boolean = true): Promise<string> {
+    this.logger.info("Generating PDF from HTML string")
+
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
 
@@ -44,8 +49,8 @@ export class PuppeteerAdapter extends GeneratePDFAdapter {
       margin: {
         top: "0.5in",
         bottom: "0.5in",
-        left: "1in",
-        right: "1in",
+        left: "0.5in",
+        right: "0.5in",
       },
     })
 

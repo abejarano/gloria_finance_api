@@ -1,11 +1,18 @@
 import { Response } from "express"
-import { ConfirmOrDenyPaymentCommitmentRequest } from "@/AccountsReceivable/domain"
+import {
+  ActionsPaymentCommitment,
+  ConfirmOrDenyPaymentCommitmentRequest,
+} from "@/AccountsReceivable/domain"
 import { ConfirmOrDenyPaymentCommitment } from "@/AccountsReceivable/applications"
 import { AccountsReceivableMongoRepository } from "@/AccountsReceivable/infrastructure/persistence/AccountsReceivableMongoRepository"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
 import { StorageGCP } from "@/Shared/infrastructure"
 import { HttpStatus } from "@/Shared/domain"
+import {
+  ChurchMongoRepository,
+  MinisterMongoRepository,
+} from "@/Church/infrastructure"
 
 export const ConfirmOrDenyPaymentCommitmentController = async (
   req: ConfirmOrDenyPaymentCommitmentRequest,
@@ -15,10 +22,12 @@ export const ConfirmOrDenyPaymentCommitmentController = async (
     const store = StorageGCP.getInstance(process.env.BUCKET_FILES)
     const account = await new ConfirmOrDenyPaymentCommitment(
       AccountsReceivableMongoRepository.getInstance(),
-      new PuppeteerAdapter(new HandlebarsHTMLAdapter(), store)
+      new PuppeteerAdapter(new HandlebarsHTMLAdapter(), store),
+      ChurchMongoRepository.getInstance(),
+      MinisterMongoRepository.getInstance()
     ).execute(req)
 
-    if (req.status !== "ACCEPTED") {
+    if (req.action === ActionsPaymentCommitment.DENIED) {
       res.status(HttpStatus.OK).json({
         message: "Payment commitment rejected successfully.",
       })
@@ -26,7 +35,7 @@ export const ConfirmOrDenyPaymentCommitmentController = async (
       return
     }
 
-    const link = store.downloadFile(account.getContract())
+    const link = await store.downloadFile(account.getContract())
 
     res.status(HttpStatus.OK).json({
       message: "Payment commitment accepted successfully.",

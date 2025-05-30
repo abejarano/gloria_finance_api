@@ -3,11 +3,11 @@ import {
   IChurchRepository,
   IMinisterRepository,
 } from "../../domain"
-import { GenericException } from "../../../Shared/domain"
-import { Logger } from "../../../Shared/adapter"
+import { GenericException } from "@/Shared/domain"
+import { Logger } from "@/Shared/adapter"
 
 export class AssignChurch {
-  private logger = Logger("AssignChurch")
+  private logger = Logger(AssignChurch.name)
 
   constructor(
     private readonly ministerRepository: IMinisterRepository,

@@ -39,9 +39,14 @@ export class CreateAccountReceivable {
       debtor: {
         name: account.getDebtor().name,
         email: account.getDebtor().email,
+        dni: account.getDebtor().debtorDNI,
       },
       church: {
         name: requestAccountReceivable.church.getName(),
+        legalRepresentative: {
+          name: "",
+          role: "",
+        },
       },
     })
   }

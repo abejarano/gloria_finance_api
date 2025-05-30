@@ -1,12 +1,13 @@
-<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Contrato de Compromisso de Pagamento</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Meow+Script&family=Pacifico&family=Yellowtail&display=swap"
-        rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Meow+Script&family=Pacifico&family=Yellowtail&display=swap"
+    rel="stylesheet"
+  />
 
   <style>
     body {
@@ -15,7 +16,9 @@
       line-height: 1.5;
     }
 
-    p, div, td {
+    p,
+    div,
+    td {
       text-align: justify;
     }
 
@@ -30,7 +33,8 @@
       margin-top: 20px;
     }
 
-    td, th {
+    td,
+    th {
       border: 1px solid #000;
       padding: 8px;
       text-align: left;
@@ -59,36 +63,49 @@
 <body>
 
 <h1>Contrato de Compromisso de Pagamento</h1>
-<br>
+<br />
 <h3>PARTES CONTRATANTES</h3>
-<p><strong>CREDOR:</strong><br>
-  {{church.name}}<br>
-  {{church.address}}<br>
-  {{church.taxId}}<br>
-  Representada legalmente por: {{church.legalRepresentative.name}} ({{church.legalRepresentative.role}})
+<p><strong>CREDOR:</strong><br />
+  {{church.name}}<br />
+  {{church.address}}<br />
+  {{church.taxId}}<br />
+  Representada legalmente por:
+  {{church.legalRepresentative.name}}
+  ({{church.legalRepresentative.role}})
 </p>
 
-<p><strong>DEVEDOR:</strong><br>
-  {{debtor.name}}<br>
-  Documento de Identidade: {{debtor.dni}}<br>
-  Endereço: {{debtor.address}}<br>
-  Telefone: {{debtor.phone}}<br>
-  E-mail: {{debtor.email}}
+<p><strong>DEVEDOR:</strong><br />
+  {{debtor.name}}<br />
+  Documento de Identidade:
+  {{debtor.dni}}<br />
+  Endereço:
+  {{debtor.address}}<br />
+  Telefone:
+  {{debtor.phone}}<br />
+  E-mail:
+  {{debtor.email}}
 </p>
 
 <h2>CLÁUSULAS CONTRATUAIS</h2>
 
-<p><strong>PRIMEIRA - OBJETO DO CONTRATO</strong><br>
-  Por meio do presente instrumento particular, o DEVEDOR reconhece expressamente assumir o compromisso de pagamento
-  referente a:
-  {{concept}} pela quantia de {{amountLiteral}} ({{symbol}} {{amount}}), valor que deverá ser quitado em sua totalidade
-  conforme estabelecido no presente contrato.
+<p><strong>PRIMEIRA - OBJETO DO CONTRATO</strong><br />
+  Por meio do presente instrumento particular, o DEVEDOR reconhece
+  expressamente assumir o compromisso de pagamento referente a:
+  {{concept}}
+  pela quantia de
+  {{amountLiteral}}
+  ({{symbol}}
+  {{amount}}), valor que deverá ser quitado em sua totalidade conforme
+  estabelecido no presente contrato.
 </p>
 
-<p><strong>SEGUNDA - MODALIDADE DE PAGAMENTO</strong><br>
-  O DEVEDOR compromete-se a pagar a totalidade do compromisso descrito na primeira cláusula
-  em {{installments.length}} {{#ifEquals installments.length 1}}
-    parcela única{{else}}parcelas{{/ifEquals}}, de acordo com o seguinte detalhamento:
+<p><strong>SEGUNDA - MODALIDADE DE PAGAMENTO</strong><br />
+  O DEVEDOR compromete-se a pagar a totalidade do compromisso descrito na
+  primeira cláusula em
+  {{installments.length}}
+  {{#ifEquals installments.length 1}}
+    parcela única{{else}}parcelas{{/ifEquals}}, de acordo com o seguinte
+  detalhamento:
 </p>
 
 <table>
@@ -112,37 +129,53 @@
   </tbody>
 </table>
 
-<p><strong>TERCEIRA - LOCAL E FORMA DE PAGAMENTO</strong><br>
-  O pagamento deverá ser realizado em dinheiro nas instalações de {{church.name}} localizadas em {{church.address}},
-  ou mediante depósito/transferência para a conta bancária:<br><br>
-  Banco: {{bank.name}}<br>
-  Titular: {{church.name}}<br>
-  Número da conta: {{bank.accountNumber}}<br>
-  Tipo de conta: {{bank.accountType}}
+<p><strong>TERCEIRA - LOCAL E FORMA DE PAGAMENTO</strong><br />
+  O pagamento deverá ser realizado em dinheiro nas instalações da
+  {{church.name}}
+  localizadas em
+  {{church.address}}, ou mediante depósito/transferência.
+  <!--  para a conta-->
+  <!--  bancária:<br /><br />-->
+  <!--  Banco:-->
+  <!--  {{bank.name}}<br />-->
+  <!--  Titular:-->
+  <!--  {{church.name}}<br />-->
+  <!--  Número da conta:-->
+  <!--  {{bank.accountNumber}}<br />-->
+  <!--  Tipo de conta:-->
+  <!--  {{bank.accountType}}-->
 </p>
 <p>
   {{instantPayment}}
 </p>
-<p><strong>QUARTA - DECLARAÇÃO DE CONSENTIMENTO</strong><br>
-  O DEVEDOR declara que assume esta obrigação de maneira livre, voluntária e sem qualquer coação, encontrando-se em
-  pleno
-  uso de suas faculdades mentais e com pleno conhecimento das implicações legais que este compromisso acarreta.
+<p><strong>QUARTA - DECLARAÇÃO DE CONSENTIMENTO</strong><br />
+  O DEVEDOR declara que assume esta obrigação de maneira livre, voluntária e
+  sem qualquer coação, encontrando-se em pleno uso de suas faculdades
+  mentais e com pleno conhecimento das implicações legais que este
+  compromisso acarreta.
 </p>
 
+<p>Em sinal de conformidade, as partes assinam o presente documento em duas
+  vias, aos
+  {{day}}
+  dias do mês
+  {{month}}
+  do ano de {{year}}.</p>
 
-<p>Em sinal de conformidade, as partes assinam o presente documento em duas vias, aos {{day}} dias do mês
-  de {{month}} do ano de 2025.</p>
-
-<br>
+<br />
 
 <div class="signature-block">
   <div class="signature">
-    {{church.legalRepresentative.role}}:<span class="signature-name">{{church.legalRepresentative.name}}</span><br>
-    CPF: {{debtor.dni}}
+    {{church.legalRepresentative.role}}:<span
+    class="signature-name"
+  >{{church.legalRepresentative.name}}</span><br />
+    CPF:
+    {{church.legalRepresentative.dni}}
   </div>
   <div class="signature">
-    <span class="signature-name">{{debtor.name}}</span><br>
-    CPF: {{debtor.dni}}
+    <span class="signature-name">{{debtor.name}}</span><br />
+    CPF:
+    {{debtor.dni}}
   </div>
 </div>
 
