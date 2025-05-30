@@ -9,7 +9,10 @@ import domainResponse from "@/Shared/helpers/domainResponse"
 import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
 import { StorageGCP } from "@/Shared/infrastructure"
 import { HttpStatus } from "@/Shared/domain"
-import { ChurchMongoRepository } from "@/Church/infrastructure"
+import {
+  ChurchMongoRepository,
+  MinisterMongoRepository,
+} from "@/Church/infrastructure"
 
 export const ConfirmOrDenyPaymentCommitmentController = async (
   req: ConfirmOrDenyPaymentCommitmentRequest,
@@ -20,7 +23,8 @@ export const ConfirmOrDenyPaymentCommitmentController = async (
     const account = await new ConfirmOrDenyPaymentCommitment(
       AccountsReceivableMongoRepository.getInstance(),
       new PuppeteerAdapter(new HandlebarsHTMLAdapter(), store),
-      ChurchMongoRepository.getInstance()
+      ChurchMongoRepository.getInstance(),
+      MinisterMongoRepository.getInstance()
     ).execute(req)
 
     if (req.action === ActionsPaymentCommitment.DENIED) {

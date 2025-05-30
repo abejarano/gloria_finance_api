@@ -18,6 +18,7 @@ type Debtor = {
   name: string
   phone: string
   email: string
+  address: string
 }
 
 export class AccountReceivable extends AggregateRoot {
@@ -82,6 +83,7 @@ export class AccountReceivable extends AggregateRoot {
         debtorDNI: debtor.debtorDNI || IdentifyEntity.get(`debtor`),
         name: debtor.name,
         email: debtor.email,
+        address: debtor.address,
       }
     }
 

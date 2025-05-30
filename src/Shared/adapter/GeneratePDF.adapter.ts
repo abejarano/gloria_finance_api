@@ -49,8 +49,8 @@ export class PuppeteerAdapter extends GeneratePDFAdapter {
       margin: {
         top: "0.5in",
         bottom: "0.5in",
-        left: "1in",
-        right: "1in",
+        left: "0.5in",
+        right: "0.5in",
       },
     })
 

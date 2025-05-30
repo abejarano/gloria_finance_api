@@ -9,6 +9,7 @@ export { IMinisterRepository } from "./interfaces/MinisterRepository.interface"
 export { ChurchNotFound } from "./exceptions/ChurchNotFound.exception"
 export { MemberNotFound } from "./exceptions/MemberNotFound.exception"
 export { MemberExist } from "./exceptions/MemberExist.exception"
+export { MinisterNotFound } from "./exceptions/MinisterNotFound.exception"
 
 export { ChurchDTO } from "./type/Church.dto.type"
 

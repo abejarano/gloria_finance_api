@@ -134,6 +134,10 @@ export class Church extends AggregateRoot {
     this.ministerId = undefined
   }
 
+  getAddress(): string {
+    return `${this.address}, ${this.street}, ${this.number}, ${this.postalCode}, ${this.city}`
+  }
+
   // getRegion(): Region {
   //   return this.region;
   // }

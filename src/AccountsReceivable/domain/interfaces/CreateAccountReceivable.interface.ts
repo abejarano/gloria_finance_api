@@ -8,6 +8,7 @@ export interface ICreateAccountReceivable {
     name: string
     phone: string
     email: string
+    address: string
   }
   accountReceivableId?: string
   churchId: string
