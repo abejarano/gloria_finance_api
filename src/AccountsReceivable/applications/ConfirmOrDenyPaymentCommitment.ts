@@ -1,19 +1,25 @@
 import {
   AccountReceivable,
   AccountReceivableNotFound,
+  ActionsPaymentCommitment,
   ConfirmOrDenyPaymentCommitmentRequest,
   IAccountsReceivableRepository,
 } from "@/AccountsReceivable/domain"
 import { GeneratePDFAdapter, Logger } from "@/Shared/adapter"
-import { Church } from "@/Church/domain"
+import { Church, IChurchRepository } from "@/Church/domain"
+import { FindChurchById } from "@/Church/applications"
 
 export class ConfirmOrDenyPaymentCommitment {
   private logger = Logger(ConfirmOrDenyPaymentCommitment.name)
+  private searchChurch: FindChurchById
 
   constructor(
     private readonly accountReceivableRepository: IAccountsReceivableRepository,
-    private readonly pdfAdapter: GeneratePDFAdapter
-  ) {}
+    private readonly pdfAdapter: GeneratePDFAdapter,
+    private readonly churchRepository: IChurchRepository
+  ) {
+    this.searchChurch = new FindChurchById(this.churchRepository)
+  }
 
   async execute(
     req: ConfirmOrDenyPaymentCommitmentRequest
@@ -29,11 +35,15 @@ export class ConfirmOrDenyPaymentCommitment {
       throw new AccountReceivableNotFound()
     }
 
-    const accepted = req.status === "ACCEPTED"
+    const church = await this.searchChurch.execute(account.getChurchId())
+
+    const accepted = req.action === ActionsPaymentCommitment.ACCEPTED
     account.accountAccepted(accepted)
 
+    this.logger.info(`Account Receivable found - Accepted?: ${accepted}`)
+
     if (accepted) {
-      await this.generateContract(account, req.church)
+      await this.generateContract(account, church)
     }
 
     await this.accountReceivableRepository.upsert(account)

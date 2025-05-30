@@ -1,7 +1,9 @@
-import { Church } from "@/Church/domain"
+export enum ActionsPaymentCommitment {
+  ACCEPTED = "ACCEPTED",
+  DENIED = "DENIED",
+}
 
 export type ConfirmOrDenyPaymentCommitmentRequest = {
   token: string
-  status: "ACCEPTED" | "DENIED"
-  church?: Church
+  action: ActionsPaymentCommitment
 }

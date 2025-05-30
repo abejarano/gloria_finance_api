@@ -119,6 +119,10 @@ export class AccountReceivable extends AggregateRoot {
     return this.token
   }
 
+  getChurchId(): string {
+    return this.churchId
+  }
+
   getInstallment(installmentId: string): Installments {
     return this.installments.find((i) => i.installmentId === installmentId)
   }

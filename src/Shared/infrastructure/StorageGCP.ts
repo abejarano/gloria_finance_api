@@ -48,6 +48,7 @@ export class StorageGCP implements IStorageService {
    * @param pathInFileStorage
    */
   async downloadFile(pathInFileStorage: string): Promise<string> {
+    this.logger.info(`Generating signed URL for file: ${pathInFileStorage}`)
     try {
       const bucket = this.storage.bucket(this.bucketName)
       const file = bucket.file(pathInFileStorage)

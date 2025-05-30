@@ -1,9 +1,12 @@
 import { IHTMLAdapter } from "@/Shared/domain/interfaces/GenerateHTML.interface"
 import * as handlebars from "handlebars"
-import fs from "node:fs"
+import * as fs from "fs"
 import { APP_DIR } from "@/app"
+import { Logger } from "@/Shared/adapter/CustomLogger"
 
 export class HandlebarsHTMLAdapter implements IHTMLAdapter {
+  private logger = Logger(HandlebarsHTMLAdapter.name)
+
   constructor() {
     handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
       return arg1 === arg2 ? options.fn(this) : options.inverse(this)
@@ -17,6 +20,8 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
   }
 
   generateHTML(templateName: string, data: any): string {
+    this.logger.info(`Generating HTML from template: ${templateName}`, data)
+
     const loadTemplate = (path: string) => {
       return fs.readFileSync(path, "utf8")
     }
