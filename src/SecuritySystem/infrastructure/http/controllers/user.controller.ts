@@ -3,17 +3,19 @@ import {
   CreateOrUpdateUser,
   MakeLogin,
 } from "../../../applications"
-import { UserMongoRepository } from "../../persistence/UserMongoRepository"
+import {
+  AuthTokenAdapter,
+  UserMongoRepository,
+} from "@/SecuritySystem/infrastructure"
 import { PasswordAdapter } from "../../adapters/Password.adapter"
-import { AuthTokenAdapter } from "../../adapters/AuthToken.adapter"
-import { HttpStatus } from "../../../../Shared/domain"
+import { HttpStatus } from "@/Shared/domain"
 
 import domainResponse from "../../../../Shared/helpers/domainResponse"
 import { CreateUserRequest, FilterUserRequest } from "../../../domain"
 import { FetchAllUsers } from "../../../applications/finder/FetchAllUsers"
-import { Logger } from "../../../../Shared/adapter"
+import { Logger } from "@/Shared/adapter"
 import { Response } from "express"
-import { SendEmailChangePassword } from "../../../../SendMail/applications"
+import { SendMailChangePassword } from "@/SendMail/applications"
 import randomString from "../../../../Shared/helpers/randomString"
 import { QueueService } from "@/Shared/infrastructure"
 
@@ -95,7 +97,7 @@ export const recoveryPassword = async (email: string, res: Response) => {
       new PasswordAdapter()
     ).execute(email, temporalPassword)
 
-    new SendEmailChangePassword(QueueService.getInstance()).execute(
+    new SendMailChangePassword(QueueService.getInstance()).execute(
       user,
       temporalPassword
     )

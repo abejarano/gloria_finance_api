@@ -12,7 +12,7 @@ import { IAvailabilityAccountRepository } from "@/Financial/domain/interfaces"
 import { PayInstallment } from "@/Shared/applications"
 
 export class PayAccountReceivable {
-  private logger = Logger("PayAccountReceivable")
+  private logger = Logger(PayAccountReceivable.name)
 
   constructor(
     private readonly availabilityAccountRepository: IAvailabilityAccountRepository,
@@ -24,7 +24,10 @@ export class PayAccountReceivable {
     this.logger.info(`Start Pay Account Receivable`, req)
 
     const accountReceivable: AccountReceivable =
-      await this.accountReceivableRepository.one(req.accountReceivableId)
+      await this.accountReceivableRepository.one({
+        accountReceivableId: req.accountReceivableId,
+      })
+
     if (!accountReceivable) {
       this.logger.debug(`Account Receivable not found`)
       throw new PayAccountReceivableNotFound()

@@ -1,9 +1,8 @@
 import nodemailer = require("nodemailer")
-import * as process from "process"
 
 import configEngineHTML from "./ConfigEngineHTML.service"
 import { Mail } from "../types/mail.type"
-import { Logger } from "../../Shared/adapter"
+import { Logger } from "@/Shared/adapter"
 
 const configTransportMail = async () => {
   const logger = Logger("configTransportMail")
@@ -39,6 +38,8 @@ export const SendMailService = async (payload: Mail) => {
 
   logger.info(`Configuraciones del email`)
 
+  const webapp = process.env.WEBAPP_URL
+
   const HelperOptions = {
     from: '"Gloria Finance" <gloriafinance@jaspesoft.com>',
     to: payload.to,
@@ -46,6 +47,7 @@ export const SendMailService = async (payload: Mail) => {
     template: `${payload.template}`,
     context: {
       ...payload.context,
+      webapp,
       client: payload.clientName,
       year: new Date().getFullYear(),
     },

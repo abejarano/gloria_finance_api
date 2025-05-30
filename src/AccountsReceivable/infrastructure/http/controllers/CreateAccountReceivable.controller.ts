@@ -2,8 +2,14 @@ import { AccountReceivableRequest } from "@/AccountsReceivable/domain"
 import { Response } from "express"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { CreateAccountReceivable } from "@/AccountsReceivable/applications"
-import { AccountsReceivableMongoRepository } from "@/AccountsReceivable/infrastructure/persistence/AccountsReceivableMongoRepository"
+import {
+  AccountsReceivableMongoRepository,
+} from "@/AccountsReceivable/infrastructure/persistence/AccountsReceivableMongoRepository"
 import { HttpStatus } from "@/Shared/domain"
+import { FindChurchById } from "@/Church/applications"
+import { ChurchMongoRepository } from "@/Church/infrastructure"
+import { SendMailPaymentCommitment } from "@/SendMail/applications"
+import { QueueService } from "@/Shared/infrastructure"
 
 /**
  * @function CreateAccountReceivableController
@@ -21,9 +27,15 @@ export const CreateAccountReceivableController = async (
   res: Response
 ): Promise<void> => {
   try {
+    const church = await new FindChurchById(
+      ChurchMongoRepository.getInstance()
+    ).execute(req.churchId)
+
     await new CreateAccountReceivable(
-      AccountsReceivableMongoRepository.getInstance()
-    ).execute(req)
+      AccountsReceivableMongoRepository.getInstance(),
+      new SendMailPaymentCommitment(QueueService.getInstance())
+    ).execute({ ...req, church: church })
+
     res
       .status(HttpStatus.CREATED)
       .json({ message: "Account receivable created successfully" })

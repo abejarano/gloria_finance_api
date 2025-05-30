@@ -11,6 +11,7 @@ export class FindChurchById {
 
     const church: Church = await this.churchRepository.one(churchId)
     if (!church) {
+      this.logger.debug(`Church not found`)
       throw new ChurchNotFound()
     }
 

@@ -12,7 +12,7 @@ import { Queues } from "@/queues"
 import userRoutes from "@/SecuritySystem/infrastructure/http/routes/user.routes"
 import reportsRouter from "@/Reports/infrastructure/http/routes"
 import purchaseRouter from "@/Purchases/infrastructure/http/routes"
-import { server, startServer } from "@/Shared/infrastructure/http/server"
+import { server, startServer } from "@/Shared/infrastructure/http/Server"
 import accountsReceivableRoutes from "@/AccountsReceivable/infrastructure/http/AccountsReceivable.routes"
 import groupAccountsPayableRoutes from "@/AccountsPayable/infrastructure/http/routes"
 

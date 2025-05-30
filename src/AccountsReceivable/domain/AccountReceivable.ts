@@ -12,24 +12,29 @@ import {
   InstallmentsStatus,
 } from "@/Shared/domain"
 
+type Debtor = {
+  debtorType: DebtorType
+  debtorDNI: string
+  name: string
+  phone: string
+  email: string
+}
+
 export class AccountReceivable extends AggregateRoot {
   protected amountTotal: number
   protected amountPaid: number
   private id?: string
-  private debtor: {
-    debtorType: DebtorType
-    debtorDNI: string
-    name: string
-    phone: string
-  }
+  private debtor: Debtor
   private accountReceivableId: string
   private churchId: string
   private description: string
   private amountPending: number
   private status: AccountsReceivableStatus
   private installments: Installments[]
+  private token: string
   private createdAt: Date
   private updatedAt: Date
+  private contract?: string
 
   static create(params: Partial<ICreateAccountReceivable>): AccountReceivable {
     const {
@@ -49,7 +54,7 @@ export class AccountReceivable extends AggregateRoot {
 
     accountReceivable.amountPaid = amountPaid
     accountReceivable.amountPending = amountPending
-    accountReceivable.status = AccountsReceivableStatus.PENDING
+    accountReceivable.status = AccountsReceivableStatus.PENDING_ACCEPTANCE
 
     let amountTotal: number = 0
     accountReceivable.installments = installments.map((i) => {
@@ -76,8 +81,13 @@ export class AccountReceivable extends AggregateRoot {
         debtorType: debtor.debtorType,
         debtorDNI: debtor.debtorDNI || IdentifyEntity.get(`debtor`),
         name: debtor.name,
+        email: debtor.email,
       }
     }
+
+    accountReceivable.token = Buffer.from(
+      JSON.stringify(accountReceivable.toPrimitives())
+    ).toString("base64")
 
     return accountReceivable
   }
@@ -96,6 +106,7 @@ export class AccountReceivable extends AggregateRoot {
     accountReceivable.createdAt = params.createdAt
     accountReceivable.updatedAt = params.updatedAt
     accountReceivable.debtor = params.debtor
+    accountReceivable.token = params.token
 
     return accountReceivable
   }
@@ -104,8 +115,24 @@ export class AccountReceivable extends AggregateRoot {
     return this.id
   }
 
+  getToken(): string {
+    return this.token
+  }
+
   getInstallment(installmentId: string): Installments {
     return this.installments.find((i) => i.installmentId === installmentId)
+  }
+
+  getInstallments(): Installments[] {
+    return this.installments
+  }
+
+  getDescription(): string {
+    return this.description
+  }
+
+  getDebtor(): Debtor {
+    return this.debtor
   }
 
   updateAmount(amountPaid: AmountValue) {
@@ -127,6 +154,25 @@ export class AccountReceivable extends AggregateRoot {
     return this.status
   }
 
+  getDueDate(): Date {
+    return this.installments[this.installments.length - 1].dueDate
+  }
+
+  accountAccepted(isAccepted: boolean) {
+    isAccepted
+      ? (this.status = AccountsReceivableStatus.PENDING)
+      : (this.status = AccountsReceivableStatus.DENIED)
+    this.updatedAt = DateBR()
+  }
+
+  setContract(contract: string) {
+    this.contract = contract
+  }
+
+  getContract(): string {
+    return this.contract
+  }
+
   toPrimitives() {
     return {
       status: this.status,
@@ -142,6 +188,8 @@ export class AccountReceivable extends AggregateRoot {
       amountPaid: this.amountPaid,
       amountPending: this.amountPending,
       installments: this.installments,
+      token: this.token,
+      contract: this.contract,
     }
   }
 }

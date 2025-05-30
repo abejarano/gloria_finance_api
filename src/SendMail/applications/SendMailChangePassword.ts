@@ -1,10 +1,10 @@
-import { IQueueService, QueueName } from "../../Shared/domain"
+import { IQueueService, QueueName } from "@/Shared/domain"
 import { TemplateEmail } from "../enum/templateEmail.enum"
-import { User } from "../../SecuritySystem/domain"
-import { Logger } from "../../Shared/adapter"
+import { User } from "@/SecuritySystem/domain"
+import { Logger } from "@/Shared/adapter"
 
-export class SendEmailChangePassword {
-  private logger = Logger("SendEmailChangePassword")
+export class SendMailChangePassword {
+  private logger = Logger(SendMailChangePassword.name)
 
   constructor(private readonly queueService: IQueueService) {}
 

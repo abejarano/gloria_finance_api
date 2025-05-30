@@ -1,6 +1,6 @@
 import { APP_DIR } from "@/app"
 import { Logger } from "@/Shared/adapter"
-import hbs = require("nodemailer-express-handlebars")
+import nodemailerExpressHbs from "nodemailer-express-handlebars"
 
 export default async (transport: any) => {
   const logger = Logger("ConfigEngineHTML")
@@ -20,7 +20,8 @@ export default async (transport: any) => {
     viewPath: `${APP_DIR}/SendMail/templates`,
     extName: ".hbs",
   }
-  const configHbs = hbs(handlebarOptions)
+
+  const configHbs = nodemailerExpressHbs(handlebarOptions)
 
   transport.use("compile", configHbs)
 }

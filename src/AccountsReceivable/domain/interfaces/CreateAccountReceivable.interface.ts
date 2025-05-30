@@ -7,6 +7,7 @@ export interface ICreateAccountReceivable {
     debtorDNI?: string
     name: string
     phone: string
+    email: string
   }
   accountReceivableId?: string
   churchId: string

@@ -1,1 +1,2 @@
-export { SendEmailChangePassword } from "./SendEmailChangePassword"
+export { SendMailChangePassword } from "./SendMailChangePassword"
+export * from "./SendMailPaymentCommitment"
