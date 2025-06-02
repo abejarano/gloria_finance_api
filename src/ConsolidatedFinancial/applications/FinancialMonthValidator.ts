@@ -1,7 +1,8 @@
 import { IFinancialYearRepository } from "../domain"
 import { FinancialMonthIsClosed } from "../domain/exceptions"
 
-import { Logger } from "../../Shared/adapter"
+import { Logger } from "@/Shared/adapter"
+import { GenericException } from "@/Shared/domain"
 
 export class FinancialMonthValidator {
   private logger = Logger("FinancialMonthValidator")
@@ -26,7 +27,7 @@ export class FinancialMonthValidator {
 
     if (!financialMonth) {
       this.logger.info(`Financial month not found`, financialMonth)
-      throw new Error("Financial month not found")
+      throw new GenericException("Financial month not found")
     }
 
     if (financialMonth.isClosed()) {

@@ -79,6 +79,7 @@ const makeFinanceRecord = async (req: PayAccountPayableRequest) => {
           voucher,
           amount: req.amount.getValue(),
           date: new Date(),
+          description: `pagamento de conta a pagar: parcela: ${req.installmentIds.join(",")}`,
         },
         req.concept,
         costCenter
