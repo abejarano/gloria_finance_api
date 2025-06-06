@@ -1,5 +1,6 @@
 export { SearchCostCenterByChurchId } from "./costCenter/SearchCostCenterByChurchId"
 export { FindCostCenterByCostCenterId } from "./costCenter/FindCostCenterByCostCenterId"
+export { CreateOrUpdateFinancialConcept } from "./financialConcept/CreateOrUpdateFinancialConcept"
 
 export { FinBankByBankId } from "./bank/FinBankByBankId"
 export { SearchBankByChurchId } from "./bank/SearchBankByChurchId"

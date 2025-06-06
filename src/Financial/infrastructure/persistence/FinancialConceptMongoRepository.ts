@@ -20,15 +20,9 @@ export class FinancialConceptMongoRepository
     return "financial_concepts"
   }
 
-  async findFinancialConceptByChurchIdAndFinancialConceptId(
-    churchId: string,
-    financialConceptId: string
-  ): Promise<FinancialConcept | undefined> {
+  async one(filter: object): Promise<FinancialConcept | undefined> {
     const collection = await this.collection()
-    const result = await collection.findOne({
-      churchId,
-      financialConceptId,
-    })
+    const result = await collection.findOne(filter)
 
     if (!result) {
       return undefined
@@ -73,19 +67,5 @@ export class FinancialConceptMongoRepository
 
   async upsert(financialConcept: FinancialConcept): Promise<void> {
     await this.persist(financialConcept.getId(), financialConcept)
-  }
-
-  async one(params: Object): Promise<FinancialConcept | undefined> {
-    const collection = await this.collection()
-    const document = await collection.findOne(params)
-
-    if (!document) {
-      return undefined
-    }
-
-    return FinancialConcept.fromPrimitives({
-      ...document,
-      id: document._id,
-    })
   }
 }

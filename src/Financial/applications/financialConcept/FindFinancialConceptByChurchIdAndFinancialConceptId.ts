@@ -15,11 +15,10 @@ export class FindFinancialConceptByChurchIdAndFinancialConceptId {
       financialConceptId,
     })
 
-    const financialConcept =
-      await this.financialConceptRepository.findFinancialConceptByChurchIdAndFinancialConceptId(
-        churchId,
-        financialConceptId
-      )
+    const financialConcept = await this.financialConceptRepository.one({
+      churchId,
+      financialConceptId,
+    })
 
     if (!financialConcept) {
       this.logger.error(`Financial concept not found`)

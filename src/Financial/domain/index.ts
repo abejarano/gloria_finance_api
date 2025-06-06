@@ -35,5 +35,6 @@ export {
 export { FilterFinanceRecordRequest } from "./requests/FilterFinanceRecord.request"
 export { AvailabilityAccountRequest } from "./requests/AvailabilityAccount.request"
 export { UpdateAvailabilityAccountBalanceRequest } from "./requests/UpdateAvailabilityAccountBalance.request"
+export { FinancialConceptRequest } from "./requests/FinancialConcept.request"
 
 export { IFinanceRecordDTO } from "./interfaces/FinanceRecordDTO.interface"

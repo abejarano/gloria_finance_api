@@ -5,10 +5,9 @@ import bankBRValidator from "../validators/BankBR.validator"
 import {
   AvailabilityAccountRequest,
   BankRequest,
-  ConceptType,
   CostCenterRequest,
 } from "../../../domain"
-import { PermissionMiddleware } from "../../../../Shared/infrastructure"
+import { PermissionMiddleware } from "@/Shared/infrastructure"
 import AvailabilityAccountValidator from "../validators/AvailabilityAccount.validator"
 import {
   createOrUpdateAvailabilityAccount,
@@ -71,29 +70,6 @@ financialConfigurationRoute.get("/bank/data/:bankId", async (req, res) => {
     res
   )
 })
-
-financialConfigurationRoute.get(
-  "/financial-concepts/:churchId/:typeConcept",
-  PermissionMiddleware,
-  async (req, res) => {
-    await FinancialConfigurationController.findFinancialConceptsByChurchIdAndTypeConcept(
-      req.params.churchId,
-      res,
-      req.params.typeConcept as ConceptType
-    )
-  }
-)
-
-financialConfigurationRoute.get(
-  "/financial-concepts/:churchId",
-  PermissionMiddleware,
-  async (req, res) => {
-    await FinancialConfigurationController.findFinancialConceptsByChurchIdAndTypeConcept(
-      req.params.churchId,
-      res
-    )
-  }
-)
 
 financialConfigurationRoute.post(
   "/availability-account",

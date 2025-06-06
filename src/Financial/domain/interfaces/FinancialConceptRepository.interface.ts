@@ -1,11 +1,7 @@
-import { FinancialConcept } from "../FinancialConcept"
-import { ConceptType } from "../enums/ConcepType.enum"
+import { ConceptType, FinancialConcept } from "@/Financial/domain"
 
 export interface IFinancialConceptRepository {
-  findFinancialConceptByChurchIdAndFinancialConceptId(
-    churchId: string,
-    financialConceptId: string
-  ): Promise<FinancialConcept | undefined>
+  one(filter: object): Promise<FinancialConcept | undefined>
 
   findFinancialConceptsByChurchId(churchId: string): Promise<FinancialConcept[]>
 
