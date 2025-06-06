@@ -30,6 +30,7 @@ export const ConfirmOrDenyPaymentCommitmentController = async (
     if (req.action === ActionsPaymentCommitment.DENIED) {
       res.status(HttpStatus.OK).json({
         message: "Payment commitment rejected successfully.",
+        contract: "",
       })
 
       return
