@@ -1,3 +1,10 @@
+# Que es Church Finance
+
+Church Finance API es una solución moderna y flexible para la gestión financiera de iglesias. Permite administrar
+miembros, donaciones, conceptos financieros y notificaciones de manera eficiente y segura.
+
+¡Optimiza la administración de tu iglesia con tecnología de vanguardia!
+
 # Stack
 
 - [`node v22`](https://nodejs.org/)
