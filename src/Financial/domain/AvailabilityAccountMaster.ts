@@ -1,4 +1,4 @@
-import { AggregateRoot } from "../../Shared/domain"
+import { AggregateRoot } from "@/Shared/domain"
 import IdentifyAvailabilityAccountMaster from "../applications/helpers/MasterBalanceIdentifier"
 import { AvailabilityAccount } from "./AvailabilityAccount"
 
@@ -8,6 +8,7 @@ export class AvailabilityAccountMaster extends AggregateRoot {
   private availabilityAccount: {
     availabilityAccountId: string
     accountName: string
+    symbol: string
   }
   private availabilityAccountMasterId: string
   private month: number
@@ -25,6 +26,7 @@ export class AvailabilityAccountMaster extends AggregateRoot {
     availabilityAccountMaster.availabilityAccount = {
       availabilityAccountId: availabilityAccount.getAvailabilityAccountId(),
       accountName: availabilityAccount.getAccountName(),
+      symbol: availabilityAccount.getSymbol(),
     }
     availabilityAccount.getAvailabilityAccountId()
     availabilityAccountMaster.availabilityAccountMasterId =
