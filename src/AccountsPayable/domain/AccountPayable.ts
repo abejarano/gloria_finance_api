@@ -116,6 +116,10 @@ export class AccountPayable extends AggregateRoot {
     return this.status
   }
 
+  getChurchId() {
+    return this.churchId
+  }
+
   toPrimitives() {
     return {
       status: this.status,

@@ -72,9 +72,8 @@ export class PayAccountPayable {
 
     new DispatchUpdateCostCenterMaster(this.queueService).execute({
       churchId: accountPayable.getChurchId(),
-      costCenterId: accountPayable.getCostCenterId(),
+      costCenterId: req.costCenterId,
       amount: req.amount.getValue(),
-      createdAt: new Date(req.createdAt),
     })
 
     this.logger.info(`Finished Pay Account Payable`)
