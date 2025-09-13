@@ -1,5 +1,5 @@
 import { ConceptType } from "../../domain"
-import { ChurchNotFound, IChurchRepository } from "../../../Church/domain"
+import { ChurchNotFound, IChurchRepository } from "@/Church/domain"
 import { IFinancialConceptRepository } from "../../domain/interfaces"
 
 export class FindFinancialConceptsByChurchIdAndTypeConcept {
@@ -14,14 +14,11 @@ export class FindFinancialConceptsByChurchIdAndTypeConcept {
       throw new ChurchNotFound()
     }
 
+    let filter = { churchId }
     if (typeConcept) {
-      return await this.financialConceptRepository.findFinancialConceptsByChurchIdAndTypeConcept(
-        churchId,
-        typeConcept
-      )
+      filter["type"] = typeConcept
     }
-    return await this.financialConceptRepository.findFinancialConceptsByChurchId(
-      churchId
-    )
+
+    return await this.financialConceptRepository.listByCriteria(filter)
   }
 }

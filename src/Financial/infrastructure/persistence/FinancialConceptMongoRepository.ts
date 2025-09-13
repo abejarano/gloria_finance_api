@@ -1,5 +1,5 @@
 import { MongoRepository } from "@/Shared/infrastructure"
-import { ConceptType, FinancialConcept } from "../../domain"
+import { FinancialConcept } from "../../domain"
 import { IFinancialConceptRepository } from "../../domain/interfaces"
 
 export class FinancialConceptMongoRepository
@@ -34,28 +34,9 @@ export class FinancialConceptMongoRepository
     })
   }
 
-  async findFinancialConceptsByChurchId(
-    churchId: string
-  ): Promise<FinancialConcept[]> {
+  async listByCriteria(filter: object): Promise<FinancialConcept[]> {
     const collection = await this.collection()
-    const result = await collection.find({ churchId }).toArray()
-
-    return result.map((concept) =>
-      FinancialConcept.fromPrimitives({
-        ...concept,
-        id: concept._id,
-      })
-    )
-  }
-
-  async findFinancialConceptsByChurchIdAndTypeConcept(
-    churchId: string,
-    typeConcept: ConceptType
-  ): Promise<FinancialConcept[]> {
-    const collection = await this.collection()
-    const result = await collection
-      .find({ churchId, type: typeConcept })
-      .toArray()
+    const result = await collection.find(filter).sort({ name: 1 }).toArray()
 
     return result.map((concept) =>
       FinancialConcept.fromPrimitives({

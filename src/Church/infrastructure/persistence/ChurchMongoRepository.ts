@@ -8,10 +8,6 @@ export class ChurchMongoRepository
 {
   private static instance: ChurchMongoRepository
 
-  constructor() {
-    super()
-  }
-
   static getInstance(): ChurchMongoRepository {
     if (ChurchMongoRepository.instance) {
       return ChurchMongoRepository.instance
