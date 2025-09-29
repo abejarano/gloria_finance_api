@@ -1,13 +1,11 @@
-import {
-  AccountPayable,
-  FilterAccountPayableRequest,
-} from "@/AccountsPayable/domain"
+import { AccountPayable, FilterAccountPayableRequest, } from "@/AccountsPayable/domain"
 import { Response } from "express"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { ListAccountsPayable } from "@/AccountsPayable/applications"
 import { Logger } from "@/Shared/adapter"
-import { HttpStatus, Paginate } from "@/Shared/domain"
+import { HttpStatus } from "@/Shared/domain"
 import { AccountsPayableMongoRepository } from "@/AccountsPayable/infrastructure/persistence"
+import { Paginate } from "@abejarano/ts-mongodb-criteria"
 
 /**
  * @function ListAccountPayableController

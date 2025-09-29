@@ -1,13 +1,13 @@
 import { Response } from "express"
-import {
-  AccountReceivable,
-  FilterAccountReceivableRequest,
-} from "@/AccountsReceivable/domain"
+import { AccountReceivable, FilterAccountReceivableRequest, } from "@/AccountsReceivable/domain"
 import { ListAccountReceivable } from "@/AccountsReceivable/applications"
-import { HttpStatus, Paginate } from "@/Shared/domain"
+import { HttpStatus } from "@/Shared/domain"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { Logger } from "@/Shared/adapter"
-import { AccountsReceivableMongoRepository } from "@/AccountsReceivable/infrastructure/persistence/AccountsReceivableMongoRepository"
+import {
+  AccountsReceivableMongoRepository
+} from "@/AccountsReceivable/infrastructure/persistence/AccountsReceivableMongoRepository"
+import { Paginate } from "@abejarano/ts-mongodb-criteria"
 
 /**
  * @function ListAccountReceivableController

@@ -19,6 +19,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "@abejarano/ts-mongodb-criteria": "^1.0.7",
     "@bull-board/express": "^6.5.4",
     "@google-cloud/logging": "^11.2.0",
     "@google-cloud/pubsub": "^4.3.3",

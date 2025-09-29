@@ -3,8 +3,8 @@ import rateLimit from "express-rate-limit"
 import { Logger, RequestContext } from "@/Shared/adapter"
 import { v4 } from "uuid"
 import { Express } from "express"
-import { MongoClientFactory } from "@/Shared/infrastructure"
 import { QueueService } from "@/Shared/infrastructure/queue/QueueService"
+import { MongoClientFactory } from "@abejarano/ts-mongodb-criteria"
 import cors = require("cors")
 import express = require("express")
 import fileUpload = require("express-fileupload")
