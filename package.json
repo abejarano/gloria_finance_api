@@ -49,6 +49,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.3",
+    "@types/express-fileupload": "^1.5.1",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.11.30",
     "@types/node-cron": "^3.0.11",

@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express"
-import { PermissionMiddleware } from "../../../../Shared/infrastructure"
+import { PermissionMiddleware } from "@/Shared/infrastructure"
 import {
   listPurchasesController,
   recordPurchaseController,
