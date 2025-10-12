@@ -33,7 +33,7 @@ const routesModule = new RoutesModule([
 ])
 
 const server = BootstrapStandardServer(
-  Number(process.env.PORT || 8080),
+  Number(process.env.APP_PORT || 8080),
   routesModule
 )
 
