@@ -89,8 +89,8 @@ export class SearchFinanceRecord {
     return new Criteria(
       Filters.fromValues(filters),
       Order.fromValues("date", OrderTypes.DESC),
-      request.perPage,
-      request.page
+      Number(request.perPage),
+      Number(request.page)
     )
   }
 }

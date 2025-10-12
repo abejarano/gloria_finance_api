@@ -70,8 +70,8 @@ export class ListAccountsPayable {
     return new Criteria(
       Filters.fromValues(filters),
       Order.fromValues("createdAt", OrderTypes.DESC),
-      request.perPage,
-      request.page
+      Number(request.perPage),
+      Number(request.page)
     )
   }
 }

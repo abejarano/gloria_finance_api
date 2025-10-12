@@ -85,8 +85,8 @@ export class ListContributions {
     return new Criteria(
       Filters.fromValues(filters),
       Order.fromValues("createdAt", OrderTypes.DESC),
-      reqFilters.perPage,
-      reqFilters.page
+      Number(reqFilters.perPage),
+      Number(reqFilters.page)
     )
   }
 }

@@ -43,8 +43,8 @@ export class SearchMembers {
     return new Criteria(
       Filters.fromValues(filters),
       Order.fromValues("members.name", OrderTypes.DESC),
-      request.perPage,
-      request.page
+      Number(request.perPage),
+      Number(request.page)
     )
   }
 }

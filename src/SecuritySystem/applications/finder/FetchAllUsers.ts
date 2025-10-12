@@ -56,8 +56,8 @@ export class FetchAllUsers {
     return new Criteria(
       Filters.fromValues(filters),
       Order.fromValues("createdAt", OrderTypes.DESC),
-      20,
-      reqFilter.page
+      Number(reqFilter?.perPage || 20),
+      Number(reqFilter.page)
     )
   }
 }

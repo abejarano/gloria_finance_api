@@ -47,8 +47,8 @@ export class SearchChurches {
     return new Criteria(
       Filters.fromValues(filters),
       Order.fromValues("createdAt", OrderTypes.DESC),
-      requestChurch.perPage,
-      requestChurch.page
+      Number(requestChurch.perPage),
+      Number(requestChurch.page)
     )
   }
 }
