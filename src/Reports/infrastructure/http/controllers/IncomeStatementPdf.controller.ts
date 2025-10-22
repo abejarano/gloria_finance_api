@@ -29,7 +29,7 @@ export const IncomeStatementPdfController = async (
     const month = incomeStatement.period.month ?? req.month
     const fileName = `financial-report-${year}${
       month ? `-${month}` : ""
-    }.pdf`.replace(/\s+/g, "-")
+    }.pdf`
 
     res.download(pdfPath, fileName, (error) => {
       fs.unlink(pdfPath, () => undefined)
