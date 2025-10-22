@@ -19,11 +19,15 @@ export class NoOpStorage implements IStorageService {
   }
 
   async uploadFile(): Promise<string> {
-    throw new Error("Upload not supported in NoOpStorage")
+    throw new Error(
+      "Upload not supported in NoOpStorage. NoOpStorage is intended for operations that do not require cloud storage. If you need to upload files to cloud storage, please use an appropriate storage implementation."
+    )
   }
 
   async downloadFile(): Promise<string> {
-    throw new Error("Download not supported in NoOpStorage")
+    throw new Error(
+      "Download not supported in NoOpStorage. NoOpStorage is intended for operations that do not require cloud storage. If you need to download files from cloud storage, please use an appropriate storage implementation."
+    )
   }
 
   async deleteFile(): Promise<void> {

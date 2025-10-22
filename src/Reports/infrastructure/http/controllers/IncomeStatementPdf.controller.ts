@@ -27,9 +27,7 @@ export const IncomeStatementPdfController = async (
 
     const year = incomeStatement.period.year ?? req.year
     const month = incomeStatement.period.month ?? req.month
-    const fileName = `financial-report-${year}${
-      month ? `-${month}` : ""
-    }.pdf`
+    const fileName = `financial-report-${year}${month ? `-${month}` : ""}.pdf`
 
     res.download(pdfPath, fileName, (error) => {
       fs.unlink(pdfPath, () => undefined)
