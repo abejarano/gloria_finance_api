@@ -2,8 +2,8 @@
   :root {
     color-scheme: light;
     font-family: "Segoe UI", Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .report {
@@ -19,7 +19,7 @@
   }
 
   .header h1 {
-    font-size: 28px;
+    font-size: 20px;
     margin: 0;
     color: #20364b;
   }
@@ -27,26 +27,26 @@
   .header p {
     margin: 4px 0;
     color: #52606d;
-    font-size: 15px;
+    font-size: 12px;
   }
 
   .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    margin-bottom: 32px;
+    gap: 10px;
+    margin-bottom: 28px;
   }
 
   .summary-card {
     border: 1px solid #d9e2ec;
     border-radius: 8px;
-    padding: 12px;
+    padding: 10px;
     background: #f7f9fc;
   }
 
   .summary-card .label {
     display: block;
-    font-size: 13px;
+    font-size: 11px;
     color: #52606d;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -55,24 +55,28 @@
 
   .summary-card .value {
     display: block;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 600;
     color: #20364b;
   }
 
+  .summary-card .value.negative {
+    color: #b42318;
+  }
+
   .summary-card .caption {
     display: block;
-    font-size: 12px;
+    font-size: 10px;
     color: #7b8794;
-    margin-top: 6px;
+    margin-top: 4px;
   }
 
   section {
-    margin-bottom: 36px;
+    margin-bottom: 30px;
   }
 
   section h2 {
-    font-size: 20px;
+    font-size: 16px;
     margin-bottom: 12px;
     color: #20364b;
   }
@@ -86,8 +90,9 @@
   th,
   td {
     border: 1px solid #d9e2ec;
-    padding: 10px;
+    padding: 6px 9px;
     text-align: left;
+    font-size: 12px;
   }
 
   th {
@@ -95,21 +100,31 @@
     color: #334e68;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 12px;
+    font-size: 10px;
   }
 
   tr:nth-child(even) td {
     background: #f7f9fc;
   }
 
+  .number-cell {
+    text-align: right;
+    font-feature-settings: "tnum";
+  }
+
+  .negative {
+    color: #b42318;
+    font-weight: 600;
+  }
+
   .totals {
-    font-size: 14px;
+    font-size: 12px;
     color: #334e68;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .footnote {
-    font-size: 12px;
+    font-size: 10px;
     color: #7b8794;
     text-align: center;
   }
@@ -131,22 +146,30 @@
       <div class="summary-grid">
         <div class="summary-card">
           <span class="label">Receita Líquida</span>
-          <span class="value">{{formatCurrency summary.revenue}}</span>
+          <span class="value {{#if (isNegative summary.revenue)}}negative{{/if}}">
+            {{formatCurrency summary.revenue}}
+          </span>
           <span class="caption">Entradas provenientes das atividades regulares.</span>
         </div>
         <div class="summary-card">
           <span class="label">Despesas Operacionais</span>
-          <span class="value">{{formatCurrency summary.operatingExpenses}}</span>
+          <span class="value {{#if (isNegative summary.operatingExpenses)}}negative{{/if}}">
+            {{formatCurrency summary.operatingExpenses}}
+          </span>
           <span class="caption">Custos necessários para manter a igreja ativa.</span>
         </div>
         <div class="summary-card">
           <span class="label">Resultado Operacional</span>
-          <span class="value">{{formatCurrency summary.operatingIncome}}</span>
+          <span class="value {{#if (isNegative summary.operatingIncome)}}negative{{/if}}">
+            {{formatCurrency summary.operatingIncome}}
+          </span>
           <span class="caption">Receitas menos despesas operacionais.</span>
         </div>
         <div class="summary-card">
           <span class="label">Resultado Líquido</span>
-          <span class="value">{{formatCurrency summary.netIncome}}</span>
+          <span class="value {{#if (isNegative summary.netIncome)}}negative{{/if}}">
+            {{formatCurrency summary.netIncome}}
+          </span>
           <span class="caption">Saldo final após itens extraordinários.</span>
         </div>
       </div>
@@ -169,9 +192,15 @@
           {{#each breakdown}}
             <tr>
               <td>{{translateCategory category}}</td>
-              <td>{{formatCurrency income}}</td>
-              <td>{{formatCurrency expenses}}</td>
-              <td>{{formatCurrency net}}</td>
+              <td class="number-cell {{#if (isNegative income)}}negative{{/if}}">
+                {{formatCurrency income}}
+              </td>
+              <td class="number-cell {{#if (isNegative expenses)}}negative{{/if}}">
+                {{formatCurrency expenses}}
+              </td>
+              <td class="number-cell {{#if (isNegative net)}}negative{{/if}}">
+                {{formatCurrency net}}
+              </td>
             </tr>
           {{/each}}
         </tbody>
@@ -204,9 +233,15 @@
             {{#each accounts}}
               <tr>
                 <td>{{availabilityAccount.accountName}}</td>
-                <td>{{formatCurrency totalInput}}</td>
-                <td>{{formatCurrency totalOutput}}</td>
-                <td>{{formatCurrency (subtract totalInput totalOutput)}}</td>
+                <td class="number-cell {{#if (isNegative totalInput)}}negative{{/if}}">
+                  {{formatCurrency totalInput}}
+                </td>
+                <td class="number-cell {{#if (isNegative totalOutput)}}negative{{/if}}">
+                  {{formatCurrency totalOutput}}
+                </td>
+                <td class="number-cell {{#if (isNegative (subtract totalInput totalOutput))}}negative{{/if}}">
+                  {{formatCurrency (subtract totalInput totalOutput)}}
+                </td>
               </tr>
             {{/each}}
           </tbody>
@@ -232,7 +267,9 @@
             {{#each costCenters}}
               <tr>
                 <td>{{costCenter.costCenterName}}</td>
-                <td>{{formatCurrency total}}</td>
+                <td class="number-cell {{#if (isNegative total)}}negative{{/if}}">
+                  {{formatCurrency total}}
+                </td>
                 <td>{{lastMove}}</td>
               </tr>
             {{/each}}

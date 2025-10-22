@@ -44,7 +44,17 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
       const numericValue = Number(value)
       const safeValue = Number.isFinite(numericValue) ? numericValue : 0
 
+      if (safeValue < 0) {
+        return `(${brlFormatter.format(Math.abs(safeValue))})`
+      }
+
       return brlFormatter.format(safeValue)
+    })
+
+    handlebars.registerHelper("isNegative", (value: unknown) => {
+      const numericValue = Number(value)
+
+      return Number.isFinite(numericValue) && numericValue < 0
     })
 
     handlebars.registerHelper("translateCategory", (category: string) => {
