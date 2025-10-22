@@ -1,5 +1,5 @@
 import { IStorageService } from "@/Shared/domain"
-import puppeteer from "puppeteer"
+import puppeteer, { Browser, LaunchOptions } from "puppeteer"
 import { v4 } from "uuid"
 import * as path from "path"
 import { IHTMLAdapter } from "@/Shared/domain/interfaces/GenerateHTML.interface"
@@ -34,7 +34,7 @@ export class PuppeteerAdapter extends GeneratePDFAdapter {
   async toPDF(upload: boolean = true): Promise<string> {
     this.logger.info("Generating PDF from HTML string")
 
-    const browser = await puppeteer.launch()
+    const browser = await this.launchBrowser()
     const page = await browser.newPage()
 
     await page.setContent(this.htmlString)
@@ -65,5 +65,60 @@ export class PuppeteerAdapter extends GeneratePDFAdapter {
       name: pdfName,
       mimetype: "application/pdf",
     })
+  }
+
+  private async launchBrowser(): Promise<Browser> {
+    const disableSandbox = this.shouldDisableSandbox()
+    const launchOptions = this.buildLaunchOptions(disableSandbox)
+
+    try {
+      return await puppeteer.launch(launchOptions)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : ""
+
+      if (!disableSandbox && message.includes("No usable sandbox")) {
+        this.logger.error(
+          "Retrying Puppeteer launch without sandbox due to environment restrictions"
+        )
+
+        return await puppeteer.launch(this.buildLaunchOptions(true))
+      }
+
+      throw error
+    }
+  }
+
+  private buildLaunchOptions(disableSandbox: boolean): LaunchOptions {
+    const options: LaunchOptions = {
+      headless: true,
+    }
+
+    if (disableSandbox) {
+      options.args = [
+        ...(options.args ?? []),
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+      ]
+    }
+
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH
+
+    if (executablePath) {
+      options.executablePath = executablePath
+    }
+
+    return options
+  }
+
+  private shouldDisableSandbox(): boolean {
+    const envValue =
+      process.env.PUPPETEER_DISABLE_SANDBOX ??
+      process.env.DISABLE_CHROMIUM_SANDBOX
+
+    if (!envValue) {
+      return false
+    }
+
+    return ["true", "1", "yes", "on"].includes(envValue.toLowerCase())
   }
 }
