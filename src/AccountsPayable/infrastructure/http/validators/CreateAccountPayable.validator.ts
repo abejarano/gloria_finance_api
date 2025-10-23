@@ -42,6 +42,22 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     rule.taxMetadata = "sometimes|object"
   }
 
+  Object.assign(rule, {
+    fiscalDocument: "sometimes|object",
+    "fiscalDocument.status": "sometimes|string|in:ISSUED,NOT_ISSUED,NOT_REQUIRED",
+    "fiscalDocument.justification": "sometimes|string",
+    "fiscalDocument.fiscalNote": "sometimes|object",
+    "fiscalDocument.fiscalNote.number": "sometimes|string",
+    "fiscalDocument.fiscalNote.series": "sometimes|string",
+    "fiscalDocument.fiscalNote.issueDate": "sometimes|date",
+    "fiscalDocument.evidence": "sometimes|object",
+    "fiscalDocument.evidence.type":
+      "sometimes|string|in:RECEIPT,CONTRACT,DECLARATION,OTHER",
+    "fiscalDocument.evidence.identifier": "sometimes|string",
+    "fiscalDocument.evidence.description": "sometimes|string",
+    "fiscalDocument.evidence.issuedAt": "sometimes|date",
+  })
+
   const v = new Validator(payload, rule)
   const matched = await v.check()
   if (!matched) {

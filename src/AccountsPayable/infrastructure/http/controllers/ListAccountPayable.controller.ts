@@ -53,6 +53,14 @@ import { Paginate } from "@abejarano/ts-mongodb-criteria"
  *   "taxMetadata": {
  *        "status": "TAXED"
  *   },
+ *   "fiscalDocument": {
+ *        "status": "NOT_ISSUED",
+ *        "justification": "Fornecedor MEI dispensado de NF",
+ *        "evidence": {
+ *            "type": "DECLARATION",
+ *            "description": "Declaração assinada pelo fornecedor"
+ *        }
+ *   },
  *   "taxes": [
  *        {
  *          "taxType": "ISS",

@@ -11,6 +11,12 @@ import {
   AccountPayableTaxMetadata,
   AccountPayableTaxStatus,
 } from "./types/AccountPayableTax.type"
+import {
+  AccountPayableDocument,
+  AccountPayableDocumentEvidenceType,
+  AccountPayableDocumentInput,
+  AccountPayableDocumentStatus,
+} from "./types/AccountPayableDocument.type"
 
 export class AccountPayable extends AggregateRoot {
   protected amountTotal: number
@@ -32,6 +38,7 @@ export class AccountPayable extends AggregateRoot {
   private taxes: AccountPayableTax[] = []
   private taxAmountTotal: number = 0
   private taxMetadata?: AccountPayableTaxMetadata
+  private fiscalDocument: AccountPayableDocument
   private createdAt: Date
   private updatedAt: Date
 
@@ -44,6 +51,7 @@ export class AccountPayable extends AggregateRoot {
       installments,
       taxes,
       taxMetadata,
+      fiscalDocument,
     } = params
 
     const accountPayable: AccountPayable = new AccountPayable()
@@ -84,6 +92,9 @@ export class AccountPayable extends AggregateRoot {
       taxMetadata,
       normalizedTaxes.length > 0
     )
+    accountPayable.fiscalDocument = AccountPayable.normalizeFiscalDocument(
+      fiscalDocument
+    )
 
     accountPayable.createdAt = DateBR()
     accountPayable.updatedAt = DateBR()
@@ -123,6 +134,9 @@ export class AccountPayable extends AggregateRoot {
     accountPayable.taxMetadata = AccountPayable.normalizeTaxMetadata(
       params.taxMetadata,
       taxes.length > 0
+    )
+    accountPayable.fiscalDocument = AccountPayable.normalizeFiscalDocument(
+      params.fiscalDocument
     )
 
     return accountPayable
@@ -171,6 +185,10 @@ export class AccountPayable extends AggregateRoot {
     return this.taxMetadata
   }
 
+  getFiscalDocument(): AccountPayableDocument {
+    return this.fiscalDocument
+  }
+
   toPrimitives() {
     return {
       status: this.status,
@@ -187,6 +205,7 @@ export class AccountPayable extends AggregateRoot {
       taxes: this.taxes,
       taxAmountTotal: this.taxAmountTotal,
       taxMetadata: this.taxMetadata,
+      fiscalDocument: this.fiscalDocument,
     }
   }
 
@@ -245,6 +264,132 @@ export class AccountPayable extends AggregateRoot {
       cstCode: metadata.cstCode?.trim() || undefined,
       cfop: metadata.cfop?.trim() || undefined,
       observation: metadata.observation?.trim() || undefined,
+    }
+  }
+
+  private static normalizeFiscalDocument(
+    document: AccountPayableDocumentInput | undefined
+  ): AccountPayableDocument {
+    const allowedStatuses: AccountPayableDocumentStatus[] = [
+      "ISSUED",
+      "NOT_ISSUED",
+      "NOT_REQUIRED",
+    ]
+
+    const defaultDocument: AccountPayableDocument = { status: "NOT_REQUIRED" }
+
+    if (!document) {
+      return defaultDocument
+    }
+
+    const normalizedStatus = document.status
+      ? (document.status.toString().toUpperCase() as AccountPayableDocumentStatus)
+      : undefined
+
+    const hasFiscalNoteData = Boolean(
+      document.fiscalNote?.number ||
+        document.fiscalNote?.series ||
+        document.fiscalNote?.issueDate
+    )
+    const hasSupportData = Boolean(
+      document.justification ||
+        document.evidence?.description ||
+        document.evidence?.identifier ||
+        document.evidence?.issuedAt
+    )
+
+    const inferredStatus: AccountPayableDocumentStatus = hasFiscalNoteData
+      ? "ISSUED"
+      : hasSupportData
+      ? "NOT_ISSUED"
+      : "NOT_REQUIRED"
+
+    const status = normalizedStatus && allowedStatuses.includes(normalizedStatus)
+      ? normalizedStatus
+      : inferredStatus
+
+    let fiscalNote: AccountPayableDocument["fiscalNote"]
+    if (document.fiscalNote) {
+      let issueDate: Date | undefined
+      if (document.fiscalNote.issueDate) {
+        const candidate =
+          document.fiscalNote.issueDate instanceof Date
+            ? document.fiscalNote.issueDate
+            : new Date(document.fiscalNote.issueDate)
+        issueDate = Number.isNaN(candidate.getTime()) ? undefined : candidate
+      }
+
+      fiscalNote = {
+        number: document.fiscalNote.number?.toString().trim() || undefined,
+        series: document.fiscalNote.series?.toString().trim() || undefined,
+        issueDate,
+      }
+
+      if (!fiscalNote.number && !fiscalNote.series && !fiscalNote.issueDate) {
+        fiscalNote = undefined
+      }
+    }
+
+    let evidence: AccountPayableDocument["evidence"]
+    if (document.evidence) {
+      const allowedEvidenceTypes: AccountPayableDocumentEvidenceType[] = [
+        "RECEIPT",
+        "CONTRACT",
+        "DECLARATION",
+        "OTHER",
+      ]
+      const normalizedType = document.evidence.type
+        ? document.evidence.type.toString().toUpperCase()
+        : "OTHER"
+
+      let issuedAt: Date | undefined
+      if (document.evidence.issuedAt) {
+        const candidate =
+          document.evidence.issuedAt instanceof Date
+            ? document.evidence.issuedAt
+            : new Date(document.evidence.issuedAt)
+        issuedAt = Number.isNaN(candidate.getTime()) ? undefined : candidate
+      }
+
+      const type = allowedEvidenceTypes.includes(
+        normalizedType as AccountPayableDocumentEvidenceType
+      )
+        ? (normalizedType as AccountPayableDocumentEvidenceType)
+        : "OTHER"
+
+      evidence = {
+        type,
+        identifier: document.evidence.identifier?.toString().trim() || undefined,
+        description:
+          document.evidence.description?.toString().trim() || undefined,
+        issuedAt,
+      }
+
+      if (
+        !evidence.identifier &&
+        !evidence.description &&
+        !evidence.issuedAt &&
+        type === "OTHER"
+      ) {
+        evidence = undefined
+      }
+    }
+
+    const justification = document.justification?.toString().trim() || undefined
+
+    if (status === "NOT_ISSUED" && !justification && !evidence) {
+      return {
+        status,
+        justification: "DOCUMENT_NOT_PROVIDED",
+        fiscalNote,
+      }
+    }
+
+    return {
+      status,
+      fiscalNote,
+      evidence,
+      justification,
     }
   }
 }
