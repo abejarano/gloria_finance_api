@@ -102,34 +102,45 @@ export class PayAccountPayable {
 
       accountPayable.updateAmount(req.amount)
 
-      await this.accountPayableRepository.upsert(accountPayable)
       unitOfWork.register(async () => {
         await this.accountPayableRepository.upsert(accountPayableSnapshot)
       })
+      await this.accountPayableRepository.upsert(accountPayable)
 
       this.logger.info(
         `Account Payable ${req.accountPayableId} updated, amount pending ${accountPayable.getAmountPending()} 
         status ${accountPayable.getStatus()}`
       )
 
+      unitOfWork.registerPostCommit(() => {
+        new DispatchUpdateAvailabilityAccountBalance(this.queueService).execute(
+          {
+            operationType: TypeOperationMoney.MONEY_OUT,
+            availabilityAccount: availabilityAccount,
+            concept: req.concept.getDescription(),
+            amount: req.amount.getValue(),
+          }
+        )
+      })
+
+      unitOfWork.registerPostCommit(() => {
+        new DispatchUpdateCostCenterMaster(this.queueService).execute({
+          churchId: accountPayable.getChurchId(),
+          costCenterId: req.costCenterId,
+          amount: req.amount.getValue(),
+        })
+      })
+
       await unitOfWork.commit()
-
-      new DispatchUpdateAvailabilityAccountBalance(this.queueService).execute({
-        operationType: TypeOperationMoney.MONEY_OUT,
-        availabilityAccount: availabilityAccount,
-        concept: req.concept.getDescription(),
-        amount: req.amount.getValue(),
-      })
-
-      new DispatchUpdateCostCenterMaster(this.queueService).execute({
-        churchId: accountPayable.getChurchId(),
-        costCenterId: req.costCenterId,
-        amount: req.amount.getValue(),
-      })
 
       this.logger.info(`Finished Pay Account Payable`)
     } catch (error) {
-      await unitOfWork.rollback()
+      try {
+        await unitOfWork.rollback()
+      } catch (rollbackError) {
+        this.logger.error("Rollback failed", rollbackError)
+        throw rollbackError
+      }
       throw error
     }
   }
