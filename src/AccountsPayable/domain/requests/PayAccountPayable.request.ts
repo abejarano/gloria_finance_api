@@ -6,11 +6,11 @@ export type PayAccountPayableRequest = {
   costCenterId: string
   installmentId: string
   installmentIds: string[]
-  financialTransactionId: string
+  financialTransactionId?: string
   availabilityAccountId: string
   churchId: string
   amount: AmountValue
   file?: any
   voucher?: string
-  concept: FinancialConcept
+  concept?: FinancialConcept
 }
