@@ -215,6 +215,30 @@ function testAccountPayableSupportsExemptInvoices(): void {
   })
 }
 
+function testAccountPayableDefaultsTaxMetadataForUntaxedInvoices(): void {
+  const account = AccountPayable.create({
+    supplier: {
+      supplierId: "supplier-003",
+      supplierType: SupplierType.COMPANY,
+      supplierDNI: "12345678901",
+      name: "Limpeza e Cia",
+      phone: "11977776666",
+    },
+    churchId: "church-004",
+    description: "Serviço de limpeza pontual",
+    installments: [
+      {
+        amount: 500,
+        dueDate: new Date("2025-05-10T00:00:00.000Z"),
+      },
+    ],
+  })
+
+  assert.strictEqual(account.getTaxes().length, 0)
+  assert.strictEqual(account.getTaxAmountTotal(), 0)
+  assert.deepStrictEqual(account.getTaxMetadata(), { status: "NOT_APPLICABLE" })
+}
+
 async function runTests() {
   const tests: TestCase[] = [
     {
@@ -228,6 +252,10 @@ async function runTests() {
     {
       name: "AccountPayable.create stores metadata for exempt invoices",
       run: testAccountPayableSupportsExemptInvoices,
+    },
+    {
+      name: "AccountPayable.create defaults metadata when no taxes are provided",
+      run: testAccountPayableDefaultsTaxMetadataForUntaxedInvoices,
     },
   ]
 

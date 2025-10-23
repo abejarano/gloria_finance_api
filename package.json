@@ -5,7 +5,8 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon -r tsconfig-paths/register src/app.ts",
-    "test": "node -r ts-node/register -r tsconfig-paths/register src/tests/run-business-tests.ts",
+    "test": "jest --forceExit --runInBand --detectOpenHandles",
+    "test:business": "node -r ts-node/register -r tsconfig-paths/register src/tests/accounts-payable-taxes.test.ts",
     "start:prod": "node -r tsconfig-paths/register dist/app.js",
     "build": "tsc -p tsconfig.build.json && tsc-alias && npm run copy-static-assets",
     "format": "prettier --write \"src/**/*.{ts,hbs}\" ",

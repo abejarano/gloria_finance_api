@@ -51,10 +51,7 @@ import { Paginate } from "@abejarano/ts-mongodb-criteria"
  *   "amountPending": 500,
  *   "taxAmountTotal": 25,
  *   "taxMetadata": {
- *        "status": "TAXED",
- *        "cstCode": "101",
- *        "cfop": "5933",
- *        "observation": "Retenção padrão"
+ *        "status": "TAXED"
  *   },
  *   "taxes": [
  *        {

@@ -29,8 +29,8 @@ export class AccountPayable extends AggregateRoot {
   private amountPending: number
   private status: AccountPayableStatus
   private installments: Installments[]
-  private taxes: AccountPayableTax[]
-  private taxAmountTotal: number
+  private taxes: AccountPayableTax[] = []
+  private taxAmountTotal: number = 0
   private taxMetadata?: AccountPayableTaxMetadata
   private createdAt: Date
   private updatedAt: Date
@@ -42,7 +42,7 @@ export class AccountPayable extends AggregateRoot {
       description,
       amountPaid,
       installments,
-      taxes = [],
+      taxes,
       taxMetadata,
     } = params
 
@@ -72,13 +72,14 @@ export class AccountPayable extends AggregateRoot {
 
     const normalizedTaxes = AccountPayable.normalizeTaxes(
       amountTotal,
-      taxes
+      taxes ?? []
     )
     accountPayable.taxes = normalizedTaxes
-    accountPayable.taxAmountTotal = normalizedTaxes.reduce(
-      (acc, tax) => acc + tax.amount,
+    const taxTotal = normalizedTaxes.reduce(
+      (total, tax) => total + tax.amount,
       0
     )
+    accountPayable.taxAmountTotal = Number(taxTotal.toFixed(2))
     accountPayable.taxMetadata = AccountPayable.normalizeTaxMetadata(
       taxMetadata,
       normalizedTaxes.length > 0
@@ -135,18 +136,6 @@ export class AccountPayable extends AggregateRoot {
     return this.installments.find((i) => i.installmentId === installmentId)
   }
 
-  getTaxes(): AccountPayableTax[] {
-    return this.taxes
-  }
-
-  getTaxAmountTotal(): number {
-    return this.taxAmountTotal
-  }
-
-  getTaxMetadata(): AccountPayableTaxMetadata | undefined {
-    return this.taxMetadata
-  }
-
   updateAmount(amountPaid: AmountValue) {
     this.amountPaid += amountPaid.getValue()
     this.amountPending -= amountPaid.getValue()
@@ -168,6 +157,18 @@ export class AccountPayable extends AggregateRoot {
 
   getChurchId() {
     return this.churchId
+  }
+
+  getTaxes(): AccountPayableTax[] {
+    return this.taxes
+  }
+
+  getTaxAmountTotal(): number {
+    return this.taxAmountTotal
+  }
+
+  getTaxMetadata(): AccountPayableTaxMetadata | undefined {
+    return this.taxMetadata
   }
 
   toPrimitives() {
@@ -193,23 +194,24 @@ export class AccountPayable extends AggregateRoot {
     baseAmount: number,
     taxes: AccountPayableTaxInput[]
   ): AccountPayableTax[] {
-    if (!taxes?.length) {
+    if (!taxes.length) {
       return []
     }
 
     return taxes.map((tax) => {
-      const percentage = Number(tax.percentage)
+      const rawPercentage = Number(tax.percentage)
+      const percentage = Number.isFinite(rawPercentage) ? rawPercentage : 0
       const providedAmount =
         tax.amount !== undefined ? Number(tax.amount) : undefined
       const calculatedAmount =
-        providedAmount !== undefined
+        providedAmount !== undefined && !Number.isNaN(providedAmount)
           ? providedAmount
           : Number(((baseAmount * percentage) / 100).toFixed(2))
 
       return {
         taxType: tax.taxType,
         percentage,
-        amount: calculatedAmount,
+        amount: Number(calculatedAmount.toFixed(2)),
       }
     })
   }
@@ -219,30 +221,26 @@ export class AccountPayable extends AggregateRoot {
     hasTaxes: boolean
   ): AccountPayableTaxMetadata | undefined {
     if (!metadata) {
-      if (!hasTaxes) {
-        return { status: "NOT_APPLICABLE" }
-      }
-
-      return undefined
+      return hasTaxes ? undefined : { status: "NOT_APPLICABLE" }
     }
 
-    const status = metadata.status
-      ? (metadata.status.toUpperCase() as AccountPayableTaxStatus)
-      : undefined
     const allowedStatuses: AccountPayableTaxStatus[] = [
       "TAXED",
       "EXEMPT",
       "SUBSTITUTION",
       "NOT_APPLICABLE",
     ]
-    const normalizedStatus = status && allowedStatuses.includes(status)
-      ? status
+    const normalizedStatus = metadata.status
+      ? (metadata.status.toString().toUpperCase() as AccountPayableTaxStatus)
+      : undefined
+    const status = normalizedStatus && allowedStatuses.includes(normalizedStatus)
+      ? normalizedStatus
       : hasTaxes
         ? "TAXED"
         : "NOT_APPLICABLE"
 
     return {
-      status: normalizedStatus,
+      status,
       exemptionReason: metadata.exemptionReason?.trim() || undefined,
       cstCode: metadata.cstCode?.trim() || undefined,
       cfop: metadata.cfop?.trim() || undefined,
