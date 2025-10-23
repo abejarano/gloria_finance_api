@@ -156,7 +156,14 @@ async function testCreateAccountPayablePersistsTaxes(): Promise<void> {
 
   assert.strictEqual(persisted.taxAmountTotal, expectedTotal)
   assert.strictEqual(persisted.taxes.length, 2)
-  assert.deepStrictEqual(persisted.fiscalDocument, { status: "NOT_REQUIRED" })
+  assert.deepStrictEqual(persisted.taxMetadata, {
+    status: "TAXED",
+    taxExempt: false,
+    exemptionReason: undefined,
+    cstCode: undefined,
+    cfop: undefined,
+    observation: undefined,
+  })
 
   const iss = persisted.taxes.find((tax) => tax.taxType === "ISS")
   assert.ok(iss, "ISS tax should be present on persistence")
@@ -166,7 +173,6 @@ async function testCreateAccountPayablePersistsTaxes(): Promise<void> {
   const inss = persisted.taxes.find((tax) => tax.taxType === "INSS")
   assert.ok(inss, "INSS tax should be present on persistence")
   assert.strictEqual(inss!.amount, 330)
-  assert.strictEqual(persisted.taxMetadata, undefined)
 }
 
 function testAccountPayableSupportsExemptInvoices(): void {
@@ -188,17 +194,10 @@ function testAccountPayableSupportsExemptInvoices(): void {
     ],
     taxMetadata: {
       status: "EXEMPT",
+      taxExempt: true,
       exemptionReason: "Serviço enquadrado no art. 150, VI, b da CF",
       cstCode: "041",
       observation: "NF emitida sem destaque de imposto por imunidade tributária",
-    },
-    fiscalDocument: {
-      status: "ISSUED",
-      fiscalNote: {
-        number: "  NF12345  ",
-        series: "A1",
-        issueDate: "2025-02-01T00:00:00.000Z",
-      },
     },
   })
 
@@ -208,31 +207,22 @@ function testAccountPayableSupportsExemptInvoices(): void {
   const metadata = account.getTaxMetadata()
   assert.ok(metadata, "Tax metadata should be stored for exempt invoices")
   assert.strictEqual(metadata!.status, "EXEMPT")
+  assert.strictEqual(metadata!.taxExempt, true)
   assert.strictEqual(metadata!.cstCode, "041")
   assert.strictEqual(metadata!.cfop, undefined)
-
-  const fiscalDocument = account.getFiscalDocument()
-  assert.strictEqual(fiscalDocument.status, "ISSUED")
-  assert.strictEqual(fiscalDocument.fiscalNote?.number, "NF12345")
-  assert.strictEqual(fiscalDocument.fiscalNote?.series, "A1")
-  assert.ok(
-    fiscalDocument.fiscalNote?.issueDate instanceof Date,
-    "Fiscal note issue date should be converted to Date"
-  )
 
   const persisted = account.toPrimitives()
   assert.strictEqual(persisted.taxAmountTotal, 0)
   assert.deepStrictEqual(persisted.taxes, [])
   assert.deepStrictEqual(persisted.taxMetadata, {
     status: "EXEMPT",
+    taxExempt: true,
     exemptionReason: "Serviço enquadrado no art. 150, VI, b da CF",
     cstCode: "041",
     cfop: undefined,
     observation:
       "NF emitida sem destaque de imposto por imunidade tributária",
   })
-  assert.strictEqual(persisted.fiscalDocument?.status, "ISSUED")
-  assert.strictEqual(persisted.fiscalDocument?.fiscalNote?.series, "A1")
 }
 
 function testAccountPayableDefaultsTaxMetadataForUntaxedInvoices(): void {
@@ -256,55 +246,14 @@ function testAccountPayableDefaultsTaxMetadataForUntaxedInvoices(): void {
 
   assert.strictEqual(account.getTaxes().length, 0)
   assert.strictEqual(account.getTaxAmountTotal(), 0)
-  assert.deepStrictEqual(account.getTaxMetadata(), { status: "NOT_APPLICABLE" })
-  assert.deepStrictEqual(account.getFiscalDocument(), { status: "NOT_REQUIRED" })
-}
-
-function testAccountPayableSupportsPaymentsWithoutFiscalNote(): void {
-  const account = AccountPayable.create({
-    supplier: {
-      supplierId: "supplier-004",
-      supplierType: SupplierType.COMPANY,
-      supplierDNI: "98765432199",
-      name: "Serviço de Jardinagem",
-      phone: "11966665555",
-    },
-    churchId: "church-005",
-    description: "Manutenção externa",
-    installments: [
-      {
-        amount: 900,
-        dueDate: new Date("2025-06-01T00:00:00.000Z"),
-      },
-    ],
-    fiscalDocument: {
-      status: "not_issued",
-      justification: "  Fornecedor MEI dispensado da emissão de NF ",
-      evidence: {
-        type: "declaration",
-        description: "Declaração assinada pelo fornecedor",
-      },
-    },
+  assert.deepStrictEqual(account.getTaxMetadata(), {
+    status: "EXEMPT",
+    taxExempt: true,
+    exemptionReason: undefined,
+    cstCode: undefined,
+    cfop: undefined,
+    observation: undefined,
   })
-
-  const fiscalDocument = account.getFiscalDocument()
-  assert.strictEqual(fiscalDocument.status, "NOT_ISSUED")
-  assert.strictEqual(
-    fiscalDocument.justification,
-    "Fornecedor MEI dispensado da emissão de NF"
-  )
-  assert.strictEqual(fiscalDocument.evidence?.type, "DECLARATION")
-  assert.strictEqual(
-    fiscalDocument.evidence?.description,
-    "Declaração assinada pelo fornecedor"
-  )
-
-  const persisted = account.toPrimitives()
-  assert.strictEqual(persisted.fiscalDocument?.status, "NOT_ISSUED")
-  assert.strictEqual(
-    persisted.fiscalDocument?.justification,
-    "Fornecedor MEI dispensado da emissão de NF"
-  )
 }
 
 async function runTests() {
@@ -324,10 +273,6 @@ async function runTests() {
     {
       name: "AccountPayable.create defaults metadata when no taxes are provided",
       run: testAccountPayableDefaultsTaxMetadataForUntaxedInvoices,
-    },
-    {
-      name: "AccountPayable.create stores fiscal document metadata for missing NF",
-      run: testAccountPayableSupportsPaymentsWithoutFiscalNote,
     },
   ]
 

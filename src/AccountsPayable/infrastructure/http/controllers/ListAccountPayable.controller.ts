@@ -49,25 +49,13 @@ import { Paginate } from "@abejarano/ts-mongodb-criteria"
  *   "amountTotal": 500,
  *   "amountPaid": 0,
  *   "amountPending": 500,
- *   "taxAmountTotal": 25,
+ *   "taxAmountTotal": 0,
  *   "taxMetadata": {
- *        "status": "TAXED"
+ *        "status": "EXEMPT",
+ *        "taxExempt": true,
+ *        "observation": "Serviço vinculado à finalidade essencial da igreja"
  *   },
- *   "fiscalDocument": {
- *        "status": "NOT_ISSUED",
- *        "justification": "Fornecedor MEI dispensado de NF",
- *        "evidence": {
- *            "type": "DECLARATION",
- *            "description": "Declaração assinada pelo fornecedor"
- *        }
- *   },
- *   "taxes": [
- *        {
- *          "taxType": "ISS",
- *          "percentage": 5,
- *          "amount": 25
- *        }
- *    ],
+ *   "taxes": [],
  *   "installments": [
  *        {
  *          "installmentId": "inst123",

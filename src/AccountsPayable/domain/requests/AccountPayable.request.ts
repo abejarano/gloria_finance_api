@@ -1,5 +1,4 @@
 import { AccountPayableTaxMetadata } from "../types/AccountPayableTax.type"
-import { AccountPayableDocumentInput } from "../types/AccountPayableDocument.type"
 
 export type AccountPayableRequest = {
   supplierId: string
@@ -15,5 +14,4 @@ export type AccountPayableRequest = {
     amount?: number
   }[]
   taxMetadata?: AccountPayableTaxMetadata
-  fiscalDocument?: AccountPayableDocumentInput
 }

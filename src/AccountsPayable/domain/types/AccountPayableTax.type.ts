@@ -16,6 +16,7 @@ export type AccountPayableTaxStatus =
 
 export type AccountPayableTaxMetadata = {
   status?: AccountPayableTaxStatus
+  taxExempt?: boolean
   exemptionReason?: string
   cstCode?: string
   cfop?: string

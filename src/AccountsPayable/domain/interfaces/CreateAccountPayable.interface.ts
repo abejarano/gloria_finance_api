@@ -4,7 +4,6 @@ import {
   AccountPayableTaxInput,
   AccountPayableTaxMetadata,
 } from "../types/AccountPayableTax.type"
-import { AccountPayableDocumentInput } from "../types/AccountPayableDocument.type"
 
 export interface ICreateAccountPayable {
   supplier: {
@@ -24,5 +23,4 @@ export interface ICreateAccountPayable {
   taxes?: AccountPayableTaxInput[]
   taxAmountTotal?: number
   taxMetadata?: AccountPayableTaxMetadata
-  fiscalDocument?: AccountPayableDocumentInput
 }
