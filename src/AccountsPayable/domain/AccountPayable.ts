@@ -11,6 +11,7 @@ import {
   AccountPayableTaxMetadata,
   AccountPayableTaxStatus,
 } from "./types/AccountPayableTax.type"
+import { InvalidInstallmentsConfiguration } from "./exceptions/InvalidInstallmentsConfiguration"
 
 export class AccountPayable extends AggregateRoot {
   protected amountTotal: number
@@ -54,35 +55,70 @@ export class AccountPayable extends AggregateRoot {
     accountPayable.amountPaid = amountPaid
     accountPayable.status = AccountPayableStatus.PENDING
 
-    let amountTotal: number = 0
-    accountPayable.installments = installments.map((i) => {
-      amountTotal += Number(i.amount)
+    const normalizedInstallments = Array.isArray(installments)
+      ? installments
+      : []
+
+    if (!normalizedInstallments.length) {
+      throw new InvalidInstallmentsConfiguration(
+        "At least one installment must be provided. For invoices issued separately (scenario B), register each note as its own account payable."
+      )
+    }
+
+    let installmentsTotal: number = 0
+    accountPayable.installments = normalizedInstallments.map((i) => {
+      const normalizedAmount = Number(Number(i.amount).toFixed(2))
+      installmentsTotal += normalizedAmount
 
       return {
         ...i,
+        amount: normalizedAmount,
         dueDate: new Date(i.dueDate),
         installmentId: i.installmentId || IdentifyEntity.get(`installment`),
         status: InstallmentsStatus.PENDING,
       }
     })
 
-    accountPayable.amountTotal = amountTotal
+    const declaredAmount =
+      params.amountTotal !== undefined ? Number(params.amountTotal) : undefined
+
+    if (declaredAmount !== undefined && !Number.isFinite(declaredAmount)) {
+      throw new InvalidInstallmentsConfiguration(
+        "The declared payable amount must be a numeric value."
+      )
+    }
+
+    if (
+      declaredAmount !== undefined &&
+      Math.abs(Number(declaredAmount.toFixed(2)) - Number(installmentsTotal.toFixed(2))) >
+        0.01
+    ) {
+      throw new InvalidInstallmentsConfiguration(
+        "Installment amounts must match the declared payable total within a tolerance of 0.01."
+      )
+    }
+
+    const normalizedTotal =
+      declaredAmount !== undefined ? declaredAmount : installmentsTotal
+
+    accountPayable.amountTotal = Number(normalizedTotal.toFixed(2))
     accountPayable.amountPaid = 0
     accountPayable.amountPending = accountPayable.amountTotal
 
-    const normalizedTaxes = AccountPayable.normalizeTaxes(
-      amountTotal,
-      taxes ?? []
-    )
+    const taxesInput = Array.isArray(taxes) ? taxes : []
+    const forceExempt = taxMetadata?.taxExempt === true
+    const normalizedTaxes = forceExempt
+      ? []
+      : AccountPayable.normalizeTaxes(accountPayable.amountTotal, taxesInput)
     accountPayable.taxes = normalizedTaxes
-    const taxTotal = normalizedTaxes.reduce(
-      (total, tax) => total + tax.amount,
-      0
-    )
-    accountPayable.taxAmountTotal = Number(taxTotal.toFixed(2))
+    const taxTotal = normalizedTaxes.reduce((total, tax) => total + tax.amount, 0)
+    accountPayable.taxAmountTotal = forceExempt
+      ? 0
+      : Number(taxTotal.toFixed(2))
     accountPayable.taxMetadata = AccountPayable.normalizeTaxMetadata(
       taxMetadata,
-      normalizedTaxes.length > 0
+      normalizedTaxes.length > 0,
+      forceExempt
     )
 
     accountPayable.createdAt = DateBR()
@@ -102,27 +138,51 @@ export class AccountPayable extends AggregateRoot {
   static fromPrimitives(params: any): AccountPayable {
     const accountPayable: AccountPayable = new AccountPayable()
     accountPayable.id = params.id
-    accountPayable.installments = params.installments
+    const persistedInstallments = Array.isArray(params.installments)
+      ? params.installments.map((installment) => ({
+          ...installment,
+          amount: Number(Number(installment.amount).toFixed(2)),
+        }))
+      : []
+    accountPayable.installments = persistedInstallments
     accountPayable.accountPayableId = params.accountPayableId
     accountPayable.churchId = params.churchId
     accountPayable.description = params.description
-    accountPayable.amountTotal = params.amountTotal
-    accountPayable.amountPaid = params.amountPaid
-    accountPayable.amountPending = params.amountPending
+    accountPayable.amountTotal = Number(params.amountTotal ?? 0)
+    accountPayable.amountPaid = Number(params.amountPaid ?? 0)
+    accountPayable.amountPending = Number(params.amountPending ?? 0)
     accountPayable.status = params.status
     accountPayable.createdAt = params.createdAt
     accountPayable.updatedAt = params.updatedAt
     accountPayable.supplier = params.supplier
-    const taxes = params.taxes || []
-    accountPayable.taxes = taxes.map((tax) => ({
-      taxType: tax.taxType,
-      percentage: Number(tax.percentage),
-      amount: Number(tax.amount),
-    }))
-    accountPayable.taxAmountTotal = Number(params.taxAmountTotal || 0)
+    const taxes = Array.isArray(params.taxes) ? params.taxes : []
+    const forceExempt = params.taxMetadata?.taxExempt === true
+    const normalizedTaxes = forceExempt
+      ? []
+      : taxes.map((tax) => ({
+          taxType: tax.taxType,
+          percentage: Number(tax.percentage),
+          amount: Number(Number(tax.amount).toFixed(2)),
+        }))
+    accountPayable.taxes = normalizedTaxes
+    const persistedTaxTotal = normalizedTaxes.reduce(
+      (total, tax) => total + Number(tax.amount),
+      0
+    )
+    const declaredTaxTotalRaw =
+      params.taxAmountTotal !== undefined
+        ? Number(params.taxAmountTotal)
+        : persistedTaxTotal
+    const declaredTaxTotal = Number.isFinite(declaredTaxTotalRaw)
+      ? declaredTaxTotalRaw
+      : persistedTaxTotal
+    accountPayable.taxAmountTotal = forceExempt
+      ? 0
+      : Number(declaredTaxTotal.toFixed(2))
     accountPayable.taxMetadata = AccountPayable.normalizeTaxMetadata(
       params.taxMetadata,
-      taxes.length > 0
+      normalizedTaxes.length > 0,
+      forceExempt
     )
 
     return accountPayable
@@ -140,8 +200,13 @@ export class AccountPayable extends AggregateRoot {
     this.amountPaid += amountPaid.getValue()
     this.amountPending -= amountPaid.getValue()
 
-    if (this.amountPending === 0) {
+    if (this.amountPending <= 0) {
       this.status = AccountPayableStatus.PAID
+      this.amountPending = 0
+    } else if (this.amountPending < this.amountTotal) {
+      this.status = AccountPayableStatus.PARTIAL
+    } else {
+      this.status = AccountPayableStatus.PENDING
     }
 
     this.updatedAt = DateBR()
@@ -218,7 +283,8 @@ export class AccountPayable extends AggregateRoot {
 
   private static normalizeTaxMetadata(
     metadata: AccountPayableTaxMetadata | undefined,
-    hasTaxes: boolean
+    hasTaxes: boolean,
+    forceExempt: boolean = false
   ): AccountPayableTaxMetadata {
     const allowedStatuses: AccountPayableTaxStatus[] = [
       "TAXED",
@@ -244,8 +310,11 @@ export class AccountPayable extends AggregateRoot {
         ? metadata.taxExempt
         : undefined
 
-    const taxExempt =
-      explicitExemptFlag !== undefined ? explicitExemptFlag : !hasTaxes
+    const taxExempt = forceExempt
+      ? true
+      : explicitExemptFlag !== undefined
+        ? explicitExemptFlag
+        : !hasTaxes
 
     if (taxExempt) {
       status = "EXEMPT"

@@ -32,6 +32,7 @@ import { Paginate } from "@abejarano/ts-mongodb-criteria"
  * {
  *   "nextPag": 2,
  *   "count": 25,
+ *   // Possible statuses: PENDING (open), PARTIAL (partially paid), PAID (fully settled)
  *   "results": [
  *   {
  *   "status": "PENDING",

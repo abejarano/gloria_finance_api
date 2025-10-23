@@ -2,6 +2,7 @@ import { strict as assert } from "assert"
 import {
   AccountPayable,
   AccountPayableRequest,
+  AccountPayableStatus,
   IAccountPayableRepository,
   ISupplierRepository,
   Supplier,
@@ -9,6 +10,8 @@ import {
 } from "@/AccountsPayable/domain"
 import { CreateAccountPayable } from "@/AccountsPayable/applications"
 import { Paginate } from "@abejarano/ts-mongodb-criteria"
+import { InvalidInstallmentsConfiguration } from "@/AccountsPayable/domain/exceptions/InvalidInstallmentsConfiguration"
+import { AmountValue } from "@/Shared/domain"
 
 type TestCase = {
   name: string
@@ -256,6 +259,115 @@ function testAccountPayableDefaultsTaxMetadataForUntaxedInvoices(): void {
   })
 }
 
+function testAccountPayableDropsTaxesWhenExplicitlyExempt(): void {
+  const account = AccountPayable.create({
+    supplier: {
+      supplierId: "supplier-004",
+      supplierType: SupplierType.COMPANY,
+      supplierDNI: "12345678901",
+      name: "Serviços de Jardinagem",
+      phone: "11966665555",
+    },
+    churchId: "church-005",
+    description: "Manutenção do jardim",
+    installments: [
+      {
+        amount: 900,
+        dueDate: new Date("2025-06-10T00:00:00.000Z"),
+      },
+    ],
+    taxes: [
+      { taxType: "ISS", percentage: 5 },
+      { taxType: "INSS", percentage: 11 },
+    ],
+    taxMetadata: {
+      taxExempt: true,
+      status: "EXEMPT",
+      exemptionReason: "Serviço vinculado à finalidade essencial",
+    },
+  })
+
+  assert.strictEqual(
+    account.getTaxes().length,
+    0,
+    "Explicitly exempt invoices must not persist tax lines"
+  )
+  assert.strictEqual(
+    account.getTaxAmountTotal(),
+    0,
+    "Explicitly exempt invoices must not accumulate tax totals"
+  )
+  assert.deepStrictEqual(account.getTaxMetadata(), {
+    status: "EXEMPT",
+    taxExempt: true,
+    exemptionReason: "Serviço vinculado à finalidade essencial",
+    cstCode: undefined,
+    cfop: undefined,
+    observation: undefined,
+  })
+}
+
+function testAccountPayableRejectsMismatchedInstallments(): void {
+  assert.throws(() => {
+    AccountPayable.create({
+      supplier: {
+        supplierId: "supplier-005",
+        supplierType: SupplierType.COMPANY,
+        supplierDNI: "12345678901",
+        name: "Elétrica Luz Viva",
+        phone: "11955554444",
+      },
+      churchId: "church-006",
+      description: "Instalação elétrica",
+      installments: [
+        {
+          amount: 500,
+          dueDate: new Date("2025-07-01T00:00:00.000Z"),
+        },
+        {
+          amount: 500,
+          dueDate: new Date("2025-08-01T00:00:00.000Z"),
+        },
+      ],
+      amountTotal: 1200,
+    })
+  }, InvalidInstallmentsConfiguration)
+}
+
+function testAccountPayableStatusTransitionsWithPayments(): void {
+  const account = AccountPayable.create({
+    supplier: {
+      supplierId: "supplier-006",
+      supplierType: SupplierType.COMPANY,
+      supplierDNI: "12345678901",
+      name: "Construções Gerais",
+      phone: "11944443333",
+    },
+    churchId: "church-007",
+    description: "Pintura externa",
+    installments: [
+      {
+        amount: 1000,
+        dueDate: new Date("2025-09-10T00:00:00.000Z"),
+      },
+      {
+        amount: 1000,
+        dueDate: new Date("2025-10-10T00:00:00.000Z"),
+      },
+    ],
+  })
+
+  assert.strictEqual(account.getStatus(), AccountPayableStatus.PENDING)
+
+  account.updateAmount(AmountValue.create(500))
+  assert.strictEqual(account.getStatus(), AccountPayableStatus.PARTIAL)
+  assert.strictEqual(Number(account.getAmountPending().toFixed(2)), 1500)
+
+  account.updateAmount(AmountValue.create(1500))
+  assert.strictEqual(account.getStatus(), AccountPayableStatus.PAID)
+  assert.strictEqual(account.getAmountPending(), 0)
+}
+
 async function runTests() {
   const tests: TestCase[] = [
     {
@@ -273,6 +385,18 @@ async function runTests() {
     {
       name: "AccountPayable.create defaults metadata when no taxes are provided",
       run: testAccountPayableDefaultsTaxMetadataForUntaxedInvoices,
+    },
+    {
+      name: "AccountPayable.create drops taxes when metadata enforces exemption",
+      run: testAccountPayableDropsTaxesWhenExplicitlyExempt,
+    },
+    {
+      name: "AccountPayable.create validates installment totals",
+      run: testAccountPayableRejectsMismatchedInstallments,
+    },
+    {
+      name: "AccountPayable.updateAmount transitions status based on payments",
+      run: testAccountPayableStatusTransitionsWithPayments,
     },
   ]
 
