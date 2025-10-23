@@ -27,6 +27,22 @@ export class UnitOfWork {
     this.postCommitActions.push(action)
   }
 
+  /**
+   * Commits the unit of work, executing all post-commit actions.
+   */
+  async commit(): Promise<void> {
+    try {
+      for (const action of this.postCommitActions) {
+        await action()
+      }
+      this.rollbackActions.length = 0
+    } catch (error) {
+      throw error
+    } finally {
+      this.postCommitActions.length = 0
+    }
+  }
+
   async rollback(): Promise<void> {
     const errors: unknown[] = []
 
@@ -35,7 +51,7 @@ export class UnitOfWork {
       actions.map((action) => Promise.resolve().then(() => action()))
     )
 
-    results.forEach((result, idx) => {
+    results.forEach((result) => {
       if (result.status === "rejected") {
         errors.push(result.reason)
         this.logger.error("Rollback action failed", result.reason)
@@ -46,26 +62,6 @@ export class UnitOfWork {
 
     if (errors.length) {
       throw new UnitOfWorkRollbackError(errors)
-    }
-  }
-
-  async commit(): Promise<void> {
-    try {
-      for (const action of this.postCommitActions) {
-        await action()
-      }
-      this.rollbackActions.length = 0
-    } catch (error) {
-      try {
-        await this.rollback()
-      } catch (rollbackError) {
-        this.logger.error("Rollback failed after commit error", rollbackError)
-        throw rollbackError
-      }
-
-      throw error
-    } finally {
-      this.postCommitActions.length = 0
     }
   }
 }

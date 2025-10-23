@@ -74,17 +74,18 @@ export class PayAccountPayable {
     const accountPayableSnapshot = AccountPayable.fromPrimitives(
       accountPayable.toPrimitives()
     )
+    unitOfWork.register(async () => {
+      await this.accountPayableRepository.upsert(accountPayableSnapshot)
+    })
 
     try {
       const { concept, financialRecordId, voucher } =
         await this.makeFinanceRecord(req, unitOfWork)
 
       req.concept = concept
-      req.financialTransactionId = financialRecordId
       req.voucher = voucher
 
       let amountPay = req.amount.getValue()
-      const financialTransactionId = financialRecordId
 
       for (const installmentId of req.installmentIds) {
         const installment = accountPayable.getInstallment(installmentId)
@@ -95,16 +96,12 @@ export class PayAccountPayable {
         amountPay = PayInstallment(
           installment,
           amountPay,
-          financialTransactionId,
+          financialRecordId,
           this.logger
         )
       }
 
       accountPayable.updateAmount(req.amount)
-
-      unitOfWork.register(async () => {
-        await this.accountPayableRepository.upsert(accountPayableSnapshot)
-      })
       await this.accountPayableRepository.upsert(accountPayable)
 
       this.logger.info(
@@ -135,13 +132,8 @@ export class PayAccountPayable {
 
       this.logger.info(`Finished Pay Account Payable`)
     } catch (error) {
-      try {
-        await unitOfWork.rollback()
-      } catch (rollbackError) {
-        this.logger.error("Rollback failed", rollbackError)
-        throw rollbackError
-      }
-      throw error
+      this.logger.error(`Error paying Account Payable`, error)
+      await unitOfWork.rollback()
     }
   }
 

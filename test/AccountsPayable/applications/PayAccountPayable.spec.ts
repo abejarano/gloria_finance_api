@@ -27,12 +27,7 @@ import {
   IFinancialRecordRepository,
 } from "@/Financial/domain/interfaces"
 import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
-import {
-  AmountValue,
-  InstallmentsStatus,
-  IQueueService,
-  IStorageService,
-} from "@/Shared/domain"
+import { AmountValue, InstallmentsStatus, IQueueService, IStorageService, } from "@/Shared/domain"
 
 type AccountPayablePrimitives = ReturnType<AccountPayable["toPrimitives"]> & {
   id?: string
@@ -128,7 +123,7 @@ const createCostCenter = (
     name: "Main cost center",
     churchId: "church-1",
     active: true,
-    category: CostCenterCategory.ADMINISTRATIVE,
+    category: CostCenterCategory.ESPECIAL_PROJECT,
     createdAt: new Date(),
     responsible: {
       name: "Responsible",
@@ -146,7 +141,6 @@ const createRequest = (
   costCenterId: overrides.costCenterId ?? "cost-center-1",
   installmentId: overrides.installmentId ?? "installment-1",
   installmentIds: overrides.installmentIds ?? ["installment-1"],
-  financialTransactionId: overrides.financialTransactionId,
   availabilityAccountId: overrides.availabilityAccountId ?? "availability-1",
   churchId: overrides.churchId ?? "church-1",
   amount: overrides.amount ?? AmountValue.create(100),
@@ -174,6 +168,8 @@ describe("PayAccountPayable", () => {
 
   const financialConceptRepository = {
     one: jest.fn(),
+    listByCriteria: jest.fn(),
+    upsert: jest.fn(),
   } as jest.Mocked<IFinancialConceptRepository>
 
   const financialConfigurationRepository = {

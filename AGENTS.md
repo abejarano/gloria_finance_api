@@ -88,6 +88,10 @@ We use Conventional Commits to automatically generate releases:
 - `test:` - Add tests
 - `chore:` - Maintenance tasks
 
+## Testing
+
+- All automated tests must live under the `test/` directory, mirroring the DDD structure used in `src/`.
+
 ## Tooling and Processes
 
 - **Environment loading:** `dotenv/config` is required at the entry point. Define configuration through `.env`
