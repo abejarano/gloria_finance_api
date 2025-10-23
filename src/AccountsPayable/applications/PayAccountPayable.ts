@@ -149,11 +149,11 @@ export class PayAccountPayable {
 
     if (req.file) {
       voucher = await this.storageService.uploadFile(req.file)
-      unitOfWork.register(async () => {
-        if (voucher) {
-          await this.storageService.deleteFile(voucher)
-        }
-      })
+      if (voucher) {
+        unitOfWork.register(async () => {
+          await this.storageService.deleteFile(voucher!)
+        })
+      }
     }
 
     const concept = await this.financialConceptRepository.one({
