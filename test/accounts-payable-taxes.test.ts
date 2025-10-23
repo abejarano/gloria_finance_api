@@ -47,7 +47,10 @@ class SupplierRepositoryMock implements ISupplierRepository {
   }
 
   async one(filter: object): Promise<Supplier | null> {
-    if ((filter as { supplierId?: string }).supplierId === this.supplier.getSupplierId()) {
+    if (
+      (filter as { supplierId?: string }).supplierId ===
+      this.supplier.getSupplierId()
+    ) {
       return this.supplier
     }
 
@@ -63,7 +66,7 @@ function testAccountPayableTaxCalculation(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-001",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "12345678901",
       name: "Construtora Monte",
       phone: "11999999999",
@@ -105,7 +108,7 @@ function testAccountPayableTaxCalculation(): void {
 async function testCreateAccountPayablePersistsTaxes(): Promise<void> {
   const supplier = Supplier.create({
     churchId: "church-002",
-    type: SupplierType.COMPANY,
+    type: SupplierType.SUPPLIER,
     dni: "98765432100",
     name: "Serviços Gerais Brasil",
     address: {
@@ -183,7 +186,7 @@ function testAccountPayableSupportsExemptInvoices(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-002",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "12345678901",
       name: "Arquitetura Sagrada Ltda",
       phone: "11988889999",
@@ -201,7 +204,8 @@ function testAccountPayableSupportsExemptInvoices(): void {
       taxExempt: true,
       exemptionReason: "Serviço enquadrado no art. 150, VI, b da CF",
       cstCode: "041",
-      observation: "NF emitida sem destaque de imposto por imunidade tributária",
+      observation:
+        "NF emitida sem destaque de imposto por imunidade tributária",
     },
   })
 
@@ -224,8 +228,7 @@ function testAccountPayableSupportsExemptInvoices(): void {
     exemptionReason: "Serviço enquadrado no art. 150, VI, b da CF",
     cstCode: "041",
     cfop: undefined,
-    observation:
-      "NF emitida sem destaque de imposto por imunidade tributária",
+    observation: "NF emitida sem destaque de imposto por imunidade tributária",
   })
 }
 
@@ -265,7 +268,10 @@ function testAccountPayableSupportsCommitmentsWithoutInvoice(): void {
   assert.strictEqual(account.getTaxAmountTotal(), 0)
 
   const metadata = account.getTaxMetadata()
-  assert.ok(metadata, "Tax metadata should be recorded for non-taxable commitments")
+  assert.ok(
+    metadata,
+    "Tax metadata should be recorded for non-taxable commitments"
+  )
   assert.strictEqual(metadata!.status, AccountPayableTaxStatus.NOT_APPLICABLE)
   assert.strictEqual(metadata!.taxExempt, true)
   assert.strictEqual(
@@ -294,7 +300,7 @@ function testAccountPayableStoresMixedTaxStatuses(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-010",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "22345678901",
       name: "Serviços de Climatização",
       phone: "11922221111",
@@ -350,7 +356,7 @@ function testAccountPayableDefaultsToSubstitutionWhenOnlySubstitutedLines(): voi
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-011",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "32345678901",
       name: "Transporte Litúrgico",
       phone: "11911110000",
@@ -389,7 +395,7 @@ function testAccountPayableDefaultsTaxMetadataForUntaxedInvoices(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-003",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "12345678901",
       name: "Limpeza e Cia",
       phone: "11977776666",
@@ -420,7 +426,7 @@ function testAccountPayableDropsTaxesWhenExplicitlyExempt(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-004",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "12345678901",
       name: "Serviços de Jardinagem",
       phone: "11966665555",
@@ -469,17 +475,15 @@ function testAccountPayableSupportsScenarioBWithoutInstallments(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-007",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "98765432100",
-      name: "Engenharia Estrutural", 
+      name: "Engenharia Estrutural",
       phone: "11933332222",
     },
     churchId: "church-008",
     description: "Montagem de estrutura metálica",
     amountTotal,
-    taxes: [
-      { taxType: "ISS", percentage: 3 },
-    ],
+    taxes: [{ taxType: "ISS", percentage: 3 }],
   })
 
   const expectedIss = Number(((amountTotal * 3) / 100).toFixed(2))
@@ -501,9 +505,9 @@ function testAccountPayableRequiresAmountTotalForScenarioB(): void {
     AccountPayable.create({
       supplier: {
         supplierId: "supplier-008",
-        supplierType: SupplierType.COMPANY,
+        supplierType: SupplierType.SUPPLIER,
         supplierDNI: "98765432100",
-        name: "Serviços Técnicos", 
+        name: "Serviços Técnicos",
         phone: "11933335555",
       },
       churchId: "church-009",
@@ -517,7 +521,7 @@ function testAccountPayableRejectsMismatchedInstallments(): void {
     AccountPayable.create({
       supplier: {
         supplierId: "supplier-005",
-        supplierType: SupplierType.COMPANY,
+        supplierType: SupplierType.SUPPLIER,
         supplierDNI: "12345678901",
         name: "Elétrica Luz Viva",
         phone: "11955554444",
@@ -543,7 +547,7 @@ function testAccountPayableStatusTransitionsWithPayments(): void {
   const account = AccountPayable.create({
     supplier: {
       supplierId: "supplier-006",
-      supplierType: SupplierType.COMPANY,
+      supplierType: SupplierType.SUPPLIER,
       supplierDNI: "12345678901",
       name: "Construções Gerais",
       phone: "11944443333",
