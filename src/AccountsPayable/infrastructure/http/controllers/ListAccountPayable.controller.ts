@@ -57,6 +57,7 @@ import { Paginate } from "@abejarano/ts-mongodb-criteria"
  *        "observation": "Serviço vinculado à finalidade essencial da igreja"
  *   },
  *   "taxes": [],
+ *   // Cada linha de imposto pode trazer o status fiscal (TAXED, SUBSTITUTION, NOT_APPLICABLE)
  *   "installments": [
  *        {
  *          "installmentId": "inst123",

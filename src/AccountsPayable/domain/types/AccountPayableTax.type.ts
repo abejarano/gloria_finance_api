@@ -4,6 +4,7 @@ export type AccountPayableTax = {
   taxType: string
   percentage: number
   amount: number
+  status?: AccountPayableTaxStatus
 }
 
 export type AccountPayableTaxInput = Omit<AccountPayableTax, "amount"> & {

@@ -127,7 +127,7 @@ export class AccountPayable extends AggregateRoot {
       : Number(taxTotal.toFixed(2))
     accountPayable.taxMetadata = AccountPayable.normalizeTaxMetadata(
       taxMetadata,
-      normalizedTaxes.length > 0,
+      normalizedTaxes,
       forceExempt
     )
 
@@ -169,11 +169,10 @@ export class AccountPayable extends AggregateRoot {
     const forceExempt = params.taxMetadata?.taxExempt === true
     const normalizedTaxes = forceExempt
       ? []
-      : taxes.map((tax) => ({
-          taxType: tax.taxType,
-          percentage: Number(tax.percentage),
-          amount: Number(Number(tax.amount).toFixed(2)),
-        }))
+      : AccountPayable.normalizeTaxes(
+          accountPayable.amountTotal,
+          taxes
+        )
     accountPayable.taxes = normalizedTaxes
     const persistedTaxTotal = normalizedTaxes.reduce(
       (total, tax) => total + Number(tax.amount),
@@ -191,7 +190,7 @@ export class AccountPayable extends AggregateRoot {
       : Number(declaredTaxTotal.toFixed(2))
     accountPayable.taxMetadata = AccountPayable.normalizeTaxMetadata(
       params.taxMetadata,
-      normalizedTaxes.length > 0,
+      normalizedTaxes,
       forceExempt
     )
 
@@ -283,30 +282,78 @@ export class AccountPayable extends AggregateRoot {
           ? providedAmount
           : Number(((baseAmount * percentage) / 100).toFixed(2))
 
+      const normalizedStatus = AccountPayable.normalizeTaxStatus(tax.status)
+
       return {
         taxType: tax.taxType,
         percentage,
         amount: Number(calculatedAmount.toFixed(2)),
+        status: normalizedStatus,
       }
     })
   }
 
+  private static normalizeTaxStatus(
+    status: AccountPayableTaxStatus | string | undefined
+  ): AccountPayableTaxStatus | undefined {
+    if (!status) {
+      return undefined
+    }
+
+    const normalized = status.toString().toUpperCase()
+    const allowedStatuses = new Set<string>(
+      Object.values(AccountPayableTaxStatus)
+    )
+
+    return allowedStatuses.has(normalized)
+      ? (normalized as AccountPayableTaxStatus)
+      : undefined
+  }
+
   private static normalizeTaxMetadata(
     metadata: AccountPayableTaxMetadata | undefined,
-    hasTaxes: boolean,
+    taxes: AccountPayableTax[],
     forceExempt: boolean = false
   ): AccountPayableTaxMetadata {
+    const hasTaxes = taxes.length > 0
     const allowedStatuses = Object.values(
       AccountPayableTaxStatus
     ) as AccountPayableTaxStatus[]
 
     const normalizedStatus = metadata?.status
-      ? (metadata.status.toString().toUpperCase() as AccountPayableTaxStatus)
+      ? AccountPayable.normalizeTaxStatus(metadata.status)
       : undefined
 
-    const defaultStatus = hasTaxes
-      ? AccountPayableTaxStatus.TAXED
-      : AccountPayableTaxStatus.EXEMPT
+    const defaultStatus = (() => {
+      if (!hasTaxes) {
+        return AccountPayableTaxStatus.EXEMPT
+      }
+
+      const hasSubstitution = taxes.some(
+        (tax) => tax.status === AccountPayableTaxStatus.SUBSTITUTION
+      )
+      const hasTaxed = taxes.some(
+        (tax) =>
+          !tax.status || tax.status === AccountPayableTaxStatus.TAXED
+      )
+      const hasNotApplicable = taxes.some(
+        (tax) => tax.status === AccountPayableTaxStatus.NOT_APPLICABLE
+      )
+
+      if (hasTaxed) {
+        return AccountPayableTaxStatus.TAXED
+      }
+
+      if (hasSubstitution) {
+        return AccountPayableTaxStatus.SUBSTITUTION
+      }
+
+      if (hasNotApplicable) {
+        return AccountPayableTaxStatus.NOT_APPLICABLE
+      }
+
+      return AccountPayableTaxStatus.TAXED
+    })()
 
     let status = normalizedStatus && allowedStatuses.includes(normalizedStatus)
       ? normalizedStatus

@@ -1,4 +1,5 @@
 import { AccountPayableTaxMetadata } from "../types/AccountPayableTax.type"
+import { AccountPayableTaxStatus } from "../enums/AccountPayableTaxStatus.enum"
 
 export type AccountPayableRequest = {
   supplierId: string
@@ -13,6 +14,7 @@ export type AccountPayableRequest = {
     taxType: string
     percentage: number
     amount?: number
+    status?: AccountPayableTaxStatus
   }[]
   taxMetadata?: AccountPayableTaxMetadata
 }

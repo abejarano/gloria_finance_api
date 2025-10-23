@@ -229,6 +229,101 @@ function testAccountPayableSupportsExemptInvoices(): void {
   })
 }
 
+function testAccountPayableStoresMixedTaxStatuses(): void {
+  const account = AccountPayable.create({
+    supplier: {
+      supplierId: "supplier-010",
+      supplierType: SupplierType.COMPANY,
+      supplierDNI: "22345678901",
+      name: "Serviços de Climatização",
+      phone: "11922221111",
+    },
+    churchId: "church-010",
+    description: "Instalação de ar condicionado",
+    installments: [
+      {
+        amount: 2000,
+        dueDate: new Date("2025-01-20T00:00:00.000Z"),
+      },
+    ],
+    taxes: [
+      {
+        taxType: "ISS",
+        percentage: 5,
+        status: AccountPayableTaxStatus.TAXED,
+      },
+      {
+        taxType: "ICMS-ST",
+        percentage: 0,
+        amount: 120,
+        status: AccountPayableTaxStatus.SUBSTITUTION,
+      },
+    ],
+  })
+
+  const taxes = account.getTaxes()
+  assert.strictEqual(taxes.length, 2)
+
+  const substitution = taxes.find((tax) => tax.taxType === "ICMS-ST")
+  assert.ok(substitution, "Substitution tax line should be present")
+  assert.strictEqual(
+    substitution!.status,
+    AccountPayableTaxStatus.SUBSTITUTION,
+    "Substitution status must be preserved on tax line"
+  )
+
+  const taxedLine = taxes.find((tax) => tax.taxType === "ISS")
+  assert.ok(taxedLine, "Regular tax line should be present")
+  assert.strictEqual(
+    taxedLine!.status,
+    AccountPayableTaxStatus.TAXED,
+    "Regular tax line defaults to TAXED status"
+  )
+
+  const metadata = account.getTaxMetadata()
+  assert.strictEqual(metadata.status, AccountPayableTaxStatus.TAXED)
+  assert.strictEqual(metadata.taxExempt, false)
+}
+
+function testAccountPayableDefaultsToSubstitutionWhenOnlySubstitutedLines(): void {
+  const account = AccountPayable.create({
+    supplier: {
+      supplierId: "supplier-011",
+      supplierType: SupplierType.COMPANY,
+      supplierDNI: "32345678901",
+      name: "Transporte Litúrgico",
+      phone: "11911110000",
+    },
+    churchId: "church-011",
+    description: "Serviço de transporte para retiro",
+    amountTotal: 1500,
+    taxes: [
+      {
+        taxType: "ICMS-ST",
+        percentage: 0,
+        amount: 90,
+        status: AccountPayableTaxStatus.SUBSTITUTION,
+      },
+    ],
+  })
+
+  const taxes = account.getTaxes()
+  assert.strictEqual(taxes.length, 1)
+  assert.strictEqual(
+    taxes[0].status,
+    AccountPayableTaxStatus.SUBSTITUTION,
+    "Substitution-only invoices should mark the tax line as substitution"
+  )
+
+  const metadata = account.getTaxMetadata()
+  assert.strictEqual(
+    metadata.status,
+    AccountPayableTaxStatus.SUBSTITUTION,
+    "Default metadata should reflect substitution regime when applicable"
+  )
+  assert.strictEqual(metadata.taxExempt, false)
+}
+
 function testAccountPayableDefaultsTaxMetadataForUntaxedInvoices(): void {
   const account = AccountPayable.create({
     supplier: {
@@ -430,6 +525,14 @@ async function runTests() {
     {
       name: "AccountPayable.create stores metadata for exempt invoices",
       run: testAccountPayableSupportsExemptInvoices,
+    },
+    {
+      name: "AccountPayable.create persists mixed tax line statuses",
+      run: testAccountPayableStoresMixedTaxStatuses,
+    },
+    {
+      name: "AccountPayable.create defaults metadata to substitution when appropriate",
+      run: testAccountPayableDefaultsToSubstitutionWhenOnlySubstitutedLines,
     },
     {
       name: "AccountPayable.create defaults metadata when no taxes are provided",
