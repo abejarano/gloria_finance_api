@@ -1,5 +1,5 @@
-import { DateBR } from "../../Shared/helpers"
-import { Member } from "../../Church/domain"
+import { DateBR } from "@/Shared/helpers"
+import { Member } from "@/Church/domain"
 import { CostCenterCategory } from "./enums/CostCenterCategory.enum"
 import { CostCenterRequest } from "./requests/CostCenter.request"
 
@@ -9,6 +9,7 @@ export class CostCenter {
   private name: string
   private description?: string
   private responsible: {
+    memberId: string
     name: string
     email: string
     phone: string
@@ -34,6 +35,7 @@ export class CostCenter {
     costCenter.description = description
     costCenter.createdAt = DateBR()
     costCenter.responsible = {
+      memberId: responsibleMember.getMemberId(),
       name: responsibleMember.getName(),
       email: responsibleMember.getEmail(),
       phone: responsibleMember.getPhone(),
@@ -79,6 +81,7 @@ export class CostCenter {
     this.name = request.name
     this.description = request.description
     this.responsible = {
+      memberId: responsibleMember.getMemberId(),
       name: responsibleMember.getName(),
       email: responsibleMember.getEmail(),
       phone: responsibleMember.getPhone(),
