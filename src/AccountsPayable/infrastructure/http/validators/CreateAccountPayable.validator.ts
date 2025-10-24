@@ -26,6 +26,10 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     description: "required|string",
     amountTotal: "sometimes|numeric",
     installments: "sometimes|array",
+    taxDocument: "required|object",
+    "taxDocument.type": "required|string|in:INVOICE,RECEIPT,CONTRACT,OTHER",
+    "taxDocument.number": "sometimes|string",
+    "taxDocument.date": "required|date",
   }
 
   const hasInstallmentsArray = Array.isArray(payload.installments)

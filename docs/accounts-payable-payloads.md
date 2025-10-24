@@ -12,6 +12,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:987654321",
   "description": "Reforma do altar",
+  "taxDocument": {
+    "type": "INVOICE",
+    "number": "NF-2024/781",
+    "date": "2024-08-01"
+  },
   "installments": [
     { "amount": 15000, "dueDate": "2024-10-10" },
     { "amount": 15000, "dueDate": "2024-11-10" }
@@ -29,6 +34,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:987654321",
   "description": "Serviço de manutenção elétrica",
+  "taxDocument": {
+    "type": "INVOICE",
+    "number": "NF-2024/802",
+    "date": "2024-07-28"
+  },
   "installments": [
     { "amount": 500, "dueDate": "2024-08-05" },
     { "amount": 500, "dueDate": "2024-09-05" }
@@ -50,6 +60,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:987654321",
   "description": "Serviço de iluminação do templo",
+  "taxDocument": {
+    "type": "INVOICE",
+    "number": "NF-2024/825",
+    "date": "2024-07-30"
+  },
   "installments": [
     { "amount": 8000, "dueDate": "2024-08-15" },
     { "amount": 8000, "dueDate": "2024-09-15" }
@@ -71,6 +86,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:135791357",
   "description": "Compra de veículo seminovo",
+  "taxDocument": {
+    "type": "CONTRACT",
+    "number": "CONTRATO-VEICULO-2024-09",
+    "date": "2024-07-20"
+  },
   "installments": [
     { "amount": 20000, "dueDate": "2024-08-10" },
     { "amount": 20000, "dueDate": "2024-09-10" },
@@ -92,6 +112,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:246813579",
   "description": "Pagamento NF #2024-045",
+  "taxDocument": {
+    "type": "INVOICE",
+    "number": "NF-2024-045",
+    "date": "2024-08-03"
+  },
   "amountTotal": 3200,
   "taxMetadata": {
     "status": "EXEMPT",
@@ -106,6 +131,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:246813579",
   "description": "Pagamento NF #2024-046",
+  "taxDocument": {
+    "type": "INVOICE",
+    "number": "NF-2024-046",
+    "date": "2024-08-04"
+  },
   "amountTotal": 4500,
   "taxes": [
     { "taxType": "ISS", "percentage": 5, "amount": 225, "status": "TAXED" }
@@ -125,6 +155,11 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 {
   "supplierId": "urn:supplier:246813579",
   "description": "Pagamento NF #2024-047",
+  "taxDocument": {
+    "type": "INVOICE",
+    "number": "NF-2024-047",
+    "date": "2024-08-05"
+  },
   "amountTotal": 7800,
   "taxes": [
     { "taxType": "ICMS-ST", "percentage": 12, "amount": 936, "status": "SUBSTITUTION" }
@@ -139,6 +174,8 @@ El `PermissionMiddleware` incorpora automáticamente el `churchId` a partir del 
 
 ## Notas adicionales
 
+- Define `taxMetadata.taxExempt` en `true` únicamente cuando a NF é isenta; o validador HTTP rejeitará linhas de imposto nesse caso.
+- El bloque `taxDocument` es obrigatório. Utilize `type` com um dos valores do enum (`INVOICE`, `RECEIPT`, `CONTRACT`, `OTHER`), `date` em formato ISO (`YYYY-MM-DD`) e `number` quando houver identificação oficial do documento.
 - Define `taxMetadata.taxExempt` en `true` únicamente cuando a NF é isenta; o validador HTTP rejeitará linhas de imposto nesse caso.
 - Se `taxMetadata.taxExempt` for `false`, pelo menos uma entrada em `taxes` deve estar presente e o sistema calculará `taxAmountTotal` automaticamente.
 - No cenário B (`installments` omitido), `amountTotal` é obrigatório. Caso envie parcelas, o total é deduzido da soma das parcelas.

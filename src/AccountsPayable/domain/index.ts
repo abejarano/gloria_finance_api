@@ -9,6 +9,7 @@ export * from "./enums/AccountPayableStatus"
 export * from "./enums/AccountPayableTaxStatus.enum"
 export * from "./enums/SupplierType"
 export * from "./enums/InstallmentStatus"
+export * from "./enums/TaxDocumentType.enum"
 
 export * from "./requests/AccountPayable.request"
 export * from "./requests/PayAccountPayable.request"

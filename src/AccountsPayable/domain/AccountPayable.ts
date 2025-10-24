@@ -12,6 +12,7 @@ import {
 } from "./types/AccountPayableTax.type"
 import { InvalidInstallmentsConfiguration } from "./exceptions/InvalidInstallmentsConfiguration"
 import { AccountPayableTaxStatus } from "./enums/AccountPayableTaxStatus.enum"
+import { TaxDocumentType } from "@/AccountsPayable/domain/enums/TaxDocumentType.enum"
 
 export class AccountPayable extends AggregateRoot {
   protected amountTotal: number
@@ -33,6 +34,11 @@ export class AccountPayable extends AggregateRoot {
   private taxes: AccountPayableTax[] = []
   private taxAmountTotal: number = 0
   private taxMetadata: AccountPayableTaxMetadata
+  private taxDocument: {
+    type: TaxDocumentType
+    number?: string
+    date: Date
+  }
   private createdAt: Date
   private updatedAt: Date
 
@@ -45,6 +51,7 @@ export class AccountPayable extends AggregateRoot {
       installments,
       taxes,
       taxMetadata,
+      taxDocument,
     } = params
 
     const accountPayable: AccountPayable = new AccountPayable()
@@ -90,7 +97,7 @@ export class AccountPayable extends AggregateRoot {
     if (!hasInstallments) {
       if (declaredAmount === undefined) {
         throw new InvalidInstallmentsConfiguration(
-          "Para notas fiscais registradas individualmente (cenário B), informe o valor total da NF em amountTotal e não envie parcelas."
+          "Para notas fiscais registradas individualmente, informe o valor total da NF em amountTotal e não envie parcelas."
         )
       }
     } else if (declaredAmount !== undefined) {
@@ -100,7 +107,7 @@ export class AccountPayable extends AggregateRoot {
 
       if (difference > 0.01) {
         throw new InvalidInstallmentsConfiguration(
-          "A soma das parcelas (cenário A) deve coincidir com o valor total informado da NF. Ajuste os valores ou cadastre cada NF individualmente (cenário B). Diferença máxima permitida: R$ 0,01."
+          "A soma das parcelas deve coincidir com o valor total informado da NF. Ajuste os valores ou cadastre cada NF individualmente (cenário B). Diferença máxima permitida: R$ 0,01."
         )
       }
     }
@@ -133,6 +140,11 @@ export class AccountPayable extends AggregateRoot {
       normalizedTaxes,
       forceExempt
     )
+    accountPayable.taxDocument = {
+      type: taxDocument.type,
+      number: taxDocument!.number,
+      date: new Date(taxDocument.date),
+    }
 
     accountPayable.createdAt = DateBR()
     accountPayable.updatedAt = DateBR()
@@ -193,75 +205,9 @@ export class AccountPayable extends AggregateRoot {
       normalizedTaxes,
       forceExempt
     )
+    accountPayable.taxDocument = params.taxDocument
 
     return accountPayable
-  }
-
-  getId(): string {
-    return this.id
-  }
-
-  getInstallment(installmentId: string): Installments {
-    return this.installments.find((i) => i.installmentId === installmentId)
-  }
-
-  updateAmount(amountPaid: AmountValue) {
-    this.amountPaid += amountPaid.getValue()
-    this.amountPending -= amountPaid.getValue()
-
-    if (this.amountPending <= 0) {
-      this.status = AccountPayableStatus.PAID
-      this.amountPending = 0
-    } else if (this.amountPending < this.amountTotal) {
-      this.status = AccountPayableStatus.PARTIAL
-    } else {
-      this.status = AccountPayableStatus.PENDING
-    }
-
-    this.updatedAt = DateBR()
-  }
-
-  getAmountPending() {
-    return this.amountPending
-  }
-
-  getStatus() {
-    return this.status
-  }
-
-  getChurchId() {
-    return this.churchId
-  }
-
-  getTaxes(): AccountPayableTax[] {
-    return this.taxes
-  }
-
-  getTaxAmountTotal(): number {
-    return this.taxAmountTotal
-  }
-
-  getTaxMetadata(): AccountPayableTaxMetadata {
-    return this.taxMetadata
-  }
-
-  toPrimitives() {
-    return {
-      status: this.status,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      supplier: this.supplier,
-      accountPayableId: this.accountPayableId,
-      churchId: this.churchId,
-      description: this.description,
-      amountTotal: this.amountTotal,
-      amountPaid: this.amountPaid,
-      amountPending: this.amountPending,
-      installments: this.installments,
-      taxes: this.taxes,
-      taxAmountTotal: this.taxAmountTotal,
-      taxMetadata: this.taxMetadata,
-    }
   }
 
   private static normalizeTaxes(
@@ -390,6 +336,74 @@ export class AccountPayable extends AggregateRoot {
       cstCode: metadata?.cstCode?.trim() || undefined,
       cfop: metadata?.cfop?.trim() || undefined,
       observation: metadata?.observation?.trim() || undefined,
+    }
+  }
+
+  getId(): string {
+    return this.id
+  }
+
+  getInstallment(installmentId: string): Installments {
+    return this.installments.find((i) => i.installmentId === installmentId)
+  }
+
+  updateAmount(amountPaid: AmountValue) {
+    this.amountPaid += amountPaid.getValue()
+    this.amountPending -= amountPaid.getValue()
+
+    if (this.amountPending <= 0) {
+      this.status = AccountPayableStatus.PAID
+      this.amountPending = 0
+    } else if (this.amountPending < this.amountTotal) {
+      this.status = AccountPayableStatus.PARTIAL
+    } else {
+      this.status = AccountPayableStatus.PENDING
+    }
+
+    this.updatedAt = DateBR()
+  }
+
+  getAmountPending() {
+    return this.amountPending
+  }
+
+  getStatus() {
+    return this.status
+  }
+
+  getChurchId() {
+    return this.churchId
+  }
+
+  getTaxes(): AccountPayableTax[] {
+    return this.taxes
+  }
+
+  getTaxAmountTotal(): number {
+    return this.taxAmountTotal
+  }
+
+  getTaxMetadata(): AccountPayableTaxMetadata {
+    return this.taxMetadata
+  }
+
+  toPrimitives() {
+    return {
+      status: this.status,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      supplier: this.supplier,
+      accountPayableId: this.accountPayableId,
+      churchId: this.churchId,
+      description: this.description,
+      amountTotal: this.amountTotal,
+      amountPaid: this.amountPaid,
+      amountPending: this.amountPending,
+      installments: this.installments,
+      taxes: this.taxes,
+      taxAmountTotal: this.taxAmountTotal,
+      taxMetadata: this.taxMetadata,
+      taxDocument: this.taxDocument,
     }
   }
 }
