@@ -10,6 +10,7 @@ import { DispatchUpdateAvailabilityAccountBalance } from "@/Financial/applicatio
 import { TypeOperationMoney } from "@/Financial/domain"
 import { IAvailabilityAccountRepository } from "@/Financial/domain/interfaces"
 import { PayInstallment } from "@/Shared/applications"
+import { InstallmentNotFound } from "@/AccountsPayable/domain"
 
 export class PayAccountReceivable {
   private logger = Logger(PayAccountReceivable.name)
@@ -39,7 +40,7 @@ export class PayAccountReceivable {
       const installment = accountReceivable.getInstallment(installmentId)
       if (!installment) {
         this.logger.debug(`Installment ${installmentId} not found`)
-        continue
+        throw new InstallmentNotFound(installmentId)
       }
       amountPay = PayInstallment(
         installment,
