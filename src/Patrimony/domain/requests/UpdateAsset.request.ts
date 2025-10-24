@@ -1,0 +1,17 @@
+import { AssetStatus } from "../enums/AssetStatus.enum"
+import { CreateAssetAttachmentRequest } from "./CreateAsset.request"
+
+export type UpdateAssetRequest = {
+  assetId: string
+  name?: string
+  category?: string
+  value?: number
+  acquisitionDate?: string
+  congregationId?: string
+  location?: string
+  responsibleId?: string
+  status?: AssetStatus
+  attachments?: CreateAssetAttachmentRequest[]
+  performedBy: string
+  notes?: string
+}
