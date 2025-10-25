@@ -4,8 +4,7 @@ import { AssetModel } from "../models/Asset.model"
 import { AssetListFilters } from "../types/AssetListFilters.type"
 
 export interface IAssetRepository {
-  create(asset: Asset): Promise<void>
-  update(asset: Asset): Promise<void>
+  upsert(asset: Asset): Promise<void>
   list(criteria: Criteria): Promise<Paginate<AssetModel>>
   one(filter: Record<string, unknown>): Promise<Asset | undefined>
   count(filters?: AssetListFilters): Promise<number>

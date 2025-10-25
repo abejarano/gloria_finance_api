@@ -16,8 +16,14 @@ import {
 } from "../../../applications"
 import { AssetMongoRepository } from "../../persistence/AssetMongoRepository"
 import { HttpStatus } from "@/Shared/domain"
+import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
+import { NoOpStorage } from "@/Shared/infrastructure"
 
 const repository = AssetMongoRepository.getInstance()
+const pdfGenerator = new PuppeteerAdapter(
+  new HandlebarsHTMLAdapter(),
+  NoOpStorage.getInstance()
+)
 
 export const createAssetController = async (
   request: CreateAssetRequest,
@@ -76,9 +82,10 @@ export const generateInventoryReportController = async (
   res: Response
 ) => {
   try {
-    const result = await new GenerateInventoryReport(repository).execute(
-      request
-    )
+    const result = await new GenerateInventoryReport(
+      repository,
+      pdfGenerator
+    ).execute(request)
 
     res.status(HttpStatus.OK).send(result)
   } catch (error) {

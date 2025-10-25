@@ -1,6 +1,4 @@
-import { Logger } from "@/Shared/adapter"
-import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
-import { NoOpStorage } from "@/Shared/infrastructure"
+import { Logger, PuppeteerAdapter } from "@/Shared/adapter"
 import {
   AssetStatusLabels,
   AssetResponse,
@@ -25,10 +23,7 @@ export class GenerateInventoryReport {
 
   constructor(
     private readonly repository: IAssetRepository,
-    private readonly pdfGenerator: PuppeteerAdapter = new PuppeteerAdapter(
-      new HandlebarsHTMLAdapter(),
-      NoOpStorage.getInstance()
-    )
+    private readonly pdfGenerator: PuppeteerAdapter
   ) {}
 
   async execute(request: InventoryReportRequest) {

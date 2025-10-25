@@ -41,7 +41,7 @@ export class ListAssets {
 
     if (request.congregationId) {
       filters.push(
-        new Map([
+        new Map<string, unknown>([
           ["field", "congregationId"],
           ["operator", Operator.EQUAL],
           ["value", request.congregationId],
@@ -51,7 +51,7 @@ export class ListAssets {
 
     if (request.category) {
       filters.push(
-        new Map([
+        new Map<string, unknown>([
           ["field", "category"],
           ["operator", Operator.EQUAL],
           ["value", request.category],
@@ -61,7 +61,7 @@ export class ListAssets {
 
     if (request.status) {
       filters.push(
-        new Map([
+        new Map<string, unknown>([
           ["field", "status"],
           ["operator", Operator.EQUAL],
           ["value", request.status],
@@ -75,7 +75,7 @@ export class ListAssets {
     if (searchTerm) {
       const regex = new RegExp(searchTerm, "i")
       filters.push(
-        new Map([
+        new Map<string, unknown>([
           ["field", "$or"],
           ["operator", Operator.EQUAL],
           [

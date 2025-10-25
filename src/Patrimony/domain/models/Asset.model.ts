@@ -3,7 +3,7 @@ import { AssetAttachment } from "../types/AssetAttachment.type"
 import { AssetHistoryEntry } from "../types/AssetHistoryEntry.type"
 
 export type AssetModel = {
-  id: string
+  id?: string
   assetId: string
   code: string
   name: string

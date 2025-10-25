@@ -51,7 +51,7 @@ export class CreateAsset {
       }
     )
 
-    await this.repository.create(asset)
+    await this.repository.upsert(asset)
 
     this.logger.info("Asset stored successfully", {
       assetId: asset.getAssetId(),

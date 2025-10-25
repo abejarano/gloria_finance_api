@@ -3,11 +3,13 @@ import { AssetModel } from "../../domain/models/Asset.model"
 import { AssetResponse } from "../../domain/responses/Asset.response"
 
 export const mapAssetToResponse = (asset: Asset | AssetModel): AssetResponse => {
-  const plain =
-    asset instanceof Asset ? asset.toPrimitives() : (asset as AssetModel)
+  const base = asset instanceof Asset
+    ? { ...asset.toPrimitives(), id: asset.getId() ?? undefined }
+    : asset
 
   return {
-    ...plain,
-    documentsPending: !plain.attachments || plain.attachments.length === 0,
+    ...base,
+    documentsPending:
+      !base.attachments || base.attachments.length === 0,
   }
 }

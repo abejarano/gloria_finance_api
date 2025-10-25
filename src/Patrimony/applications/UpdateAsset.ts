@@ -71,7 +71,7 @@ export class UpdateAsset {
       }
     )
 
-    await this.repository.update(asset)
+    await this.repository.upsert(asset)
 
     return mapAssetToResponse(asset)
   }

@@ -25,11 +25,7 @@ export class AssetMongoRepository
     return "patrimony_assets"
   }
 
-  async create(asset: Asset): Promise<void> {
-    await this.persist(asset.getId(), asset)
-  }
-
-  async update(asset: Asset): Promise<void> {
+  async upsert(asset: Asset): Promise<void> {
     await this.persist(asset.getId(), asset)
   }
 
