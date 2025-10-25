@@ -4,7 +4,6 @@ export type { AssetAttachment } from "./types/AssetAttachment.type"
 export type { AssetHistoryEntry } from "./types/AssetHistoryEntry.type"
 export type { AssetModel } from "./models/Asset.model"
 export type { AssetListFilters } from "./types/AssetListFilters.type"
-export type { AssetListResult } from "./types/AssetListResult.type"
 export type {
   CreateAssetRequest,
   CreateAssetAttachmentRequest,

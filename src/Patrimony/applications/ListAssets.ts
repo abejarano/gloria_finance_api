@@ -25,7 +25,7 @@ export class ListAssets {
 
     const criteria = this.prepareCriteria(request, { page, perPage })
 
-    const result = await this.repository.list(criteria, { page, perPage })
+    const result = await this.repository.list(criteria)
 
     return {
       ...result,

@@ -15,7 +15,7 @@ export class AssetCodeGenerator {
       const next = total + 1 + attempts
       const candidate = `${CODE_PREFIX}${next.toString().padStart(CODE_PAD_LENGTH, "0")}`
 
-      const exists = await this.repository.findByCode(candidate)
+      const exists = await this.repository.one({ code: candidate })
 
       if (!exists) {
         return candidate
