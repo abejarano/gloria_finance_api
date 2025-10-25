@@ -13,6 +13,7 @@ import ListAssetsValidator from "../validators/ListAssets.validator"
 import InventoryReportValidator from "../validators/InventoryReport.validator"
 import {
   AssetStatus,
+  CreateAssetAttachmentRequest,
   CreateAssetRequest,
   UpdateAssetRequest,
 } from "../../../domain"
@@ -25,15 +26,54 @@ const resolveUserId = (request: Request) => {
   return user.userId || user.id || user.sub || "system"
 }
 
+const collectAttachmentsFromRequest = (
+  req: Request
+): { attachments?: CreateAssetAttachmentRequest[]; provided: boolean } => {
+  const hasAttachmentsProp = Object.prototype.hasOwnProperty.call(
+    req.body,
+    "attachments"
+  )
+
+  const filesInput = (req as Request & {
+    files?: { [fieldname: string]: unknown }
+  }).files?.attachments as
+    | CreateAssetAttachmentRequest["file"]
+    | CreateAssetAttachmentRequest["file"][]
+    | undefined
+
+  const files = Array.isArray(filesInput)
+    ? filesInput
+    : filesInput
+    ? [filesInput]
+    : []
+
+  if (!hasAttachmentsProp) {
+    return { attachments: undefined, provided: false }
+  }
+
+  const metadata = Array.isArray(req.body.attachments)
+    ? (req.body.attachments as CreateAssetAttachmentRequest[])
+    : []
+
+  const attachments = metadata.map((attachment, index) => ({
+    ...attachment,
+    file: attachment.file ?? files[index],
+  }))
+
+  return { attachments, provided: true }
+}
+
 router.post(
   "/",
   [PermissionMiddleware, CreateAssetValidator],
   async (req: Request, res: Response) => {
     const performedBy = resolveUserId(req)
+    const { attachments, provided } = collectAttachmentsFromRequest(req)
 
     await createAssetController(
       {
         ...req.body,
+        attachments: provided ? attachments ?? [] : undefined,
         value: Number(req.body.value),
         status: req.body.status as AssetStatus,
         performedBy,
@@ -92,6 +132,7 @@ router.put(
   [PermissionMiddleware, UpdateAssetValidator],
   async (req: Request, res: Response) => {
     const performedBy = resolveUserId(req)
+    const { attachments, provided } = collectAttachmentsFromRequest(req)
 
     await updateAssetController(
       {
@@ -102,6 +143,7 @@ router.put(
             ? Number(req.body.value)
             : undefined,
         status: req.body.status as AssetStatus,
+        attachments: provided ? attachments ?? [] : undefined,
         performedBy,
       } as UpdateAssetRequest,
       res
