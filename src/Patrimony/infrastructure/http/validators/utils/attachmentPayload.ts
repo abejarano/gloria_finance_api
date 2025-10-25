@@ -72,8 +72,7 @@ export const normalizeAttachmentPayload = (
   const metadata = parseAttachmentMetadata(raw)
   const files = extractFiles(filesInput)
 
-  const provided =
-    raw !== undefined && raw !== null ? true : files.length > 0
+  const provided = raw !== undefined && raw !== null ? true : files.length > 0
 
   const length = Math.max(metadata.length, files.length)
 
@@ -83,11 +82,9 @@ export const normalizeAttachmentPayload = (
     const meta = metadata[index] ?? {}
     const file = files[index]
 
-    const name =
-      toTrimmedString(meta.name) ?? file?.name ?? ""
+    const name = toTrimmedString(meta.name) ?? file?.name ?? ""
 
-    const mimetype =
-      toTrimmedString(meta.mimetype) ?? file?.mimetype
+    const mimetype = toTrimmedString(meta.mimetype) ?? file?.mimetype
 
     const size = toNumber(meta.size) ?? (file ? file.size : undefined)
 

@@ -1,7 +1,7 @@
 import { AssetStatus } from "../enums/AssetStatus.enum"
 
 export type ListAssetsRequest = {
-  congregationId?: string
+  churchId?: string
   category?: string
   status?: AssetStatus
   search?: string

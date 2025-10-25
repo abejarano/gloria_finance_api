@@ -2,10 +2,10 @@ import { Logger } from "@/Shared/adapter"
 import {
   Asset,
   AssetAttachmentLimitException,
+  AssetCodeGenerator,
   AssetStatus,
   CreateAssetRequest,
   IAssetRepository,
-  AssetCodeGenerator,
 } from "../domain"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 
@@ -44,7 +44,7 @@ export class CreateAsset {
         category: request.category,
         acquisitionDate: new Date(request.acquisitionDate),
         value: Number(request.value),
-        congregationId: request.congregationId,
+        churchId: request.churchId,
         location: request.location,
         responsibleId: request.responsibleId,
         status: request.status ?? AssetStatus.ACTIVE,

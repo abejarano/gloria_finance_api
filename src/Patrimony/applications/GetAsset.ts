@@ -1,5 +1,9 @@
 import { Logger } from "@/Shared/adapter"
-import { GetAssetRequest, IAssetRepository, AssetNotFoundException } from "../domain"
+import {
+  GetAssetRequest,
+  IAssetRepository,
+  AssetNotFoundException,
+} from "../domain"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 
 export class GetAsset {

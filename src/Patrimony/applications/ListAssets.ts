@@ -3,14 +3,11 @@ import {
   Criteria,
   Filters,
   Operator,
+  OrCondition,
   Order,
   OrderTypes,
-  OrCondition,
 } from "@abejarano/ts-mongodb-criteria"
-import {
-  IAssetRepository,
-  ListAssetsRequest,
-} from "../domain"
+import { IAssetRepository, ListAssetsRequest } from "../domain"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 
 export class ListAssets {
@@ -21,8 +18,8 @@ export class ListAssets {
   async execute(request: ListAssetsRequest) {
     this.logger.info("Listing patrimony assets", request)
 
-    const perPage = Math.max(Number(request.perPage ?? 20), 1)
-    const page = Math.max(Number(request.page ?? 1), 1)
+    const perPage = Number(request.perPage ?? 20)
+    const page = Number(request.page ?? 1)
 
     const criteria = this.prepareCriteria(request, { page, perPage })
 
@@ -40,14 +37,14 @@ export class ListAssets {
   ): Criteria {
     type FilterValue = string | number | boolean | OrCondition[] | Operator
 
-    const filters: Array<Map<string, FilterValue>> = []
+    const filters: Array<Map<string, any>> = []
 
-    if (request.congregationId) {
+    if (request.churchId) {
       filters.push(
         new Map<string, FilterValue>([
-          ["field", "congregationId"],
+          ["field", "churchId"],
           ["operator", Operator.EQUAL],
-          ["value", request.congregationId],
+          ["value", request.churchId],
         ])
       )
     }

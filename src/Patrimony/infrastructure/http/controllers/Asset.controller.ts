@@ -1,20 +1,18 @@
 import { Response } from "express"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import {
+  CreateAsset,
   CreateAssetAttachmentRequest,
   CreateAssetRequest,
-  ListAssetsRequest,
-  UpdateAssetRequest,
+  GenerateInventoryReport,
+  GetAsset,
   GetAssetRequest,
   InventoryReportRequest,
-} from "../../../domain"
-import {
-  CreateAsset,
   ListAssets,
+  ListAssetsRequest,
   UpdateAsset,
-  GetAsset,
-  GenerateInventoryReport,
-} from "../../../applications"
+  UpdateAssetRequest,
+} from "@/Patrimony"
 import { AssetMongoRepository } from "../../persistence/AssetMongoRepository"
 import { HttpStatus } from "@/Shared/domain"
 import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
@@ -57,66 +55,23 @@ const normalizeAttachments = async (
       typeof attachment.mimetype === "string" ? attachment.mimetype : undefined
     let sizeValue: number | undefined
 
-    if (typeof attachment.size === "number") {
-      sizeValue = attachment.size
-    } else if (
-      typeof attachment.size === "string" &&
-      attachment.size.trim().length > 0
-    ) {
-      const parsed = Number(attachment.size)
-      sizeValue = Number.isNaN(parsed) ? undefined : parsed
-    }
+    sizeValue = attachment.size
 
     let url = typeof attachment.url === "string" ? attachment.url : undefined
 
-    if (file) {
-      const storedPath = await storage.uploadFile(file)
-      uploadedAccumulator.push(storedPath)
-      url = storedPath
-      mimetype = mimetype ?? file.mimetype
-      sizeValue = sizeValue ?? file.size
-      if (!name) {
-        name = file.name
-      }
-    }
-
-    const normalizedName =
-      typeof name === "string" && name.trim().length > 0
-        ? name.trim()
-        : file?.name ?? "Anexo patrimonial"
-
-    const normalizedMimetype =
-      typeof mimetype === "string" && mimetype.trim().length > 0
-        ? mimetype.trim()
-        : undefined
-
-    if (!url) {
-      throw new AttachmentValidationError(
-        "Cada anexo deve possuir um arquivo para upload ou uma URL existente."
-      )
-    }
-
-    if (!normalizedMimetype) {
-      throw new AttachmentValidationError(
-        "O tipo de arquivo do anexo é obrigatório."
-      )
-    }
-
-    const normalizedSize =
-      typeof sizeValue === "number" && !Number.isNaN(sizeValue)
-        ? Number(sizeValue)
-        : undefined
-
-    if (typeof normalizedSize !== "number") {
-      throw new AttachmentValidationError(
-        "O tamanho do anexo é obrigatório."
-      )
+    const storedPath = await storage.uploadFile(file)
+    uploadedAccumulator.push(storedPath)
+    url = storedPath
+    mimetype = mimetype ?? file.mimetype
+    sizeValue = sizeValue ?? file.size
+    if (!name) {
+      name = file.name
     }
 
     normalized.push({
-      name: normalizedName,
-      mimetype: normalizedMimetype,
-      size: normalizedSize,
+      name,
+      mimetype,
+      size: sizeValue,
       url,
     })
   }
@@ -211,7 +166,7 @@ export const updateAssetController = async (
     const result = await new UpdateAsset(repository).execute({
       ...request,
       attachments: attachmentsProvided
-        ? normalizedAttachments ?? []
+        ? (normalizedAttachments ?? [])
         : undefined,
     })
 

@@ -4,6 +4,7 @@ import { AssetStatus } from "./enums/AssetStatus.enum"
 import { AssetAttachment } from "./types/AssetAttachment.type"
 import { AssetHistoryEntry } from "./types/AssetHistoryEntry.type"
 import { v4 } from "uuid"
+import { DateBR } from "@/Shared/helpers"
 
 export type AssetPrimitives = {
   id?: string
@@ -13,7 +14,7 @@ export type AssetPrimitives = {
   category: string
   acquisitionDate: Date
   value: number
-  congregationId: string
+  churchId: string
   location: string
   responsibleId: string
   status: AssetStatus
@@ -33,7 +34,7 @@ export class Asset extends AggregateRoot {
   private category: string
   private acquisitionDate: Date
   private value: number
-  private congregationId: string
+  private churchId: string
   private location: string
   private responsibleId: string
   private status: AssetStatus
@@ -51,7 +52,7 @@ export class Asset extends AggregateRoot {
       category: string
       acquisitionDate: Date
       value: number
-      congregationId: string
+      churchId: string
       location: string
       responsibleId: string
       status: AssetStatus
@@ -67,17 +68,17 @@ export class Asset extends AggregateRoot {
     asset.category = props.category
     asset.acquisitionDate = props.acquisitionDate
     asset.value = props.value
-    asset.congregationId = props.congregationId
+    asset.churchId = props.churchId
     asset.location = props.location
     asset.responsibleId = props.responsibleId
     asset.status = props.status
     asset.attachments = (props.attachments ?? []).map((attachment) => ({
       attachmentId: v4(),
-      uploadedAt: new Date(),
+      uploadedAt: DateBR(),
       ...attachment,
     }))
     asset.history = []
-    asset.createdAt = new Date()
+    asset.createdAt = DateBR()
     asset.updatedAt = asset.createdAt
 
     asset.appendHistory({
@@ -88,7 +89,7 @@ export class Asset extends AggregateRoot {
         name: { current: asset.name },
         category: { current: asset.category },
         value: { current: asset.value },
-        congregationId: { current: asset.congregationId },
+        churchId: { current: asset.churchId },
         responsibleId: { current: asset.responsibleId },
         status: { current: asset.status },
       },
@@ -107,7 +108,7 @@ export class Asset extends AggregateRoot {
     asset.category = plainData.category
     asset.acquisitionDate = new Date(plainData.acquisitionDate)
     asset.value = plainData.value
-    asset.congregationId = plainData.congregationId
+    asset.churchId = plainData.churchId
     asset.location = plainData.location
     asset.responsibleId = plainData.responsibleId
     asset.status = plainData.status
@@ -157,7 +158,7 @@ export class Asset extends AggregateRoot {
       category: this.category,
       acquisitionDate: this.acquisitionDate,
       value: this.value,
-      congregationId: this.congregationId,
+      churchId: this.churchId,
       location: this.location,
       responsibleId: this.responsibleId,
       status: this.status,
@@ -176,7 +177,7 @@ export class Asset extends AggregateRoot {
       category?: string
       acquisitionDate?: Date
       value?: number
-      congregationId?: string
+      churchId?: string
       location?: string
       responsibleId?: string
       status?: AssetStatus
@@ -216,14 +217,14 @@ export class Asset extends AggregateRoot {
     }
 
     if (
-      typeof payload.congregationId === "string" &&
-      payload.congregationId !== this.congregationId
+      typeof payload.churchId === "string" &&
+      payload.churchId !== this.churchId
     ) {
-      changes.congregationId = {
-        previous: this.congregationId,
-        current: payload.congregationId,
+      changes.churchId = {
+        previous: this.churchId,
+        current: payload.churchId,
       }
-      this.congregationId = payload.congregationId
+      this.churchId = payload.churchId
     }
 
     if (
@@ -245,10 +246,7 @@ export class Asset extends AggregateRoot {
       this.responsibleId = payload.responsibleId
     }
 
-    if (
-      payload.status &&
-      payload.status !== this.status
-    ) {
+    if (payload.status && payload.status !== this.status) {
       changes.status = { previous: this.status, current: payload.status }
       this.status = payload.status
     }
@@ -301,7 +299,7 @@ export class Asset extends AggregateRoot {
     const previous = this.attachments
     this.attachments = attachments.map((attachment) => ({
       attachmentId: v4(),
-      uploadedAt: new Date(),
+      uploadedAt: DateBR(),
       ...attachment,
     }))
     this.touch()
@@ -318,10 +316,12 @@ export class Asset extends AggregateRoot {
     })
   }
 
-  markInventory(
-    metadata: { performedBy: string; notes?: string; checkedAt?: Date }
-  ) {
-    this.inventoryCheckedAt = metadata.checkedAt ?? new Date()
+  markInventory(metadata: {
+    performedBy: string
+    notes?: string
+    checkedAt?: Date
+  }) {
+    this.inventoryCheckedAt = metadata.checkedAt ?? DateBR()
     this.inventoryCheckedBy = metadata.performedBy
     this.touch()
     this.appendHistory({
@@ -332,7 +332,7 @@ export class Asset extends AggregateRoot {
   }
 
   private touch() {
-    this.updatedAt = new Date()
+    this.updatedAt = DateBR()
   }
 
   private appendHistory(
@@ -340,7 +340,7 @@ export class Asset extends AggregateRoot {
   ): AssetHistoryEntry {
     const historyEntry: AssetHistoryEntry = {
       entryId: IdentifyEntity.get("asset-history"),
-      performedAt: new Date(),
+      performedAt: DateBR(),
       ...entry,
     }
 

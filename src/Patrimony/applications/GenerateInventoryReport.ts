@@ -1,7 +1,7 @@
 import { Logger, PuppeteerAdapter } from "@/Shared/adapter"
 import {
-  AssetStatusLabels,
   AssetResponse,
+  AssetStatusLabels,
   IAssetRepository,
   InventoryReportRequest,
 } from "../domain"
@@ -30,7 +30,7 @@ export class GenerateInventoryReport {
     this.logger.info("Generating patrimony inventory report", request)
 
     const filters = AssetCodeGenerator.buildFilters({
-      congregationId: request.congregationId,
+      churchId: request.churchId,
       category: request.category,
       status: request.status,
     })
@@ -48,14 +48,19 @@ export class GenerateInventoryReport {
   }
 
   private buildSummary(assets: AssetResponse[]): InventorySummary {
-    const totalValue = assets.reduce((acc, asset) => acc + Number(asset.value || 0), 0)
+    const totalValue = assets.reduce(
+      (acc, asset) => acc + Number(asset.value || 0),
+      0
+    )
 
     const byStatus = assets.reduce<Record<string, number>>((acc, asset) => {
       acc[asset.status] = (acc[asset.status] ?? 0) + 1
       return acc
     }, {})
 
-    const documentsPending = assets.filter((asset) => asset.documentsPending).length
+    const documentsPending = assets.filter(
+      (asset) => asset.documentsPending
+    ).length
 
     return {
       totalAssets: assets.length,
@@ -65,10 +70,7 @@ export class GenerateInventoryReport {
     }
   }
 
-  private buildCsvResponse(
-    assets: AssetResponse[],
-    summary: InventorySummary
-  ) {
+  private buildCsvResponse(assets: AssetResponse[], summary: InventorySummary) {
     const header = [
       "Código",
       "Nome",
@@ -88,7 +90,7 @@ export class GenerateInventoryReport {
       asset.category,
       AssetStatusLabels[asset.status],
       Number(asset.value ?? 0).toFixed(2),
-      asset.congregationId,
+      asset.churchId,
       asset.responsibleId,
       new Date(asset.acquisitionDate).toISOString().slice(0, 10),
       asset.location,
@@ -96,7 +98,11 @@ export class GenerateInventoryReport {
     ])
 
     const csv = [header, ...rows]
-      .map((row) => row.map((value) => `"${(value ?? "").toString().replace(/"/g, '""')}"`).join(CSV_SEPARATOR))
+      .map((row) =>
+        row
+          .map((value) => `"${(value ?? "").toString().replace(/"/g, '""')}"`)
+          .join(CSV_SEPARATOR)
+      )
       .join("\n")
 
     return {
@@ -123,14 +129,16 @@ export class GenerateInventoryReport {
         }).format(summary.totalValue),
       },
       filters: {
-        congregationId: request.congregationId,
+        churchId: request.churchId,
         category: request.category,
         status: request.status,
       },
       assets: assets.map((asset, index) => ({
         ...asset,
         index: index + 1,
-        acquisitionDateFormatted: new Date(asset.acquisitionDate).toLocaleDateString("pt-BR"),
+        acquisitionDateFormatted: new Date(
+          asset.acquisitionDate
+        ).toLocaleDateString("pt-BR"),
         statusLabel: AssetStatusLabels[asset.status],
         valueFormatted: new Intl.NumberFormat("pt-BR", {
           style: "currency",

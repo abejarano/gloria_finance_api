@@ -7,7 +7,7 @@ export type UpdateAssetRequest = {
   category?: string
   value?: number
   acquisitionDate?: string
-  congregationId?: string
+  churchId?: string
   location?: string
   responsibleId?: string
   status?: AssetStatus

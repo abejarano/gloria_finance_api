@@ -59,7 +59,7 @@ export class UpdateAsset {
         category: request.category,
         acquisitionDate,
         value,
-        congregationId: request.congregationId,
+        churchId: request.churchId,
         location: request.location,
         responsibleId: request.responsibleId,
         status: request.status,

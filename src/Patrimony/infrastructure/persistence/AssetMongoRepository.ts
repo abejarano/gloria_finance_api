@@ -1,11 +1,11 @@
-import { Criteria, MongoRepository, Paginate } from "@abejarano/ts-mongodb-criteria"
+import {
+  Criteria,
+  MongoRepository,
+  Paginate,
+} from "@abejarano/ts-mongodb-criteria"
 import { Filter } from "mongodb"
 import { Asset } from "../../domain/Asset"
-import {
-  AssetListFilters,
-  AssetModel,
-  IAssetRepository,
-} from "../../domain"
+import { AssetListFilters, AssetModel, IAssetRepository } from "../../domain"
 
 export class AssetMongoRepository
   extends MongoRepository<Asset>
@@ -30,10 +30,8 @@ export class AssetMongoRepository
   }
 
   async list(criteria: Criteria): Promise<Paginate<AssetModel>> {
-    const documents = await this.searchByCriteria<Record<string, unknown>>(
-      criteria
-    )
-    const paginated = this.paginate<Record<string, unknown>>(documents)
+    const documents = await this.searchByCriteria(criteria)
+    const paginated = await this.paginate(documents)
 
     return {
       ...paginated,
@@ -61,10 +59,7 @@ export class AssetMongoRepository
   async search(filters?: AssetListFilters): Promise<AssetModel[]> {
     const collection = await this.collection()
     const query = this.buildQuery(filters)
-    const documents = await collection
-      .find(query)
-      .sort({ name: 1 })
-      .toArray()
+    const documents = await collection.find(query).sort({ name: 1 }).toArray()
 
     return documents.map((doc) => this.mapToModel(doc))
   }
@@ -72,8 +67,8 @@ export class AssetMongoRepository
   private buildQuery(filters?: AssetListFilters, search?: string): Filter<any> {
     const query: Filter<any> = {}
 
-    if (filters?.congregationId) {
-      query.congregationId = filters.congregationId
+    if (filters?.churchId) {
+      query.churchId = filters.churchId
     }
 
     if (filters?.category) {
@@ -96,7 +91,6 @@ export class AssetMongoRepository
 
     return query
   }
-
 
   private mapToModel(document: any): AssetModel {
     const attachments = (document.attachments ?? []).map((attachment) => ({
@@ -121,7 +115,7 @@ export class AssetMongoRepository
         ? new Date(document.acquisitionDate)
         : new Date(),
       value: Number(document.value ?? 0),
-      congregationId: document.congregationId,
+      churchId: document.churchId,
       location: document.location,
       responsibleId: document.responsibleId,
       status: document.status,

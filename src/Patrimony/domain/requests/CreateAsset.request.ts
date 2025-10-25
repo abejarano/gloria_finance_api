@@ -13,9 +13,10 @@ export type CreateAssetRequest = {
   category: string
   value: number
   acquisitionDate: string
-  congregationId: string
+  churchId: string
   location: string
   responsibleId: string
+  serialNumber: string
   status?: AssetStatus
   attachments?: CreateAssetAttachmentRequest[]
   performedBy: string

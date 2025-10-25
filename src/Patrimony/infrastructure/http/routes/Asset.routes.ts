@@ -16,7 +16,7 @@ import {
   CreateAssetAttachmentRequest,
   CreateAssetRequest,
   UpdateAssetRequest,
-} from "../../../domain"
+} from "@/Patrimony"
 
 const router = Router()
 
@@ -29,14 +29,18 @@ const resolveUserId = (request: Request) => {
 const collectAttachmentsFromRequest = (
   req: Request
 ): { attachments?: CreateAssetAttachmentRequest[]; provided: boolean } => {
+  console.log(req.files)
+
   const hasAttachmentsProp = Object.prototype.hasOwnProperty.call(
     req.body,
     "attachments"
   )
 
-  const filesInput = (req as Request & {
-    files?: { [fieldname: string]: unknown }
-  }).files?.attachments as
+  const filesInput = (
+    req as Request & {
+      files?: { [fieldname: string]: unknown }
+    }
+  ).files?.attachments as
     | CreateAssetAttachmentRequest["file"]
     | CreateAssetAttachmentRequest["file"][]
     | undefined
@@ -44,8 +48,8 @@ const collectAttachmentsFromRequest = (
   const files = Array.isArray(filesInput)
     ? filesInput
     : filesInput
-    ? [filesInput]
-    : []
+      ? [filesInput]
+      : []
 
   if (!hasAttachmentsProp) {
     return { attachments: undefined, provided: false }
@@ -73,7 +77,8 @@ router.post(
     await createAssetController(
       {
         ...req.body,
-        attachments: provided ? attachments ?? [] : undefined,
+        churchId: req["user"].churchId,
+        attachments: provided ? (attachments ?? []) : undefined,
         value: Number(req.body.value),
         status: req.body.status as AssetStatus,
         performedBy,
@@ -91,10 +96,7 @@ router.get(
 
     await listAssetsController(
       {
-        congregationId:
-          typeof req.query.congregationId === "string"
-            ? req.query.congregationId
-            : undefined,
+        churchId: req["user"].churchId,
         category:
           typeof req.query.category === "string"
             ? req.query.category
@@ -143,7 +145,7 @@ router.put(
             ? Number(req.body.value)
             : undefined,
         status: req.body.status as AssetStatus,
-        attachments: provided ? attachments ?? [] : undefined,
+        attachments: provided ? (attachments ?? []) : undefined,
         performedBy,
       } as UpdateAssetRequest,
       res
@@ -159,9 +161,9 @@ router.get(
 
     await generateInventoryReportController(
       {
-        congregationId:
-          typeof req.query.congregationId === "string"
-            ? req.query.congregationId
+        churchId:
+          typeof req.query.churchId === "string"
+            ? req.query.churchId
             : undefined,
         category:
           typeof req.query.category === "string"

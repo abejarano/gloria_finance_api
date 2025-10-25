@@ -35,7 +35,7 @@ export default async (req, res, next) => {
     category: "string",
     value: "numeric",
     acquisitionDate: "dateFormat:YYYY-MM-DD",
-    congregationId: "string",
+    churchId: "string",
     location: "string",
     responsibleId: "string",
     status: `in:${statusValues}`,

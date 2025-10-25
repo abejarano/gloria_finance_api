@@ -1,6 +1,6 @@
 import { Logger } from "@/Shared/adapter"
 import { HttpStatus } from "@/Shared/domain"
-import { AssetStatus } from "../../../domain"
+import { AssetStatus } from "@/Patrimony"
 import { Validator } from "node-input-validator"
 import {
   hasMissingAttachmentSource,
@@ -10,6 +10,7 @@ import {
 const logger = Logger("CreateAssetValidator")
 
 export default async (req, res, next) => {
+  console.log(req.files)
   const { attachments, provided } = normalizeAttachmentPayload(
     req.body.attachments,
     req.files?.attachments
@@ -34,7 +35,6 @@ export default async (req, res, next) => {
     category: "required|string",
     value: "required|numeric",
     acquisitionDate: "required|dateFormat:YYYY-MM-DD",
-    congregationId: "required|string",
     location: "required|string",
     responsibleId: "required|string",
     status: `in:${statusValues}`,

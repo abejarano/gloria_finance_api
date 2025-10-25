@@ -7,6 +7,14 @@ const CODE_PAD_LENGTH = 6
 export class AssetCodeGenerator {
   constructor(private readonly repository: IAssetRepository) {}
 
+  static buildFilters(filter?: AssetListFilters): AssetListFilters {
+    return {
+      churchId: filter?.churchId,
+      category: filter?.category,
+      status: filter?.status,
+    }
+  }
+
   async generate(): Promise<string> {
     let attempts = 0
 
@@ -26,17 +34,8 @@ export class AssetCodeGenerator {
 
     const fallback = Date.now().toString()
 
-    return `${CODE_PREFIX}${fallback.slice(-CODE_PAD_LENGTH).padStart(
-      CODE_PAD_LENGTH,
-      "0"
-    )}`
-  }
-
-  static buildFilters(filter?: AssetListFilters): AssetListFilters {
-    return {
-      congregationId: filter?.congregationId,
-      category: filter?.category,
-      status: filter?.status,
-    }
+    return `${CODE_PREFIX}${fallback
+      .slice(-CODE_PAD_LENGTH)
+      .padStart(CODE_PAD_LENGTH, "0")}`
   }
 }

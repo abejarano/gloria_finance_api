@@ -10,7 +10,7 @@ export type AssetModel = {
   category: string
   acquisitionDate: Date
   value: number
-  congregationId: string
+  churchId: string
   location: string
   responsibleId: string
   status: AssetStatus
