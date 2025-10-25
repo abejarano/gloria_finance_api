@@ -5,9 +5,12 @@ import {
   IAssetRepository,
   InventoryReportRequest,
 } from "../domain"
-import { AssetCodeGenerator } from "../domain/services/AssetCodeGenerator"
+import { AssetCodeGenerator } from "@/Patrimony"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 import { promises as fs } from "fs"
+import { join } from "path"
+import { tmpdir } from "os"
+import { IChurchRepository } from "@/Church/domain"
 
 const CSV_SEPARATOR = ";"
 
@@ -18,15 +21,21 @@ type InventorySummary = {
   documentsPending: number
 }
 
+type InventoryReportFile = {
+  path: string
+  filename: string
+}
+
 export class GenerateInventoryReport {
   private readonly logger = Logger(GenerateInventoryReport.name)
 
   constructor(
+    private readonly churchRepository: IChurchRepository,
     private readonly repository: IAssetRepository,
     private readonly pdfGenerator: PuppeteerAdapter
   ) {}
 
-  async execute(request: InventoryReportRequest) {
+  async execute(request: InventoryReportRequest): Promise<InventoryReportFile> {
     this.logger.info("Generating patrimony inventory report", request)
 
     const filters = AssetCodeGenerator.buildFilters({
@@ -38,13 +47,13 @@ export class GenerateInventoryReport {
     const assets = await this.repository.search(filters)
     const responses = assets.map(mapAssetToResponse)
 
-    const summary = this.buildSummary(responses)
-
     if (request.format === "csv") {
-      return this.buildCsvResponse(responses, summary)
+      return await this.buildCsvFile(responses)
     }
 
-    return await this.buildPdfResponse(responses, summary, request)
+    const summary = this.buildSummary(responses)
+
+    return await this.buildPdfFile(responses, summary, request)
   }
 
   private buildSummary(assets: AssetResponse[]): InventorySummary {
@@ -70,7 +79,9 @@ export class GenerateInventoryReport {
     }
   }
 
-  private buildCsvResponse(assets: AssetResponse[], summary: InventorySummary) {
+  private async buildCsvFile(
+    assets: AssetResponse[]
+  ): Promise<InventoryReportFile> {
     const header = [
       "Código",
       "Nome",
@@ -105,20 +116,28 @@ export class GenerateInventoryReport {
       )
       .join("\n")
 
+    const timestamp = Date.now()
+    const filename = `inventario-patrimonial-${timestamp}.csv`
+    const tempFilePath = join(
+      tmpdir(),
+      `${timestamp}-${Math.random().toString(16).slice(2)}.csv`
+    )
+
+    await fs.writeFile(tempFilePath, csv, "utf-8")
+
     return {
-      format: "csv" as const,
-      filename: `inventario-patrimonial-${Date.now()}.csv`,
-      contentType: "text/csv",
-      content: Buffer.from(csv, "utf-8").toString("base64"),
-      summary,
+      filename,
+      path: tempFilePath,
     }
   }
 
-  private async buildPdfResponse(
+  private async buildPdfFile(
     assets: AssetResponse[],
     summary: InventorySummary,
     request: InventoryReportRequest
-  ) {
+  ): Promise<InventoryReportFile> {
+    const church = await this.churchRepository.one(request.churchId)
+
     const templateData = {
       generatedAt: new Date().toISOString(),
       summary: {
@@ -129,7 +148,7 @@ export class GenerateInventoryReport {
         }).format(summary.totalValue),
       },
       filters: {
-        churchId: request.churchId,
+        church: `${church.getName()}`,
         category: request.category,
         status: request.status,
       },
@@ -147,19 +166,14 @@ export class GenerateInventoryReport {
       })),
     }
 
-    const pdfPath = await this.pdfGenerator
-      .htmlTemplate("patrimony/inventory-report", templateData)
-      .toPDF(false)
-
-    const content = await fs.readFile(pdfPath)
-    await fs.unlink(pdfPath)
+    const timestamp = Date.now()
+    const filename = `inventario-patrimonial-${timestamp}.pdf`
 
     return {
-      format: "pdf" as const,
-      filename: `inventario-patrimonial-${Date.now()}.pdf`,
-      contentType: "application/pdf",
-      content: content.toString("base64"),
-      summary,
+      path: await this.pdfGenerator
+        .htmlTemplate("patrimony/inventory-report", templateData)
+        .toPDF(false),
+      filename: filename,
     }
   }
 }

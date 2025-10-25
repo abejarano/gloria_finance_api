@@ -144,35 +144,35 @@ Para actualizar anexos reutiliza el body `form-data`:
   originales (puedes consultarlos con `GET /patrimony/:assetId`). Repite la clave para cada id o envía un valor en JSON
   como `["att-1","att-2"]` si estás usando `Content-Type: application/json`.
 
-| Clave                | Tipo | Valor                                                                                                                                       |
-|----------------------|------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| location             | Text | Auditorio                                                                                                                                   |
-| responsibleId        | Text | urn:user:new-director                                                                                                                       |
-| notes                | Text | Traslado aprobado en comité 2024-Q3                                                                                                         |
-| attachments          | Text | [{"name":"Contrato-donacion.pdf","url":"https://storage.example.com/assets/piano/contrato.pdf","mimetype":"application/pdf","size":524288}] |
-| attachments          | File | inventario-2024.pdf                                                                                                                         |
-| attachmentsToRemove  | Text | urn:attachment:1                                                                                                                            |
-| attachmentsToRemove  | Text | urn:attachment:2                                                                                                                            |
+| Clave               | Tipo | Valor                                                                                                                                       |
+|---------------------|------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| location            | Text | Auditorio                                                                                                                                   |
+| responsibleId       | Text | urn:user:new-director                                                                                                                       |
+| notes               | Text | Traslado aprobado en comité 2024-Q3                                                                                                         |
+| attachments         | Text | [{"name":"Contrato-donacion.pdf","url":"https://storage.example.com/assets/piano/contrato.pdf","mimetype":"application/pdf","size":524288}] |
+| attachments         | File | inventario-2024.pdf                                                                                                                         |
+| attachmentsToRemove | Text | urn:attachment:1                                                                                                                            |
+| attachmentsToRemove | Text | urn:attachment:2                                                                                                                            |
 
 Cuando envíes `attachmentsToRemove` el backend eliminará esos registros y ejecutará `deleteFile` en cada URL
 correspondiente. Si no agregas nuevos archivos y dejas el campo vacío, los anexos restantes se mantienen sin cambios.
 
 ## Generar reporte de inventario
 
-`GET {{baseUrl}}/patrimony/assets/report/inventory`
+`GET {{baseUrl}}/patrimony/report/inventory`
 
 Genera un resumen en CSV o PDF. Usa los mismos filtros de la lista para segmentar por congregación, categoría o estado.
 El parámetro `format` acepta `csv` o `pdf`.
 
 ```
-{{baseUrl}}/patrimony/assets/report/inventory?
+{{baseUrl}}/patrimony/report/inventory?
   format=pdf&
   churchId=urn:church:central&
   category=instrument
 ```
 
-> El endpoint devuelve el archivo en el cuerpo de la respuesta con los encabezados correspondientes (
-`Content-Type: application/pdf` o `text/csv`). Guarda el archivo desde Postman seleccionando "Save Response".
+> El endpoint envía el archivo directamente como descarga (`Content-Disposition: attachment`). Postman no lo mostrará en
+> pantalla, así que selecciona "Save Response" para guardarlo en el disco.
 
 ---
 

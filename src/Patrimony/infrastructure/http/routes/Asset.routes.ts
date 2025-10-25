@@ -15,6 +15,7 @@ import {
   AssetStatus,
   CreateAssetAttachmentRequest,
   CreateAssetRequest,
+  InventoryReportFormat,
   UpdateAssetRequest,
 } from "@/Patrimony"
 
@@ -164,7 +165,7 @@ router.get(
       {
         ...req.query,
         churchId: req["user"].churchId,
-        format: req.query.format as "csv" | "pdf",
+        format: req.query.format as InventoryReportFormat,
         status: req.query.status as AssetStatus,
         performedBy,
       },

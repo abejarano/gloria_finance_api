@@ -4,8 +4,12 @@ import {
   Paginate,
 } from "@abejarano/ts-mongodb-criteria"
 import { Filter } from "mongodb"
-import { Asset } from "../../domain/Asset"
-import { AssetListFilters, AssetModel, IAssetRepository } from "../../domain"
+import {
+  Asset,
+  AssetListFilters,
+  AssetModel,
+  IAssetRepository,
+} from "@/Patrimony"
 
 export class AssetMongoRepository
   extends MongoRepository<Asset>
