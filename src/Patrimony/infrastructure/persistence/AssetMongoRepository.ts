@@ -33,9 +33,12 @@ export class AssetMongoRepository
     const documents = await this.searchByCriteria<Record<string, unknown>>(
       criteria
     )
-    const results = documents.map((doc) => this.mapToModel(doc))
+    const paginated = this.paginate<Record<string, unknown>>(documents)
 
-    return this.paginate<AssetModel>(results)
+    return {
+      ...paginated,
+      results: paginated.results.map((doc) => this.mapToModel(doc)),
+    }
   }
 
   async one(filter: Record<string, unknown>): Promise<Asset | undefined> {

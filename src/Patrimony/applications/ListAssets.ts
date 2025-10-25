@@ -5,6 +5,7 @@ import {
   Operator,
   Order,
   OrderTypes,
+  OrCondition,
 } from "@abejarano/ts-mongodb-criteria"
 import {
   IAssetRepository,
@@ -37,11 +38,13 @@ export class ListAssets {
     request: ListAssetsRequest,
     pagination: { page: number; perPage: number }
   ): Criteria {
-    const filters: Array<Map<string, unknown>> = []
+    type FilterValue = string | number | boolean | OrCondition[] | Operator
+
+    const filters: Array<Map<string, FilterValue>> = []
 
     if (request.congregationId) {
       filters.push(
-        new Map<string, unknown>([
+        new Map<string, FilterValue>([
           ["field", "congregationId"],
           ["operator", Operator.EQUAL],
           ["value", request.congregationId],
@@ -51,7 +54,7 @@ export class ListAssets {
 
     if (request.category) {
       filters.push(
-        new Map<string, unknown>([
+        new Map<string, FilterValue>([
           ["field", "category"],
           ["operator", Operator.EQUAL],
           ["value", request.category],
@@ -61,7 +64,7 @@ export class ListAssets {
 
     if (request.status) {
       filters.push(
-        new Map<string, unknown>([
+        new Map<string, FilterValue>([
           ["field", "status"],
           ["operator", Operator.EQUAL],
           ["value", request.status],
@@ -73,20 +76,22 @@ export class ListAssets {
       typeof request.search === "string" ? request.search.trim() : undefined
 
     if (searchTerm) {
-      const regex = new RegExp(searchTerm, "i")
+      const searchConditions: OrCondition[] = [
+        { field: "name", operator: Operator.CONTAINS, value: searchTerm },
+        { field: "code", operator: Operator.CONTAINS, value: searchTerm },
+        {
+          field: "responsibleId",
+          operator: Operator.CONTAINS,
+          value: searchTerm,
+        },
+        { field: "location", operator: Operator.CONTAINS, value: searchTerm },
+      ]
+
       filters.push(
-        new Map<string, unknown>([
-          ["field", "$or"],
-          ["operator", Operator.EQUAL],
-          [
-            "value",
-            [
-              { name: regex },
-              { code: regex },
-              { responsibleId: regex },
-              { location: regex },
-            ],
-          ],
+        new Map<string, FilterValue>([
+          ["field", "search"],
+          ["operator", Operator.OR],
+          ["value", searchConditions],
         ])
       )
     }
