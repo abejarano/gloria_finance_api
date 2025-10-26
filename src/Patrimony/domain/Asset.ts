@@ -129,18 +129,8 @@ export class Asset extends AggregateRoot {
     asset.value = plainData.value
     asset.churchId = plainData.churchId
     asset.location = plainData.location
-    const responsible = plainData.responsible ?? {
-      memberId: plainData.responsibleId ?? "",
-      name: plainData.responsible?.name ?? "",
-      email: plainData.responsible?.email ?? null,
-      phone: plainData.responsible?.phone ?? null,
-    }
-    asset.responsible = {
-      memberId: responsible.memberId,
-      name: responsible.name,
-      email: responsible.email ?? null,
-      phone: responsible.phone ?? null,
-    }
+    asset.responsible = plainData.responsible
+
     asset.status = plainData.status
     asset.attachments = (plainData.attachments ?? []).map((attachment) => ({
       ...attachment,
@@ -270,7 +260,8 @@ export class Asset extends AggregateRoot {
       const isSameResponsible =
         payload.responsible.memberId === this.responsible.memberId &&
         payload.responsible.name === this.responsible.name &&
-        (payload.responsible.email ?? null) === (this.responsible.email ?? null) &&
+        (payload.responsible.email ?? null) ===
+          (this.responsible.email ?? null) &&
         (payload.responsible.phone ?? null) === (this.responsible.phone ?? null)
 
       if (!isSameResponsible) {

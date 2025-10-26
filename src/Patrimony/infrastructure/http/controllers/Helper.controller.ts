@@ -29,6 +29,16 @@ export const normalizeAttachments = async (
 
     let url = typeof attachment.url === "string" ? attachment.url : undefined
 
+    if (!file) {
+      normalized.push({
+        name,
+        mimetype,
+        size: sizeValue,
+        url,
+      })
+      continue
+    }
+
     const storedPath = await storage.uploadFile(file)
     uploadedAccumulator.push(storedPath)
     url = storedPath

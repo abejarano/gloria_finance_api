@@ -98,7 +98,7 @@ export class AssetMongoRepository
     return query
   }
 
-  private mapToModel(document: any): AssetModel {
+  private mapToModel(document: any) {
     const attachments = (document.attachments ?? []).map((attachment) => ({
       ...attachment,
       uploadedAt: attachment.uploadedAt

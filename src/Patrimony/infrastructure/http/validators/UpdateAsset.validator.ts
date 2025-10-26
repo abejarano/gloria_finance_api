@@ -38,7 +38,6 @@ export default async (req, res, next) => {
   const statusValues = Object.values(AssetStatus).join(",")
 
   const rules = {
-    assetId: "required|string",
     name: "string",
     category: "string",
     value: "numeric",

@@ -2,11 +2,11 @@ import { Request, Response, Router } from "express"
 import { PermissionMiddleware } from "@/Shared/infrastructure"
 import {
   createAssetController,
+  disposeAssetController,
   generateInventoryReportController,
   generatePhysicalInventorySheetController,
   getAssetController,
   listAssetsController,
-  disposeAssetController,
   recordAssetInventoryController,
   updateAssetController,
 } from "../controllers"
@@ -18,12 +18,12 @@ import DisposeAssetValidator from "../validators/DisposeAsset.validator"
 import RecordAssetInventoryValidator from "../validators/RecordAssetInventory.validator"
 import PhysicalInventorySheetValidator from "../validators/PhysicalInventorySheet.validator"
 import {
+  AssetInventoryStatus,
   AssetStatus,
   CreateAssetAttachmentRequest,
   CreateAssetRequest,
-  InventoryReportFormat,
-  AssetInventoryStatus,
   DisposeAssetRequest,
+  InventoryReportFormat,
   PhysicalInventorySheetRequest,
   RecordAssetInventoryRequest,
   UpdateAssetRequest,
@@ -149,10 +149,7 @@ router.put(
       {
         ...req.body,
         assetId: req.params.assetId,
-        value:
-          typeof req.body.value !== "undefined"
-            ? Number(req.body.value)
-            : undefined,
+        value: Number(req.body.value),
         status: req.body.status as AssetStatus,
         attachments: provided ? (attachments ?? []) : undefined,
         attachmentsToRemove: Array.isArray(req.body.attachmentsToRemove)

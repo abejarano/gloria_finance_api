@@ -6,7 +6,6 @@ import { AssetDisposalRecord } from "../types/AssetDisposal.type"
 import { AssetResponsible } from "../types/AssetResponsible.type"
 
 export type AssetModel = {
-  id?: string
   assetId: string
   code: string
   name: string

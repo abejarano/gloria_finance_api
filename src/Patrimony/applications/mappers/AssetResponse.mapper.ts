@@ -8,24 +8,12 @@ export const mapAssetToResponse = (
   const base: AssetPrimitives | AssetModel =
     asset instanceof Asset ? asset.toPrimitives() : asset
 
-  const assetId = asset instanceof Asset ? asset.getId() : asset.id
-
-  const responsible =
-    base.responsible ??
-    (asset instanceof Asset
-      ? asset.getResponsible()
-      : {
-          memberId: base.responsibleId ?? "",
-          name: "",
-          email: null,
-          phone: null,
-        })
+  const responsible = base.responsible
 
   const serialized: AssetModel = {
     ...base,
-    ...(assetId ? { id: assetId } : {}),
     responsibleId: base.responsibleId ?? responsible.memberId,
-    responsible,
+    responsible: responsible,
   }
 
   return {
