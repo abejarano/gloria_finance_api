@@ -6,6 +6,9 @@ Postman o Insomnia y ajustar identificadores/datos según tu ambiente. Todos los
 se indique lo contrario, establece también `Content-Type: application/json`. Cuando necesites adjuntar anexos en las
 operaciones de alta o edición cambia el body a `multipart/form-data` y agrega cada archivo en un campo `attachments`.
 
+Además del MVP (alta, consulta, edición y reporte), aquí se documentan los flujos de control expandido introducidos en
+la Fase 3: baja de bienes y control de inventarios físicos.
+
 ## Base URL sugerida
 
 Configura una variable `{{baseUrl}}` apuntando al host de tu instancia (por ejemplo, `https://api.mi-iglesia.test`). Las
@@ -174,7 +177,76 @@ El parámetro `format` acepta `csv` o `pdf`.
 > El endpoint envía el archivo directamente como descarga (`Content-Disposition: attachment`). Postman no lo mostrará en
 > pantalla, así que selecciona "Save Response" para guardarlo en el disco.
 
+## Registrar baja de un bien patrimonial
+
+`POST {{baseUrl}}/patrimony/:assetId/disposal`
+
+Marca un bien como donado, vendido o extraviado y almacena el motivo junto con la fecha del evento. El backend valida
+que el `status` pertenezca a los valores de baja permitidos (`DONATED`, `SOLD`, `LOST`). La fecha `disposedAt` es
+opcional y debe seguir el formato `YYYY-MM-DD`; si la omites el sistema utilizará la fecha actual. Cualquier texto en
+`observations` quedará guardado tanto en el registro de baja como en el historial del bien.
+
+```json
+POST {{baseUrl}}/patrimony/asset-123/disposal
+{
+  "status": "DONATED",
+  "reason": "Entregado a la congregación Nueva Vida",
+  "disposedAt": "2024-09-10",
+  "observations": "Aprobado en asamblea del 08/09"
+}
+```
+
+La respuesta es el objeto del activo con sus campos actualizados. Verás el `status` cambiado y un bloque `disposal`
+similar a:
+
+```json
+{
+  "status": "DONATED",
+  "reason": "Entregado a la congregación Nueva Vida",
+  "performedBy": "urn:user:admin",
+  "occurredAt": "2024-09-10T00:00:00.000Z",
+  "notes": "Aprobado en asamblea del 08/09"
+}
+```
+
+## Registrar inventario físico de un bien
+
+`POST {{baseUrl}}/patrimony/:assetId/inventory`
+
+Permite dejar constancia de que un activo fue verificado físicamente. El campo `status` usa los valores del enumerado de
+inventario (`CONFIRMED`, `NOT_FOUND`). Puedes adjuntar notas para clarificar el resultado. El parámetro `checkedAt` es
+opcional, acepta formato `YYYY-MM-DD` y, si no se envía, se tomará la fecha actual.
+
+```json
+POST {{baseUrl}}/patrimony/asset-123/inventory
+{
+  "status": "CONFIRMED",
+  "checkedAt": "2024-09-12",
+  "notes": "Verificado durante la auditoría trimestral"
+}
+```
+
+El servicio devolverá el activo con los campos `inventoryStatus`, `inventoryCheckedAt` e `inventoryCheckedBy` completos
+y un nuevo evento en el historial (`INVENTORY_CONFIRMED`).
+
+## Descargar checklist para inventario físico
+
+`GET {{baseUrl}}/patrimony/report/inventory/physical`
+
+Genera un CSV listo para imprimir o trabajar en campo, listando los bienes filtrados por congregación, categoría o
+estado operativo. El usuario autenticado determina la congregación (`churchId`). Los parámetros admiten los mismos
+valores que la búsqueda general (`category`, `status`).
+
+```
+{{baseUrl}}/patrimony/report/inventory/physical?
+  category=instrument&
+  status=ACTIVE
+```
+
+El archivo contiene columnas para código, nombre, responsable, localización, estado y el último resultado de inventario
+registrado. En Postman selecciona "Send and Download" o "Save Response" para guardar el CSV.
+
 ---
 
-Con estos ejemplos podrás armar rápidamente una colección en Postman que cubra el MVP patrimonial (Fase 1) y validar
-tanto flujos de alta como de consulta y reportes.
+Con estos ejemplos podrás armar rápidamente una colección en Postman que cubra el módulo patrimonial completo, desde el
+MVP hasta las capacidades de control expandido incorporadas en la Fase 3.
