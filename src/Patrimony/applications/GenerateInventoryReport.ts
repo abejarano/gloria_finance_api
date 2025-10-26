@@ -102,7 +102,7 @@ export class GenerateInventoryReport {
       AssetStatusLabels[asset.status],
       Number(asset.value ?? 0).toFixed(2),
       asset.churchId,
-      asset.responsibleId,
+      asset.responsible?.name ?? asset.responsibleId,
       new Date(asset.acquisitionDate).toISOString().slice(0, 10),
       asset.location,
       asset.documentsPending ? "Sim" : "Não",
@@ -159,6 +159,7 @@ export class GenerateInventoryReport {
           asset.acquisitionDate
         ).toLocaleDateString("pt-BR"),
         statusLabel: AssetStatusLabels[asset.status],
+        responsibleName: asset.responsible?.name ?? asset.responsibleId,
         valueFormatted: new Intl.NumberFormat("pt-BR", {
           style: "currency",
           currency: "BRL",

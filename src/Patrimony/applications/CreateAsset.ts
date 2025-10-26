@@ -6,6 +6,7 @@ import {
   CreateAssetRequest,
   IAssetRepository,
 } from "../domain"
+import { IMemberRepository, MemberNotFound } from "@/Church/domain"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 
 export class CreateAsset {
@@ -13,6 +14,7 @@ export class CreateAsset {
 
   constructor(
     private readonly repository: IAssetRepository,
+    private readonly memberRepository: IMemberRepository,
     private readonly codeGenerator: AssetCodeGenerator = new AssetCodeGenerator(
       repository
     )
@@ -28,6 +30,14 @@ export class CreateAsset {
       size: attachment.size!,
     }))
 
+    const responsibleMember = await this.memberRepository.one({
+      memberId: request.responsibleId,
+    })
+
+    if (!responsibleMember) {
+      throw new MemberNotFound()
+    }
+
     const code = await this.codeGenerator.generate()
 
     const asset = Asset.create(
@@ -39,7 +49,12 @@ export class CreateAsset {
         value: Number(request.value),
         churchId: request.churchId,
         location: request.location,
-        responsibleId: request.responsibleId,
+        responsible: {
+          memberId: responsibleMember.getMemberId(),
+          name: responsibleMember.getName(),
+          email: responsibleMember.getEmail(),
+          phone: responsibleMember.getPhone(),
+        },
         status: request.status ?? AssetStatus.ACTIVE,
         attachments,
       },

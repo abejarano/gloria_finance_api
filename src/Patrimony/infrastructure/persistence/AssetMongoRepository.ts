@@ -89,6 +89,8 @@ export class AssetMongoRepository
         { name: regex },
         { code: regex },
         { responsibleId: regex },
+        { "responsible.memberId": regex },
+        { "responsible.name": regex },
         { location: regex },
       ]
     }
@@ -118,6 +120,15 @@ export class AssetMongoRepository
         }
       : null
 
+    const responsibleData = document.responsible ?? {}
+
+    const responsible = {
+      memberId: responsibleData.memberId ?? document.responsibleId ?? "",
+      name: responsibleData.name ?? "",
+      email: responsibleData.email ?? document.responsibleEmail ?? null,
+      phone: responsibleData.phone ?? document.responsiblePhone ?? null,
+    }
+
     return {
       id: document._id?.toString(),
       assetId: document.assetId,
@@ -130,7 +141,8 @@ export class AssetMongoRepository
       value: Number(document.value ?? 0),
       churchId: document.churchId,
       location: document.location,
-      responsibleId: document.responsibleId,
+      responsibleId: responsible.memberId || document.responsibleId,
+      responsible,
       status: document.status,
       attachments,
       history,

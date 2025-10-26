@@ -5,6 +5,7 @@ import {
   normalizeAttachments,
 } from "@/Patrimony/infrastructure/http/controllers/Helper.controller"
 import { AssetMongoRepository } from "@/Patrimony/infrastructure/persistence"
+import { MemberMongoRepository } from "@/Church/infrastructure"
 import { HttpStatus } from "@/Shared/domain"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { Response } from "express"
@@ -23,7 +24,8 @@ export const updateAssetController = async (
     )
 
     const { asset, removedAttachments } = await new UpdateAsset(
-      AssetMongoRepository.getInstance()
+      AssetMongoRepository.getInstance(),
+      MemberMongoRepository.getInstance()
     ).execute({
       ...request,
       attachments: attachmentsProvided

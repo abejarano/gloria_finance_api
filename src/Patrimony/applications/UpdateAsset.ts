@@ -6,6 +6,7 @@ import {
   IAssetRepository,
   UpdateAssetRequest,
 } from "../domain"
+import { IMemberRepository, MemberNotFound } from "@/Church/domain"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 import { v4 } from "uuid"
 
@@ -22,7 +23,10 @@ export type UpdateAssetResult = {
 export class UpdateAsset {
   private readonly logger = Logger(UpdateAsset.name)
 
-  constructor(private readonly repository: IAssetRepository) {}
+  constructor(
+    private readonly repository: IAssetRepository,
+    private readonly memberRepository: IMemberRepository
+  ) {}
 
   async execute(request: UpdateAssetRequest): Promise<UpdateAssetResult> {
     this.logger.info("Updating patrimony asset", request)
@@ -74,6 +78,29 @@ export class UpdateAsset {
       value = undefined
     }
 
+    let responsiblePayload
+
+    if (typeof request.responsibleId === "string") {
+      const normalizedResponsibleId = request.responsibleId.trim()
+
+      if (normalizedResponsibleId.length > 0) {
+        const responsibleMember = await this.memberRepository.one({
+          memberId: normalizedResponsibleId,
+        })
+
+        if (!responsibleMember) {
+          throw new MemberNotFound()
+        }
+
+        responsiblePayload = {
+          memberId: responsibleMember.getMemberId(),
+          name: responsibleMember.getName(),
+          email: responsibleMember.getEmail(),
+          phone: responsibleMember.getPhone(),
+        }
+      }
+    }
+
     asset.updateDetails(
       {
         name: request.name,
@@ -82,7 +109,7 @@ export class UpdateAsset {
         value,
         churchId: request.churchId,
         location: request.location,
-        responsibleId: request.responsibleId,
+        responsible: responsiblePayload,
         status: request.status,
         attachments: attachmentsPayload,
       },

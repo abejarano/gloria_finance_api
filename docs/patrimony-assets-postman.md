@@ -32,7 +32,7 @@ archivo se agrega en un campo `attachments` (puedes repetir la clave tantas vece
 | acquisitionDate | Text | 2024-04-15                     |
 | churchId        | Text | urn:church:central             |
 | location        | Text | Salón principal                |
-| responsibleId   | Text | urn:user:music-director        |
+| responsibleId   | Text | urn:member:music-director      |
 | status          | Text | ACTIVE                         |
 | attachments     | File | factura.pdf                    |
 | attachments     | File | foto-frontal.jpg               |
@@ -44,12 +44,16 @@ como
 `[{"name":"Factura.pdf","url":"https://storage.example.com/assets/piano/factura.pdf","mimetype":"application/pdf","size":524288]`;
 el orden del array debe coincidir con los archivos enviados para combinar metadatos con nuevos uploads.
 
+> El servicio consulta automáticamente la ficha del miembro indicado en `responsibleId` y guarda su nombre, correo y
+> teléfono en el registro del bien para reutilizarlos en reportes y listados.
+
 ## Listar bienes con filtros y búsqueda
 
 `GET {{baseUrl}}/patrimony`
 
 Usa query params para acotar los resultados. El patrón Criteria aplica paginación (`page`, `perPage`), filtros
-directos (`churchId`, `category`, `status`) y búsqueda textual (`search`) sobre nombre, código, responsable o ubicación.
+directos (`churchId`, `category`, `status`) y búsqueda textual (`search`) sobre nombre, código, responsable (por id o
+nombre) o ubicación.
 
 ```
 {{baseUrl}}/patrimony?
@@ -74,7 +78,13 @@ La respuesta tiene formato de paginación estándar del proyecto:
       "value": 48000,
       "churchId": "urn:church:central",
       "location": "Salón principal",
-      "responsibleId": "urn:user:music-director",
+      "responsibleId": "urn:member:music-director",
+      "responsible": {
+        "memberId": "urn:member:music-director",
+        "name": "Pr. Daniel Ortiz",
+        "email": "daniel.ortiz@example.com",
+        "phone": "+55 11 91234-5678"
+      },
       "status": "ACTIVE",
       "attachments": [
         {
@@ -150,7 +160,7 @@ Para actualizar anexos reutiliza el body `form-data`:
 | Clave               | Tipo | Valor                                                                                                                                       |
 |---------------------|------|---------------------------------------------------------------------------------------------------------------------------------------------|
 | location            | Text | Auditorio                                                                                                                                   |
-| responsibleId       | Text | urn:user:new-director                                                                                                                       |
+| responsibleId       | Text | urn:member:new-director                                                                                                                       |
 | notes               | Text | Traslado aprobado en comité 2024-Q3                                                                                                         |
 | attachments         | Text | [{"name":"Contrato-donacion.pdf","url":"https://storage.example.com/assets/piano/contrato.pdf","mimetype":"application/pdf","size":524288}] |
 | attachments         | File | inventario-2024.pdf                                                                                                                         |
@@ -166,6 +176,9 @@ correspondiente. Si no agregas nuevos archivos y dejas el campo vacío, los anex
 
 Genera un resumen en CSV o PDF. Usa los mismos filtros de la lista para segmentar por congregación, categoría o estado.
 El parámetro `format` acepta `csv` o `pdf`.
+
+Los archivos generados incluyen el nombre del responsable (además del identificador interno) junto con la
+información de ubicación, valor y estado.
 
 ```
 {{baseUrl}}/patrimony/report/inventory?

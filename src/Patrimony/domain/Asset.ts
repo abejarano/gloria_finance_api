@@ -5,6 +5,7 @@ import { AssetInventoryStatus } from "./enums/AssetInventoryStatus.enum"
 import { AssetAttachment } from "./types/AssetAttachment.type"
 import { AssetHistoryEntry } from "./types/AssetHistoryEntry.type"
 import { AssetDisposalRecord } from "./types/AssetDisposal.type"
+import { AssetResponsible } from "./types/AssetResponsible.type"
 import { v4 } from "uuid"
 import { DateBR } from "@/Shared/helpers"
 import { InvalidAssetDisposalException } from "./exceptions/InvalidAssetDisposal.exception"
@@ -19,7 +20,8 @@ export type AssetPrimitives = {
   value: number
   churchId: string
   location: string
-  responsibleId: string
+  responsible?: AssetResponsible
+  responsibleId?: string
   status: AssetStatus
   attachments: AssetAttachment[]
   history: AssetHistoryEntry[]
@@ -41,7 +43,7 @@ export class Asset extends AggregateRoot {
   private value: number
   private churchId: string
   private location: string
-  private responsibleId: string
+  private responsible: AssetResponsible
   private status: AssetStatus
   private attachments: AssetAttachment[]
   private history: AssetHistoryEntry[]
@@ -61,7 +63,7 @@ export class Asset extends AggregateRoot {
       value: number
       churchId: string
       location: string
-      responsibleId: string
+      responsible: AssetResponsible
       status: AssetStatus
       attachments?: Array<Omit<AssetAttachment, "attachmentId" | "uploadedAt">>
     },
@@ -77,7 +79,12 @@ export class Asset extends AggregateRoot {
     asset.value = props.value
     asset.churchId = props.churchId
     asset.location = props.location
-    asset.responsibleId = props.responsibleId
+    asset.responsible = {
+      memberId: props.responsible.memberId,
+      name: props.responsible.name,
+      email: props.responsible.email ?? null,
+      phone: props.responsible.phone ?? null,
+    }
     asset.status = props.status
     asset.attachments = (props.attachments ?? []).map((attachment) => ({
       attachmentId: v4(),
@@ -101,7 +108,8 @@ export class Asset extends AggregateRoot {
         category: { current: asset.category },
         value: { current: asset.value },
         churchId: { current: asset.churchId },
-        responsibleId: { current: asset.responsibleId },
+        responsibleId: { current: asset.responsible.memberId },
+        responsible: { current: asset.responsible },
         status: { current: asset.status },
       },
     })
@@ -121,7 +129,18 @@ export class Asset extends AggregateRoot {
     asset.value = plainData.value
     asset.churchId = plainData.churchId
     asset.location = plainData.location
-    asset.responsibleId = plainData.responsibleId
+    const responsible = plainData.responsible ?? {
+      memberId: plainData.responsibleId ?? "",
+      name: plainData.responsible?.name ?? "",
+      email: plainData.responsible?.email ?? null,
+      phone: plainData.responsible?.phone ?? null,
+    }
+    asset.responsible = {
+      memberId: responsible.memberId,
+      name: responsible.name,
+      email: responsible.email ?? null,
+      phone: responsible.phone ?? null,
+    }
     asset.status = plainData.status
     asset.attachments = (plainData.attachments ?? []).map((attachment) => ({
       ...attachment,
@@ -164,6 +183,14 @@ export class Asset extends AggregateRoot {
     return this.attachments
   }
 
+  getResponsible(): AssetResponsible {
+    return this.responsible
+  }
+
+  getResponsibleId(): string {
+    return this.responsible.memberId
+  }
+
   getHistory(): AssetHistoryEntry[] {
     return this.history
   }
@@ -178,7 +205,8 @@ export class Asset extends AggregateRoot {
       value: this.value,
       churchId: this.churchId,
       location: this.location,
-      responsibleId: this.responsibleId,
+      responsibleId: this.responsible.memberId,
+      responsible: this.responsible,
       status: this.status,
       attachments: this.attachments,
       history: this.history,
@@ -199,7 +227,7 @@ export class Asset extends AggregateRoot {
       value?: number
       churchId?: string
       location?: string
-      responsibleId?: string
+      responsible?: AssetResponsible
       status?: AssetStatus
       attachments?: AssetAttachment[]
     },
@@ -238,12 +266,30 @@ export class Asset extends AggregateRoot {
       this.location = payload.location
     }
 
-    if (payload.responsibleId !== this.responsibleId) {
-      changes.responsibleId = {
-        previous: this.responsibleId,
-        current: payload.responsibleId,
+    if (payload.responsible) {
+      const isSameResponsible =
+        payload.responsible.memberId === this.responsible.memberId &&
+        payload.responsible.name === this.responsible.name &&
+        (payload.responsible.email ?? null) === (this.responsible.email ?? null) &&
+        (payload.responsible.phone ?? null) === (this.responsible.phone ?? null)
+
+      if (!isSameResponsible) {
+        changes.responsibleId = {
+          previous: this.responsible.memberId,
+          current: payload.responsible.memberId,
+        }
+        changes.responsible = {
+          previous: this.responsible,
+          current: payload.responsible,
+        }
+
+        this.responsible = {
+          memberId: payload.responsible.memberId,
+          name: payload.responsible.name,
+          email: payload.responsible.email ?? null,
+          phone: payload.responsible.phone ?? null,
+        }
       }
-      this.responsibleId = payload.responsibleId
     }
 
     if (payload.status && payload.status !== this.status) {

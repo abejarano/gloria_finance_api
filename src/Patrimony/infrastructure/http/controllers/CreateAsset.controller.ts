@@ -8,6 +8,7 @@ import {
 import { HttpStatus } from "@/Shared/domain"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { AssetMongoRepository } from "@/Patrimony/infrastructure/persistence"
+import { MemberMongoRepository } from "@/Church/infrastructure"
 
 export const createAssetController = async (
   request: CreateAssetRequest,
@@ -22,7 +23,8 @@ export const createAssetController = async (
     )
 
     const result = await new CreateAsset(
-      AssetMongoRepository.getInstance()
+      AssetMongoRepository.getInstance(),
+      MemberMongoRepository.getInstance()
     ).execute({
       ...request,
       attachments: normalizedAttachments ?? [],

@@ -3,6 +3,7 @@ import { AssetInventoryStatus } from "../enums/AssetInventoryStatus.enum"
 import { AssetAttachment } from "../types/AssetAttachment.type"
 import { AssetHistoryEntry } from "../types/AssetHistoryEntry.type"
 import { AssetDisposalRecord } from "../types/AssetDisposal.type"
+import { AssetResponsible } from "../types/AssetResponsible.type"
 
 export type AssetModel = {
   id?: string
@@ -14,7 +15,8 @@ export type AssetModel = {
   value: number
   churchId: string
   location: string
-  responsibleId: string
+  responsibleId?: string
+  responsible: AssetResponsible
   status: AssetStatus
   attachments: AssetAttachment[]
   history: AssetHistoryEntry[]

@@ -81,6 +81,16 @@ export class ListAssets {
           operator: Operator.CONTAINS,
           value: searchTerm,
         },
+        {
+          field: "responsible.memberId",
+          operator: Operator.CONTAINS,
+          value: searchTerm,
+        },
+        {
+          field: "responsible.name",
+          operator: Operator.CONTAINS,
+          value: searchTerm,
+        },
         { field: "location", operator: Operator.CONTAINS, value: searchTerm },
       ]
 

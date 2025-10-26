@@ -64,7 +64,7 @@ export class GeneratePhysicalInventorySheet {
         asset.code,
         asset.name,
         asset.category,
-        asset.responsibleId,
+        asset.responsible?.name ?? asset.responsibleId,
         asset.location,
         AssetStatusLabels[asset.status],
         asset.inventoryCheckedAt
