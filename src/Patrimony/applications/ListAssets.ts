@@ -6,16 +6,16 @@ import {
   OrCondition,
   Order,
   OrderTypes,
+  Paginate,
 } from "@abejarano/ts-mongodb-criteria"
-import { IAssetRepository, ListAssetsRequest } from "../domain"
-import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
+import { AssetModel, IAssetRepository, ListAssetsRequest } from "../domain"
 
 export class ListAssets {
   private readonly logger = Logger(ListAssets.name)
 
   constructor(private readonly repository: IAssetRepository) {}
 
-  async execute(request: ListAssetsRequest) {
+  async execute(request: ListAssetsRequest): Promise<Paginate<AssetModel>> {
     this.logger.info("Listing patrimony assets", request)
 
     const perPage = Number(request.perPage ?? 20)
@@ -23,12 +23,12 @@ export class ListAssets {
 
     const criteria = this.prepareCriteria(request, { page, perPage })
 
-    const result = await this.repository.list(criteria)
+    return await this.repository.list(criteria)
 
-    return {
-      ...result,
-      results: result.results.map(mapAssetToResponse),
-    }
+    // return {
+    //   ...result,
+    //   results: result.results.map(mapAssetToResponse),
+    // }
   }
 
   private prepareCriteria(
@@ -78,6 +78,16 @@ export class ListAssets {
         { field: "code", operator: Operator.CONTAINS, value: searchTerm },
         {
           field: "responsibleId",
+          operator: Operator.CONTAINS,
+          value: searchTerm,
+        },
+        {
+          field: "responsible.memberId",
+          operator: Operator.CONTAINS,
+          value: searchTerm,
+        },
+        {
+          field: "responsible.name",
           operator: Operator.CONTAINS,
           value: searchTerm,
         },

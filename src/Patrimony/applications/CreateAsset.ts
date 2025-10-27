@@ -1,11 +1,11 @@
 import { Logger } from "@/Shared/adapter"
 import {
   Asset,
-  AssetCodeGenerator,
   AssetStatus,
   CreateAssetRequest,
   IAssetRepository,
 } from "../domain"
+import { IMemberRepository, MemberNotFound } from "@/Church/domain"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
 
 export class CreateAsset {
@@ -13,9 +13,7 @@ export class CreateAsset {
 
   constructor(
     private readonly repository: IAssetRepository,
-    private readonly codeGenerator: AssetCodeGenerator = new AssetCodeGenerator(
-      repository
-    )
+    private readonly memberRepository: IMemberRepository
   ) {}
 
   async execute(request: CreateAssetRequest) {
@@ -28,23 +26,35 @@ export class CreateAsset {
       size: attachment.size!,
     }))
 
-    const code = await this.codeGenerator.generate()
+    const responsibleMember = await this.memberRepository.one({
+      memberId: request.responsibleId,
+    })
+
+    if (!responsibleMember) {
+      throw new MemberNotFound()
+    }
 
     const asset = Asset.create(
       {
-        code,
+        code: request.code,
         name: request.name,
         category: request.category,
         acquisitionDate: new Date(request.acquisitionDate),
-        value: Number(request.value),
+        value: request.value,
+        quantity: request.quantity,
         churchId: request.churchId,
         location: request.location,
-        responsibleId: request.responsibleId,
+        responsible: {
+          memberId: responsibleMember.getMemberId(),
+          name: responsibleMember.getName(),
+          email: responsibleMember.getEmail(),
+          phone: responsibleMember.getPhone(),
+        },
         status: request.status ?? AssetStatus.ACTIVE,
         attachments,
       },
       {
-        performedBy: request.performedBy,
+        performedByDetails: request.performedByDetails,
         notes: request.notes,
       }
     )

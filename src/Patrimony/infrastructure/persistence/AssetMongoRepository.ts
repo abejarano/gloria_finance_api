@@ -8,6 +8,7 @@ import {
   Asset,
   AssetListFilters,
   AssetModel,
+  AssetInventoryChecker,
   IAssetRepository,
 } from "@/Patrimony"
 
@@ -89,6 +90,8 @@ export class AssetMongoRepository
         { name: regex },
         { code: regex },
         { responsibleId: regex },
+        { "responsible.memberId": regex },
+        { "responsible.name": regex },
         { location: regex },
       ]
     }
@@ -96,7 +99,7 @@ export class AssetMongoRepository
     return query
   }
 
-  private mapToModel(document: any): AssetModel {
+  private mapToModel(document: any) {
     const attachments = (document.attachments ?? []).map((attachment) => ({
       ...attachment,
       uploadedAt: attachment.uploadedAt
@@ -109,6 +112,24 @@ export class AssetMongoRepository
       performedAt: entry.performedAt ? new Date(entry.performedAt) : new Date(),
     }))
 
+    const disposal = document.disposal
+      ? {
+          ...document.disposal,
+          occurredAt: document.disposal.occurredAt
+            ? new Date(document.disposal.occurredAt)
+            : new Date(),
+        }
+      : null
+
+    const responsibleData = document.responsible ?? {}
+
+    const responsible = {
+      memberId: responsibleData.memberId ?? document.responsibleId ?? "",
+      name: responsibleData.name ?? "",
+      email: responsibleData.email ?? document.responsibleEmail ?? null,
+      phone: responsibleData.phone ?? document.responsiblePhone ?? null,
+    }
+
     return {
       id: document._id?.toString(),
       assetId: document.assetId,
@@ -119,16 +140,20 @@ export class AssetMongoRepository
         ? new Date(document.acquisitionDate)
         : new Date(),
       value: Number(document.value ?? 0),
+      quantity: Number(document.quantity ?? 0),
       churchId: document.churchId,
       location: document.location,
-      responsibleId: document.responsibleId,
+      responsibleId: responsible.memberId || document.responsibleId,
+      responsible,
       status: document.status,
       attachments,
       history,
+      inventoryStatus: document.inventoryStatus ?? null,
       inventoryCheckedAt: document.inventoryCheckedAt
         ? new Date(document.inventoryCheckedAt)
         : null,
-      inventoryCheckedBy: document.inventoryCheckedBy ?? null,
+      inventoryCheckedBy: document.inventoryCheckedBy,
+      disposal,
       createdAt: document.createdAt ? new Date(document.createdAt) : new Date(),
       updatedAt: document.updatedAt ? new Date(document.updatedAt) : new Date(),
     }
