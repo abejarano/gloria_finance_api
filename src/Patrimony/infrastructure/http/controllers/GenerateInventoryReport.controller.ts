@@ -1,4 +1,8 @@
-import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
+import {
+  HandlebarsHTMLAdapter,
+  PuppeteerAdapter,
+  XLSExportAdapter,
+} from "@/Shared/adapter"
 import { NoOpStorage } from "@/Shared/infrastructure"
 import { GenerateInventoryReport, InventoryReportRequest } from "@/Patrimony"
 import { Response } from "express"
@@ -18,14 +22,14 @@ export const generateInventoryReportController = async (
       new PuppeteerAdapter(
         new HandlebarsHTMLAdapter(),
         NoOpStorage.getInstance()
-      )
+      ),
+      new XLSExportAdapter()
     ).execute(request)
 
     const { path, filename } = file
 
     res.download(path, filename, (error) => {
       fs.unlink(path).catch(() => undefined)
-      //fs.unlink(path, () => undefined)
 
       if (error && !res.headersSent) {
         domainResponse(error, res)

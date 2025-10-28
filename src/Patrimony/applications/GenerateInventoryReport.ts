@@ -7,12 +7,8 @@ import {
 } from "../domain"
 import { AssetCodeGenerator } from "@/Patrimony"
 import { mapAssetToResponse } from "./mappers/AssetResponse.mapper"
-import { promises as fs } from "fs"
-import { join } from "path"
-import { tmpdir } from "os"
 import { IChurchRepository } from "@/Church/domain"
-
-const CSV_SEPARATOR = ";"
+import { IXLSExportAdapter, ReportFile } from "@/Shared/domain"
 
 type InventorySummary = {
   totalAssets: number
@@ -21,21 +17,17 @@ type InventorySummary = {
   documentsPending: number
 }
 
-type InventoryReportFile = {
-  path: string
-  filename: string
-}
-
 export class GenerateInventoryReport {
   private readonly logger = Logger(GenerateInventoryReport.name)
 
   constructor(
     private readonly churchRepository: IChurchRepository,
     private readonly repository: IAssetRepository,
-    private readonly pdfGenerator: PuppeteerAdapter
+    private readonly pdfGenerator: PuppeteerAdapter,
+    private readonly xlsExport: IXLSExportAdapter
   ) {}
 
-  async execute(request: InventoryReportRequest): Promise<InventoryReportFile> {
+  async execute(request: InventoryReportRequest): Promise<ReportFile> {
     this.logger.info("Generating patrimony inventory report", request)
 
     const filters = AssetCodeGenerator.buildFilters({
@@ -79,9 +71,7 @@ export class GenerateInventoryReport {
     }
   }
 
-  private async buildCsvFile(
-    assets: AssetResponse[]
-  ): Promise<InventoryReportFile> {
+  private async buildCsvFile(assets: AssetResponse[]): Promise<ReportFile> {
     const header = [
       "Código",
       "Nome",
@@ -108,34 +98,14 @@ export class GenerateInventoryReport {
       asset.documentsPending ? "Sim" : "Não",
     ])
 
-    const csv = [header, ...rows]
-      .map((row) =>
-        row
-          .map((value) => `"${(value ?? "").toString().replace(/"/g, '""')}"`)
-          .join(CSV_SEPARATOR)
-      )
-      .join("\n")
-
-    const timestamp = Date.now()
-    const filename = `inventario-patrimonial-${timestamp}.csv`
-    const tempFilePath = join(
-      tmpdir(),
-      `${timestamp}-${Math.random().toString(16).slice(2)}.csv`
-    )
-
-    await fs.writeFile(tempFilePath, csv, "utf-8")
-
-    return {
-      filename,
-      path: tempFilePath,
-    }
+    return await this.xlsExport.export(rows, header, "inventario-patrimonial")
   }
 
   private async buildPdfFile(
     assets: AssetResponse[],
     summary: InventorySummary,
     request: InventoryReportRequest
-  ): Promise<InventoryReportFile> {
+  ): Promise<ReportFile> {
     const church = await this.churchRepository.one(request.churchId)
 
     const templateData = {

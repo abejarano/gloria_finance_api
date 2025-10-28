@@ -17,4 +17,6 @@ export { IStorageService } from "./interfaces/StorageService.interface"
 export { IQueueService } from "./interfaces/QueueService.interface"
 export { IQueue } from "./interfaces/Queue.interface"
 export { IDefinitionQueue } from "./interfaces/QueueItem.interface"
-export { IExcelExportAdapter } from "./interfaces/ExcelExport.interface"
+export { IXLSExportAdapter } from "./interfaces/ExcelExport.interface"
+
+export * from "./types/ReportFile.type"

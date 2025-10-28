@@ -3,8 +3,8 @@ import { FilterFinanceRecordRequest } from "@/Financial/domain"
 import { ExportFinanceRecordToExcel } from "../../../applications"
 import { FinanceRecordMongoRepository } from "../../persistence"
 import domainResponse from "../../../../Shared/helpers/domainResponse"
-import { HttpStatus } from "@/Shared/domain"
-import { Logger, XlsxExportAdapter } from "@/Shared/adapter"
+import { Logger, XLSExportAdapter } from "@/Shared/adapter"
+import { promises as fs } from "fs"
 
 /**
  * ExportFinanceRecordToExcelController
@@ -30,35 +30,21 @@ export const ExportFinanceRecordToExcelController = async (
   try {
     logger.info("Iniciando exportación a Excel", req)
 
-    // Crear una instancia del adaptador de Excel
-    const xlsxExportAdapter = new XlsxExportAdapter()
-
     // Ejecutar el caso de uso con el adaptador
-    const buffer = await new ExportFinanceRecordToExcel(
+    const file = await new ExportFinanceRecordToExcel(
       FinanceRecordMongoRepository.getInstance(),
-      xlsxExportAdapter
+      new XLSExportAdapter()
     ).execute(req)
 
-    // Generar un nombre de archivo descriptivo
-    const datePart = new Date().toISOString().substring(0, 10)
-    const timePart = new Date().getTime()
-    const dateFilter =
-      req.startDate && req.endDate
-        ? `_${new Date(req.startDate).toISOString().substring(0, 10)}_a_${new Date(req.endDate).toISOString().substring(0, 10)}`
-        : ""
-    const fileName = `RegistrosFinancieros${dateFilter}_${datePart}_${timePart}.xlsx`
+    const { path, filename } = file
 
-    logger.info(`Enviando archivo: ${fileName}`)
+    res.download(path, filename, (error) => {
+      fs.unlink(path).catch(() => undefined)
 
-    // Configurar las cabeceras de la respuesta para la descarga de archivo Excel
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    res.setHeader("Content-Disposition", `attachment; filename=${fileName}`)
-
-    // Enviar el buffer como respuesta
-    res.status(HttpStatus.OK).send(buffer)
+      if (error && !res.headersSent) {
+        domainResponse(error, res)
+      }
+    })
 
     logger.info("Exportación finalizada con éxito")
   } catch (e) {

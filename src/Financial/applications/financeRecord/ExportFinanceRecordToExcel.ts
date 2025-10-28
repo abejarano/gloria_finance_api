@@ -1,15 +1,8 @@
 import { FilterFinanceRecordRequest } from "../../domain"
-import {
-  Criteria,
-  Filters,
-  Operator,
-  Order,
-  OrderTypes,
-} from "@abejarano/ts-mongodb-criteria"
 import { IFinancialRecordRepository } from "../../domain/interfaces"
 import { FinanceRecord } from "@/Financial/domain"
 import { Logger } from "@/Shared/adapter"
-import { IExcelExportAdapter } from "@/Shared/domain"
+import { IXLSExportAdapter, ReportFile } from "@/Shared/domain"
 import { PrepareFinanceRecordCriteria } from "./ListFilters"
 
 export class ExportFinanceRecordToExcel {
@@ -17,10 +10,10 @@ export class ExportFinanceRecordToExcel {
 
   constructor(
     private readonly financialRecordRepository: IFinancialRecordRepository,
-    private readonly excelExportAdapter: IExcelExportAdapter
+    private readonly excelExportAdapter: IXLSExportAdapter
   ) {}
 
-  async execute(request: FilterFinanceRecordRequest): Promise<Buffer> {
+  async execute(request: FilterFinanceRecordRequest): Promise<ReportFile> {
     this.logger.info(
       "Iniciando exportación de registros financieros a Excel",
       request
@@ -59,89 +52,28 @@ export class ExportFinanceRecordToExcel {
     }
 
     // Transformar los registros para el archivo Excel
-    const worksheetData = this.prepareDataForExcel(allRecords)
-    this.logger.info(`Exportando ${worksheetData.length} registros a Excel`)
+    this.logger.info(`Exportando ${allRecords.length} registros a Excel`)
 
     // Usar el adaptador para exportar los datos
     return await this.excelExportAdapter.export(
-      worksheetData,
+      allRecords.map((record: any) => [
+        new Date(record.date).toISOString().slice(0, 10),
+        record.amount,
+        record.description || "",
+        record.type,
+        record.availabilityAccount?.accountName || "N/A",
+        record.financialConcept?.name || "N/A",
+        record.costCenter?.name || "N/A",
+      ]),
+      [
+        "Monto",
+        "Descrição",
+        "Tipo",
+        "Conta Disponibilidade",
+        "Conceito Financiero",
+        "Centro de Custo",
+      ],
       "Registros Financieros"
-    )
-  }
-
-  private prepareDataForExcel(records: FinanceRecord[]): any[] {
-    return records.map((record: any) => {
-      return {
-        ID: record.financialRecordId,
-        Fecha: record.date.toLocaleDateString(),
-        Monto: record.amount,
-        Descripción: record.description || "",
-        Tipo: record.type,
-        Cuenta: record.availabilityAccount?.accountName || "N/A",
-        "Concepto Financiero": record.financialConcept?.name || "N/A",
-        "Centro de Costo": record.costCenter?.name || "N/A",
-      }
-    })
-  }
-
-  private prepareCriteria(request: FilterFinanceRecordRequest) {
-    const filters = []
-
-    if (request.availabilityAccountId) {
-      filters.push(
-        new Map([
-          ["field", "availabilityAccount.availabilityAccountId"],
-          ["operator", Operator.EQUAL],
-          ["value", request.availabilityAccountId],
-        ])
-      )
-    }
-
-    if (request.churchId) {
-      filters.push(
-        new Map([
-          ["field", "churchId"],
-          ["operator", Operator.EQUAL],
-          ["value", request.churchId],
-        ])
-      )
-    }
-
-    if (request.financialConceptId) {
-      filters.push(
-        new Map([
-          ["field", "financialConcept.financialConceptId"],
-          ["operator", Operator.EQUAL],
-          ["value", request.financialConceptId],
-        ])
-      )
-    }
-
-    if (request.startDate) {
-      filters.push(
-        new Map<string, string | Date>([
-          ["field", "date"],
-          ["operator", Operator.GTE],
-          ["value", request.startDate],
-        ])
-      )
-    }
-
-    if (request.endDate) {
-      filters.push(
-        new Map<string, string | Date>([
-          ["field", "date"],
-          ["operator", Operator.LTE],
-          ["value", request.endDate],
-        ])
-      )
-    }
-
-    return new Criteria(
-      Filters.fromValues(filters),
-      Order.fromValues("date", OrderTypes.DESC),
-      Number(request.perPage),
-      Number(request.page)
     )
   }
 }

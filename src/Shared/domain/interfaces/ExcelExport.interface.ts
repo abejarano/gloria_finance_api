@@ -1,15 +1,14 @@
+import { ReportFile } from "@/Shared/domain"
+
 /**
  * Interfaz para el adaptador de exportación a Excel
  *
  * Esta interfaz define los métodos necesarios para exportar datos a Excel
  */
-export interface IExcelExportAdapter {
+export interface IXLSExportAdapter {
   /**
-   * Exporta los datos a un archivo Excel
+   * Exporta los datos a un archivo CSV
    *
-   * @param data - Los datos a exportar
-   * @param sheetName - El nombre de la hoja de Excel
-   * @returns Un buffer con el archivo Excel
    */
-  export(data: any[], sheetName: string): Promise<Buffer>
+  export(rows: any[], header: string[], sheetName: string): Promise<ReportFile>
 }
