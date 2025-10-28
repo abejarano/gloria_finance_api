@@ -41,7 +41,7 @@ export class ExportFinanceRecordToExcel {
 
       this.logger.info(`Obteniendo página ${currentPage} de registros`)
 
-      const records = await this.financialRecordRepository.fetch(
+      const records = await this.financialRecordRepository.list(
         this.prepareCriteria(paginatedRequest)
       )
 

@@ -18,7 +18,7 @@ export class SearchFinanceRecord {
   async execute(
     request: FilterFinanceRecordRequest
   ): Promise<Paginate<FinanceRecord>> {
-    return await this.financialRecordRepository.fetch(
+    return await this.financialRecordRepository.list(
       this.prepareCriteria(request)
     )
   }
@@ -66,24 +66,37 @@ export class SearchFinanceRecord {
       )
     }
 
-    if (request.startDate) {
-      filters.push(
-        new Map<string, string | Date>([
-          ["field", "date"],
-          ["operator", Operator.GTE],
-          ["value", new Date(request.startDate)],
-        ])
-      )
-    }
+    if (request.startDate && request.endDate) {
+      const startDate = new Date(request.startDate)
+      const endDate = new Date(request.endDate)
 
-    if (request.endDate) {
       filters.push(
-        new Map<string, string | Date>([
+        new Map<string, any>([
           ["field", "date"],
-          ["operator", Operator.LTE],
-          ["value", new Date(request.endDate)],
+          ["operator", Operator.BETWEEN],
+          ["value", { startDate, endDate }],
         ])
       )
+    } else {
+      if (request.startDate) {
+        filters.push(
+          new Map<string, string | Date>([
+            ["field", "date"],
+            ["operator", Operator.GTE],
+            ["value", new Date(request.startDate)],
+          ])
+        )
+      }
+
+      if (request.endDate) {
+        filters.push(
+          new Map<string, string | Date>([
+            ["field", "date"],
+            ["operator", Operator.LTE],
+            ["value", new Date(request.endDate)],
+          ])
+        )
+      }
     }
 
     return new Criteria(

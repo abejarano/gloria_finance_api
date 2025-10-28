@@ -12,7 +12,7 @@ export interface IFinancialRecordRepository {
 
   deleteByFinancialRecordId(financialRecordId: string): Promise<void>
 
-  fetch(criteria: Criteria): Promise<Paginate<FinanceRecord>>
+  list(criteria: Criteria): Promise<Paginate<FinanceRecord>>
 
   one(filter: object): Promise<FinanceRecord | undefined>
 

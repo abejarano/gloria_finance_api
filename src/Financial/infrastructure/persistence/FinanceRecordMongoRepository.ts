@@ -47,7 +47,7 @@ export class FinanceRecordMongoRepository
     return FinanceRecord.fromPrimitives(result)
   }
 
-  async fetch(criteria: Criteria): Promise<Paginate<FinanceRecord>> {
+  async list(criteria: Criteria): Promise<Paginate<FinanceRecord>> {
     this.dbCollectionName = "financial_records"
     const result: FinanceRecord[] =
       await this.searchByCriteria<FinanceRecord>(criteria)
