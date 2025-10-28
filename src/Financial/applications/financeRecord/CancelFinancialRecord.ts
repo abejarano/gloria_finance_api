@@ -70,7 +70,7 @@ export class CancelFinancialRecord {
       financeRecordReversal: {
         churchId: movement.getChurchId(),
         amount: movement.getAmount(),
-        date: DateBR(),
+        date: new Date(DateBR().toISOString().split("T")[0]),
         availabilityAccount,
         description: "Reversão do movimento " + movement.getFinancialRecordId(),
         type: ConceptType.REVERSAL,
