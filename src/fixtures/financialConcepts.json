@@ -35,8 +35,8 @@
     "statementCategory": "REVENUE"
   },
   {
-    "name": "Empréstimos",
-    "description": "Valor a ser emprestado a um membro ou entidade.",
+    "name": "Empréstimos Concedidos",
+    "description": "Valor emprestado a membros ou entidades, registrado como saída de caixa e criação de conta a receber do tipo empréstimo.",
     "type": "OUTGO",
     "active": true,
     "statementCategory": "OTHER"

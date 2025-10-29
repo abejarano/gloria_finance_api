@@ -156,6 +156,7 @@ export class PayAccountPayable {
       }
     }
 
+    //TODO si el sistema maneja varios idiomas esto hay que refactorizarlo
     const concept = await this.financialConceptRepository.one({
       name: "Contas a Pagar",
       churchId: req.churchId,
