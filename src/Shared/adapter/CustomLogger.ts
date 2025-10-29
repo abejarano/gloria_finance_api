@@ -98,7 +98,20 @@ function createGoogleCloudLoggingTransport() {
           ? new Date(logEntry.time).toISOString()
           : new Date().toISOString() // Si no hay timestamp, usa la hora actual
 
-        const entry = log.entry({ severity, timestamp }, logEntry)
+        // Asegurarse de que el requestId esté incluido en los metadatos
+        const metadata = {
+          severity,
+          timestamp,
+          requestId: RequestContext.requestId || "N/A",
+          labels: {
+            requestId: RequestContext.requestId || "N/A",
+          },
+        }
+
+        const entry = log.entry(metadata, {
+          ...logEntry,
+          requestId: RequestContext.requestId || "N/A",
+        })
         await log.write(entry) // Escribir en Google Cloud Logging
       } catch (error) {
         console.error("Error escribiendo en Google Cloud Logging:", error)
