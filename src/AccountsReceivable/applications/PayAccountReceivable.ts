@@ -42,12 +42,7 @@ export class PayAccountReceivable {
         this.logger.debug(`Installment ${installmentId} not found`)
         throw new InstallmentNotFound(installmentId)
       }
-      amountPay = PayInstallment(
-        installment,
-        amountPay,
-        req.financialTransactionId,
-        this.logger
-      )
+      amountPay = PayInstallment(installment, amountPay, this.logger)
     }
 
     accountReceivable.updateAmount(req.amount)

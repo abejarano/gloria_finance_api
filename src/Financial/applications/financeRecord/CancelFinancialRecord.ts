@@ -1,10 +1,12 @@
 import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
 import {
   AvailabilityAccount,
-  ConceptType,
   CreateFinanceRecord,
   FinanceRecord,
   FinancialMovementNotFound,
+  FinancialRecordSource,
+  FinancialRecordStatus,
+  FinancialRecordType,
   TypeOperationMoney,
 } from "@/Financial/domain"
 import { Logger } from "@/Shared/adapter"
@@ -34,10 +36,14 @@ export class CancelFinancialRecord {
     private readonly queueService: IQueueService
   ) {}
 
-  async execute(params: { financialRecordId: string; churchId: string }) {
+  async execute(params: {
+    financialRecordId: string
+    churchId: string
+    createdBy: string
+  }) {
     this.logger.info(`Execute financial recordId:`, params)
 
-    const { financialRecordId, churchId } = params
+    const { financialRecordId, churchId, createdBy } = params
 
     const movement = await this.financialRecordRepository.one({
       financialRecordId,
@@ -55,12 +61,12 @@ export class CancelFinancialRecord {
       year: movement.getDate().getFullYear(),
     })
 
-    if (movement.getType() === ConceptType.DISCHARGE) {
-      await this.cancelOutgoRecord(movement)
+    if (movement.getType() === FinancialRecordType.OUTGO) {
+      await this.cancelOutgoRecord(movement, createdBy)
     }
   }
 
-  private async cancelOutgoRecord(movement: FinanceRecord) {
+  private async cancelOutgoRecord(movement: FinanceRecord, createdBy: string) {
     const availabilityAccount = await this.availabilityAccountRepository.one({
       availabilityAccountId: movement.getAvailabilityAccountId(),
     })
@@ -73,7 +79,10 @@ export class CancelFinancialRecord {
         date: new Date(DateBR().toISOString().split("T")[0]),
         availabilityAccount,
         description: "Reversão do movimento " + movement.getFinancialRecordId(),
-        type: ConceptType.REVERSAL,
+        type: FinancialRecordType.REVERSAL,
+        status: FinancialRecordStatus.VOID,
+        source: FinancialRecordSource.MANUAL,
+        createdBy,
       },
       operation: TypeOperationMoney.MONEY_IN,
     })

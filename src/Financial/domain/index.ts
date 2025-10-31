@@ -27,10 +27,10 @@ export * from "./enums/ConcepType.enum"
 export { StatementCategory } from "./enums/StatementCategory.enum"
 export { MoneyLocation } from "./enums/MoneyLocation.enum"
 export { TypeOperationMoney } from "./enums/TypeOperationMoney.enum"
-
 export { TypeBankAccount } from "./enums/TypeBankAccount.enum"
 export { AccountType } from "./enums/AccountType.enum"
 export { CostCenterCategory } from "./enums/CostCenterCategory.enum"
+export * from "./enums/FinancialRecordType.enum"
 
 export { ContributionRequest } from "./requests/Contribution.request"
 export { BankRequest } from "./requests/Bank.request"

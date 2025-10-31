@@ -1,5 +1,8 @@
 import {
   ContributionNotFound,
+  FinancialRecordSource,
+  FinancialRecordStatus,
+  FinancialRecordType,
   OnlineContributions,
   OnlineContributionsStatus,
   TypeOperationMoney,
@@ -8,7 +11,7 @@ import { IOnlineContributionsRepository } from "../../domain/interfaces"
 import { Logger } from "../../../Shared/adapter"
 import { TypeBankingOperation } from "../../../MovementBank/domain"
 import { IQueueService } from "../../../Shared/domain"
-import { DispatchFinancialRecord } from "../DispatchFinancialRecord"
+import { DispatchFinancialRecordCreate } from "../DispatchFinancialRecordCreate"
 import { DateBR } from "../../../Shared/helpers"
 import { DispatchUpdateAvailabilityAccountBalance } from "../DispatchUpdateAvailabilityAccountBalance"
 
@@ -22,7 +25,8 @@ export class UpdateContributionStatus {
 
   async execute(
     contributionId: string,
-    status: OnlineContributionsStatus
+    status: OnlineContributionsStatus,
+    createdBy: string
   ): Promise<void> {
     this.logger.info(
       `UpdateContributionStatus contributionId: ${contributionId}, status: ${status}`
@@ -54,16 +58,16 @@ export class UpdateContributionStatus {
       amount: contribution.getAmount(),
     })
 
-    new DispatchFinancialRecord(this.queueService).execute({
-      financialConceptId: contribution
-        .getFinancialConcept()
-        .getFinancialConceptId(),
+    new DispatchFinancialRecordCreate(this.queueService).execute({
+      financialConcept: contribution.getFinancialConcept(),
       amount: contribution.getAmount(),
       churchId: contribution.getMember().getChurchId(),
       date: DateBR(),
-      availabilityAccountId: contribution
-        .getAvailabilityAccount()
-        .getAvailabilityAccountId(),
+      createdBy,
+      financialRecordType: FinancialRecordType.INCOME,
+      source: FinancialRecordSource.AUTO,
+      status: FinancialRecordStatus.RECONCILED,
+      availabilityAccount: contribution.getAvailabilityAccount(),
       voucher: contribution.getBankTransferReceipt(),
       description: contribution.getFinancialConcept().getName(),
     })

@@ -3,10 +3,11 @@ import { IPurchaseRepository } from "../domain/interfaces"
 import { RecordPurchaseRequest } from "../domain/requests"
 import {
   IAvailabilityAccountRepository,
+  IFinancialConceptRepository,
   IFinancialConfigurationRepository,
 } from "../../Financial/domain/interfaces"
 import {
-  DispatchFinancialRecord,
+  DispatchFinancialRecordCreate,
   DispatchUpdateAvailabilityAccountBalance,
   DispatchUpdateCostCenterMaster,
   FindAvailabilityAccountByAvailabilityAccountId,
@@ -14,7 +15,13 @@ import {
 } from "../../Financial/applications"
 import { Purchase } from "../domain"
 import { IQueueService } from "../../Shared/domain"
-import { TypeOperationMoney } from "../../Financial/domain"
+import {
+  AccountType,
+  FinancialRecordSource,
+  FinancialRecordStatus,
+  FinancialRecordType,
+  TypeOperationMoney,
+} from "../../Financial/domain"
 
 export class RecordPurchase {
   private logger = Logger("RecordPurchase")
@@ -23,6 +30,7 @@ export class RecordPurchase {
     private readonly purchaseRepository: IPurchaseRepository,
     private readonly availabilityAccountRepository: IAvailabilityAccountRepository,
     private readonly financialConfigurationRepository: IFinancialConfigurationRepository,
+    private readonly financialConcept: IFinancialConceptRepository,
     private readonly queueService: IQueueService
   ) {}
 
@@ -47,7 +55,8 @@ export class RecordPurchase {
       request.invoice,
       account,
       costCenter,
-      request.items
+      request.items,
+      request.createdBy
     )
 
     this.logger.info(`RecordPurchase saving purchase`, purchase)
@@ -66,15 +75,25 @@ export class RecordPurchase {
       amount: request.total,
     })
 
-    new DispatchFinancialRecord(this.queueService).execute({
+    const concept = await this.financialConcept.one({
       financialConceptId: request.financialConceptId,
+    })
+
+    new DispatchFinancialRecordCreate(this.queueService).execute({
+      financialConcept: concept,
       churchId: request.churchId,
       amount: request.total,
       date: request.purchaseDate,
-      availabilityAccountId: request.availabilityAccountId,
+      availabilityAccount: account,
       voucher: request.invoice,
       description: request.description,
-      costCenterId: request.costCenterId,
+      createdBy: request.createdBy,
+      financialRecordType: FinancialRecordType.OUTGO,
+      source: FinancialRecordSource.AUTO,
+      status:
+        account.getType() !== AccountType.CASH
+          ? FinancialRecordStatus.CLEARED
+          : FinancialRecordStatus.RECONCILED,
     })
 
     this.logger.info(`Purchase recorded`)

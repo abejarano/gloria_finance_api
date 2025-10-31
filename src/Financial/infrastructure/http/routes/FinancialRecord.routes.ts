@@ -22,6 +22,7 @@ financialRecordRoutes.post(
       {
         ...req.body,
         churchId: req["user"].churchId,
+        createdBy: req["user"].name,
         file: req?.files?.file,
       },
       res
@@ -37,6 +38,7 @@ financialRecordRoutes.patch(
       {
         financialRecordId: req.params.financialRecordId,
         churchId: req["user"].churchId,
+        createdBy: req["user"].name,
       },
       res
     )

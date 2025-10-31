@@ -2,7 +2,7 @@ import { IQueueService, QueueName } from "@/Shared/domain"
 import { FinancialRecordQueueRequest } from "../domain"
 import { Logger } from "@/Shared/adapter"
 
-export class DispatchFinancialRecord {
+export class DispatchFinancialRecordCreate {
   private logger = Logger("DispatchFinancialRecord")
 
   constructor(private readonly queueService: IQueueService) {}
@@ -10,9 +10,6 @@ export class DispatchFinancialRecord {
   execute(financialRecord: FinancialRecordQueueRequest) {
     this.logger.info(`DispatchFinancialRecord`, financialRecord)
 
-    this.queueService.dispatch(
-      QueueName.RegisterFinancialRecord,
-      financialRecord
-    )
+    this.queueService.dispatch(QueueName.FinancialRecordCreate, financialRecord)
   }
 }

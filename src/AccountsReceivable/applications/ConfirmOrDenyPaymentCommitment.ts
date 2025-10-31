@@ -9,6 +9,14 @@ import {
 import { GeneratePDFAdapter, Logger } from "@/Shared/adapter"
 import { Church, IChurchRepository, IMinisterRepository } from "@/Church/domain"
 import { FindChurchById, FindMinisterById } from "@/Church/applications"
+import { DispatchFinancialRecordCreate } from "@/Financial/applications"
+import { DateBR } from "@/Shared/helpers"
+import {
+  FinancialRecordSource,
+  FinancialRecordStatus,
+  FinancialRecordType,
+} from "@/Financial/domain"
+import { IQueueService } from "@/Shared/domain"
 
 export class ConfirmOrDenyPaymentCommitment {
   private logger = Logger(ConfirmOrDenyPaymentCommitment.name)
@@ -19,7 +27,8 @@ export class ConfirmOrDenyPaymentCommitment {
     private readonly accountReceivableRepository: IAccountsReceivableRepository,
     private readonly pdfAdapter: GeneratePDFAdapter,
     private readonly churchRepository: IChurchRepository,
-    private readonly ministerRepository: IMinisterRepository
+    private readonly ministerRepository: IMinisterRepository,
+    private readonly queueService: IQueueService
   ) {
     this.searchChurch = new FindChurchById(this.churchRepository)
     this.searchMinister = new FindMinisterById(this.ministerRepository)
@@ -49,6 +58,22 @@ export class ConfirmOrDenyPaymentCommitment {
 
     if (accepted) {
       await this.generateContract(account, church)
+
+      new DispatchFinancialRecordCreate(this.queueService).execute({
+        churchId: account.getChurchId(),
+        date: DateBR(),
+        createdBy: account.getCreatedBy(),
+        financialRecordType: FinancialRecordType.INCOME,
+        source: FinancialRecordSource.AUTO,
+        status: FinancialRecordStatus.PENDING,
+        amount: account.getAmountPending(),
+        financialConcept: account.getFinancialConcept(),
+        description: `Conta a Receber criada: ${account.getDescription()}`,
+        reference: {
+          reference: account.getAccountReceivableId(),
+          type: "AccountReceivable",
+        },
+      })
     }
 
     await this.accountReceivableRepository.upsert(account)

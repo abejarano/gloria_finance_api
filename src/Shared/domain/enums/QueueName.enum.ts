@@ -1,7 +1,7 @@
 export enum QueueName {
   UpdateCostCenterMaster = "UpdateCostCenterMaster",
   MovementBankRecord = "MovementBankRecord",
-  RegisterFinancialRecord = "RegisterFinancialRecord",
+  FinancialRecordCreate = "FinancialRecordCreate",
   UpdateAvailabilityAccountBalance = "UpdateAvailabilityAccountBalance",
   CreateUserForMember = "CreateUserForMember",
   InitialLoadingFinancialConcepts = "InitialLoadingFinancialConcepts",

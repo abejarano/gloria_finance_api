@@ -5,17 +5,17 @@ import {
   ConceptType,
   CostCenter,
   FinancialConcept,
+  FinancialRecordQueueRequest,
   FinancialRecordRequest,
-  TypeOperationMoney,
+  FinancialRecordSource,
+  FinancialRecordStatus,
+  FinancialRecordType,
 } from "../../../domain"
 import {
   CancelFinancialRecord,
-  DispatchUpdateAvailabilityAccountBalance,
-  DispatchUpdateCostCenterMaster,
   FindAvailabilityAccountByAvailabilityAccountId,
   FindCostCenterByCostCenterId,
   FindFinancialConceptByChurchIdAndFinancialConceptId,
-  RegisterFinancialRecord,
 } from "@/Financial/applications"
 import { QueueService, StorageGCP } from "@/Shared/infrastructure"
 import { FinancialYearMongoRepository } from "@/ConsolidatedFinancial/infrastructure"
@@ -26,19 +26,18 @@ import {
   FinancialConfigurationMongoRepository,
 } from "../../persistence"
 import { Response } from "express"
+import { FinancialRecordCreate } from "@/Financial/applications/financeRecord/FinancialRecordCreate"
+import { toFinancialRecordType } from "@/Financial/domain/mappers"
 
 export const FinancialRecordController = async (
-  request: FinancialRecordRequest,
+  request: FinancialRecordRequest & { createdBy: string },
   res: Response
 ) => {
   try {
-    if (request.file) {
-      request.voucher = await StorageGCP.getInstance(
-        process.env.BUCKET_FILES
-      ).uploadFile(request.file)
-    }
-
-    const financialConcept = await searchFinancialConcept(request)
+    const financialConcept =
+      await new FindFinancialConceptByChurchIdAndFinancialConceptId(
+        FinancialConceptMongoRepository.getInstance()
+      ).execute(request.churchId, request.financialConceptId)
 
     const availabilityAccount = await searchAvailabilityAccount(
       request,
@@ -53,7 +52,7 @@ export const FinancialRecordController = async (
     ) {
       res.status(HttpStatus.BAD_REQUEST).send({
         costCenterId: {
-          message: "The costCenterId field is mandatory.",
+          message: "Deve selecionar um centro de custos.",
           rule: "required",
         },
       })
@@ -68,33 +67,24 @@ export const FinancialRecordController = async (
       ).execute(request.churchId, request.costCenterId)
     }
 
-    await new RegisterFinancialRecord(
+    let financialRecordType = FinancialRecordType.INCOME
+
+    financialRecordType = toFinancialRecordType(financialConcept.getType())
+
+    await new FinancialRecordCreate(
       FinancialYearMongoRepository.getInstance(),
       FinanceRecordMongoRepository.getInstance(),
-      FinancialConceptMongoRepository.getInstance(),
-      AvailabilityAccountMongoRepository.getInstance()
-    ).handle(request, financialConcept, costCenter)
-
-    new DispatchUpdateAvailabilityAccountBalance(
+      StorageGCP.getInstance(process.env.BUCKET_FILES),
       QueueService.getInstance()
-    ).execute({
-      availabilityAccount: availabilityAccount,
-      amount: request.amount,
-      concept: financialConcept.getName(),
-      operationType:
-        financialConcept.getType() === ConceptType.INCOME
-          ? TypeOperationMoney.MONEY_IN
-          : TypeOperationMoney.MONEY_OUT,
-      createdAt: request.date,
-    })
-
-    if (costCenter) {
-      new DispatchUpdateCostCenterMaster(QueueService.getInstance()).execute({
-        churchId: request.churchId,
-        amount: request.amount,
-        costCenterId: costCenter.getCostCenterId(),
-      })
-    }
+    ).handle({
+      ...request,
+      costCenter,
+      financialConcept,
+      financialRecordType,
+      availabilityAccount,
+      status: FinancialRecordStatus.CLEARED,
+      source: FinancialRecordSource.MANUAL,
+    } as FinancialRecordQueueRequest)
 
     res.status(HttpStatus.CREATED).send({
       message: "successful financial record registration",
@@ -127,24 +117,8 @@ const searchAvailabilityAccount = async (
   return account
 }
 
-const searchFinancialConcept = async (request: FinancialRecordRequest) => {
-  const financialConcept =
-    await new FindFinancialConceptByChurchIdAndFinancialConceptId(
-      FinancialConceptMongoRepository.getInstance()
-    ).execute(request.churchId, request.financialConceptId)
-
-  if (
-    financialConcept.getType() === ConceptType.DISCHARGE &&
-    request.costCenterId === undefined
-  ) {
-    throw new GenericException("The cost center field is mandatory.")
-  }
-
-  return financialConcept
-}
-
 export const CancelFinancialRecordController = async (
-  req: { financialRecordId: string; churchId: string },
+  req: { financialRecordId: string; churchId: string; createdBy: string },
   res: Response
 ) => {
   try {
