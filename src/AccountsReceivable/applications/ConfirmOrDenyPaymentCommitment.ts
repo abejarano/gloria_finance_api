@@ -9,7 +9,7 @@ import {
 import { GeneratePDFAdapter, Logger } from "@/Shared/adapter"
 import { Church, IChurchRepository, IMinisterRepository } from "@/Church/domain"
 import { FindChurchById, FindMinisterById } from "@/Church/applications"
-import { DispatchFinancialRecordCreate } from "@/Financial/applications"
+import { DispatchCreateFinancialRecord } from "@/Financial/applications"
 import { DateBR } from "@/Shared/helpers"
 import {
   FinancialRecordSource,
@@ -59,7 +59,7 @@ export class ConfirmOrDenyPaymentCommitment {
     if (accepted) {
       await this.generateContract(account, church)
 
-      new DispatchFinancialRecordCreate(this.queueService).execute({
+      new DispatchCreateFinancialRecord(this.queueService).execute({
         churchId: account.getChurchId(),
         date: DateBR(),
         createdBy: account.getCreatedBy(),

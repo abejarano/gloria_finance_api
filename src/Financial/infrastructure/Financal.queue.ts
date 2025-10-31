@@ -10,7 +10,7 @@ import {
 } from "./persistence"
 import { UpdateAvailabilityAccountBalance } from "../applications"
 import { UpdateCostCenterMaster } from "../applications/costCenter/UpdateCostCenterMaster"
-import { FinancialRecordCreate } from "@/Financial/applications/financeRecord/FinancialRecordCreate"
+import { CreateFinancialRecord } from "@/Financial/applications/financeRecord/CreateFinancialRecord"
 import { QueueService, StorageGCP } from "@/Shared/infrastructure"
 import { FinancialYearMongoRepository } from "@/ConsolidatedFinancial/infrastructure"
 
@@ -30,7 +30,7 @@ export const FinancialQueue = (): IDefinitionQueue[] => [
     ],
   },
   {
-    useClass: FinancialRecordCreate,
+    useClass: CreateFinancialRecord,
     inject: [
       FinancialYearMongoRepository.getInstance(),
       FinanceRecordMongoRepository.getInstance(),

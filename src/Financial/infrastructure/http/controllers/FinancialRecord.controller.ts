@@ -5,7 +5,7 @@ import {
   ConceptType,
   CostCenter,
   FinancialConcept,
-  FinancialRecordQueueRequest,
+  FinancialRecordCreateQueue,
   FinancialRecordRequest,
   FinancialRecordSource,
   FinancialRecordStatus,
@@ -26,7 +26,7 @@ import {
   FinancialConfigurationMongoRepository,
 } from "../../persistence"
 import { Response } from "express"
-import { FinancialRecordCreate } from "@/Financial/applications/financeRecord/FinancialRecordCreate"
+import { CreateFinancialRecord } from "@/Financial/applications/financeRecord/CreateFinancialRecord"
 import { toFinancialRecordType } from "@/Financial/domain/mappers"
 
 export const FinancialRecordController = async (
@@ -71,7 +71,7 @@ export const FinancialRecordController = async (
 
     financialRecordType = toFinancialRecordType(financialConcept.getType())
 
-    await new FinancialRecordCreate(
+    await new CreateFinancialRecord(
       FinancialYearMongoRepository.getInstance(),
       FinanceRecordMongoRepository.getInstance(),
       StorageGCP.getInstance(process.env.BUCKET_FILES),
@@ -84,7 +84,7 @@ export const FinancialRecordController = async (
       availabilityAccount,
       status: FinancialRecordStatus.CLEARED,
       source: FinancialRecordSource.MANUAL,
-    } as FinancialRecordQueueRequest)
+    } as FinancialRecordCreateQueue)
 
     res.status(HttpStatus.CREATED).send({
       message: "successful financial record registration",

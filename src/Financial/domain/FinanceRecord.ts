@@ -91,7 +91,9 @@ export class FinanceRecord extends AggregateRoot {
     const financialRecord: FinanceRecord = new FinanceRecord()
     financialRecord.id = plainData?.id
     financialRecord.financialRecordId = plainData.financialRecordId
-    financialRecord.financialConcept = plainData.financialConcept
+    financialRecord.financialConcept = FinancialConcept.fromPrimitives(
+      plainData.financialConcept
+    )
     financialRecord.churchId = plainData.churchId
     financialRecord.amount = plainData.amount
     financialRecord.date = plainData.date
@@ -140,6 +142,22 @@ export class FinanceRecord extends AggregateRoot {
 
   getCostCenterId(): string | undefined {
     return this.costCenter?.costCenterId
+  }
+
+  getFinancialConcept() {
+    return this.financialConcept
+  }
+
+  setVoucher(voucher: string) {
+    this.voucher = voucher
+  }
+
+  setStatus(status: FinancialRecordStatus) {
+    this.status = status
+  }
+
+  update() {
+    this.updatedAt = DateBR()
   }
 
   toPrimitives() {

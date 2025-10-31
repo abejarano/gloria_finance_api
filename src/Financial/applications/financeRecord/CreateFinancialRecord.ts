@@ -5,7 +5,7 @@ import { IQueue, IQueueService, IStorageService } from "@/Shared/domain"
 import {
   ConceptType,
   FinanceRecord,
-  FinancialRecordQueueRequest,
+  FinancialRecordCreateQueue,
   TypeOperationMoney,
 } from "@/Financial/domain"
 import { UnitOfWork } from "@/Shared/helpers"
@@ -15,8 +15,8 @@ import {
 } from "@/Financial/applications"
 import { FinancialMonthValidator } from "@/ConsolidatedFinancial/applications"
 
-export class FinancialRecordCreate implements IQueue {
-  private logger = Logger(FinancialRecordCreate.name)
+export class CreateFinancialRecord implements IQueue {
+  private logger = Logger(CreateFinancialRecord.name)
 
   constructor(
     private readonly financialYearRepository: IFinancialYearRepository,
@@ -25,7 +25,9 @@ export class FinancialRecordCreate implements IQueue {
     private readonly queueService: IQueueService
   ) {}
 
-  async handle(args: FinancialRecordQueueRequest): Promise<void> {
+  async handle(args: FinancialRecordCreateQueue): Promise<void> {
+    this.logger.info(`CreateFinancialRecord`, args)
+
     await new FinancialMonthValidator(this.financialYearRepository).validate({
       churchId: args.churchId,
     })

@@ -8,7 +8,7 @@ import {
   FinancialRecordType,
 } from "@/Financial/domain"
 
-export type FinancialRecordQueueRequest = {
+export type FinancialRecordCreateQueue = {
   churchId: string
   amount: number
   description: string
@@ -17,7 +17,7 @@ export type FinancialRecordQueueRequest = {
   source: FinancialRecordSource
   status: FinancialRecordStatus
   costCenter?: CostCenter
-  financialConcept?: FinancialConcept
+  financialConcept: FinancialConcept
   availabilityAccount?: AvailabilityAccount
   createdBy: string
   file?: any
@@ -26,6 +26,14 @@ export type FinancialRecordQueueRequest = {
     type: string
     reference: string
   }
+}
+
+export type FinancialRecordUpdateQueue = {
+  file?: any
+  financialConceptId: string
+  status?: FinancialRecordStatus
+  costCenter?: CostCenter
+  availabilityAccount?: AvailabilityAccount
 }
 
 export type FinancialRecordRequest = {

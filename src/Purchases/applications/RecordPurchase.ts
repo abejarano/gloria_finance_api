@@ -7,7 +7,7 @@ import {
   IFinancialConfigurationRepository,
 } from "../../Financial/domain/interfaces"
 import {
-  DispatchFinancialRecordCreate,
+  DispatchCreateFinancialRecord,
   DispatchUpdateAvailabilityAccountBalance,
   DispatchUpdateCostCenterMaster,
   FindAvailabilityAccountByAvailabilityAccountId,
@@ -79,7 +79,7 @@ export class RecordPurchase {
       financialConceptId: request.financialConceptId,
     })
 
-    new DispatchFinancialRecordCreate(this.queueService).execute({
+    new DispatchCreateFinancialRecord(this.queueService).execute({
       financialConcept: concept,
       churchId: request.churchId,
       amount: request.total,

@@ -16,6 +16,7 @@ export { AvailabilityAccount } from "./AvailabilityAccount"
 export { AvailabilityAccountMaster } from "./AvailabilityAccountMaster"
 export { CostCenterMaster } from "./CostCenterMaster"
 
+export * from "./exceptions/FinancialConceptNotFound.exception"
 export { BankNotFound } from "./exceptions/BankNotFound.exception"
 export { CostCenterNotFound } from "./exceptions/CostCenterNotFound.exception"
 export { FinancialConceptDisable } from "./exceptions/FinancialConceptDisable.exception"
@@ -36,10 +37,7 @@ export { ContributionRequest } from "./requests/Contribution.request"
 export { BankRequest } from "./requests/Bank.request"
 export { FilterContributionsRequest } from "./requests/FilterContributions.request"
 export { CostCenterRequest } from "./requests/CostCenter.request"
-export {
-  FinancialRecordQueueRequest,
-  FinancialRecordRequest,
-} from "./requests/FinancialRecord.request"
+export * from "./requests/FinancialRecord.request"
 export { FilterFinanceRecordRequest } from "./requests/FilterFinanceRecord.request"
 export {
   FinanceRecordReportRequest,

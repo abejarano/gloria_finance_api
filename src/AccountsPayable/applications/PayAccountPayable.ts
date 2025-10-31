@@ -1,7 +1,6 @@
 import { Logger } from "@/Shared/adapter"
 import {
   AccountPayable,
-  AccountPayableChurchMismatch,
   AccountPayableNotFound,
   IAccountPayableRepository,
   InstallmentNotFound,
@@ -16,13 +15,17 @@ import {
 import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
 import { IQueueService, IStorageService } from "@/Shared/domain"
 import {
-  DispatchUpdateAvailabilityAccountBalance,
-  DispatchUpdateCostCenterMaster,
+  DispatchCreateFinancialRecord,
   FindAvailabilityAccountByAvailabilityAccountId,
 } from "@/Financial/applications"
-import { TypeOperationMoney } from "@/Financial/domain"
 import { PayInstallment } from "@/Shared/applications"
-import { UnitOfWork } from "@/Shared/helpers"
+import { DateBR, UnitOfWork } from "@/Shared/helpers"
+import {
+  FinancialConceptNotFound,
+  FinancialRecordSource,
+  FinancialRecordStatus,
+  FinancialRecordType,
+} from "@/Financial/domain"
 
 export class PayAccountPayable {
   private logger = Logger(PayAccountPayable.name)
@@ -53,22 +56,6 @@ export class PayAccountPayable {
       throw new AccountPayableNotFound()
     }
 
-    if (accountPayable.getChurchId() !== req.churchId) {
-      this.logger.debug(`Account Payable church mismatch`, {
-        accountChurchId: accountPayable.getChurchId(),
-        requestChurchId: req.churchId,
-      })
-      throw new AccountPayableChurchMismatch(
-        accountPayable.getChurchId(),
-        req.churchId
-      )
-    }
-
-    const availabilityAccount =
-      await new FindAvailabilityAccountByAvailabilityAccountId(
-        this.availabilityAccountRepository
-      ).execute(req.availabilityAccountId, req.churchId)
-
     const accountPayableSnapshot = AccountPayable.fromPrimitives(
       accountPayable.toPrimitives()
     )
@@ -76,13 +63,42 @@ export class PayAccountPayable {
       await this.accountPayableRepository.upsert(accountPayableSnapshot)
     })
 
+    const availabilityAccount =
+      await new FindAvailabilityAccountByAvailabilityAccountId(
+        this.availabilityAccountRepository
+      ).execute(req.availabilityAccountId, accountPayable.getChurchId())
+
+    const concept = await this.financialConceptRepository.one({
+      name: "Contas a Pagar",
+      churchId: accountPayable.getChurchId(),
+    })
+
+    if (!concept) {
+      this.logger.debug(`Financial Concept 'Contas a Pagar' not found`)
+      throw new FinancialConceptNotFound("Contas a Pagar")
+    }
+
+    unitOfWork.execPostCommit(async () => {
+      new DispatchCreateFinancialRecord(this.queueService).execute({
+        churchId: accountPayable.getChurchId(),
+        file: req.file,
+        date: DateBR(),
+        createdBy: "system",
+        availabilityAccount,
+        financialRecordType: FinancialRecordType.OUTGO,
+        source: FinancialRecordSource.AUTO,
+        status: FinancialRecordStatus.CLEARED,
+        amount: req.amount.getValue(),
+        financialConcept: concept,
+        description: `pagamento de conta a pagar: parcela: ${req.installmentIds.join(",")}`,
+        reference: {
+          reference: `${accountPayable.getAccountPayableId()} installments ${req.installmentIds.join(",")}`,
+          type: "AccountPayable",
+        },
+      })
+    })
+
     try {
-      // const { concept, financialRecordId, voucher } =
-      //   await this.makeFinanceRecord(req, unitOfWork)
-
-      // req.concept = concept
-      // req.voucher = voucher
-
       let amountPay = req.amount.getValue()
 
       for (const installmentId of req.installmentIds) {
@@ -102,25 +118,6 @@ export class PayAccountPayable {
         status ${accountPayable.getStatus()}`
       )
 
-      unitOfWork.execPostCommit(() => {
-        new DispatchUpdateAvailabilityAccountBalance(this.queueService).execute(
-          {
-            operationType: TypeOperationMoney.MONEY_OUT,
-            availabilityAccount: availabilityAccount,
-            concept: req.concept.getDescription(),
-            amount: req.amount.getValue(),
-          }
-        )
-      })
-
-      unitOfWork.execPostCommit(() => {
-        new DispatchUpdateCostCenterMaster(this.queueService).execute({
-          churchId: accountPayable.getChurchId(),
-          costCenterId: req.costCenterId,
-          amount: req.amount.getValue(),
-        })
-      })
-
       await unitOfWork.commit()
 
       this.logger.info(`Finished Pay Account Payable`)
@@ -129,64 +126,4 @@ export class PayAccountPayable {
       await unitOfWork.rollback()
     }
   }
-
-  // private async makeFinanceRecord(
-  //   req: PayAccountPayableRequest,
-  //   unitOfWork: UnitOfWork
-  // ): Promise<{
-  //   concept: FinancialConcept
-  //   financialRecordId: string
-  //   voucher?: string
-  // }> {
-  //   let voucher: string | undefined
-  //
-  //   if (req.file) {
-  //     voucher = await this.storageService.uploadFile(req.file)
-  //     if (voucher) {
-  //       unitOfWork.register(async () => {
-  //         await this.storageService.deleteFile(voucher!)
-  //       })
-  //     }
-  //   }
-  //
-  //   //TODO si el sistema maneja varios idiomas esto hay que refactorizarlo
-  //   const concept = await this.financialConceptRepository.one({
-  //     name: "Contas a Pagar",
-  //     churchId: req.churchId,
-  //   })
-  //
-  //   const costCenter = await new FindCostCenterByCostCenterId(
-  //     this.financialConfigurationRepository
-  //   ).execute(req.churchId, req.costCenterId)
-  //
-  //   const financialRecord = await new RegisterFinancialRecord(
-  //     this.financialYearRepository,
-  //     this.financialRecordRepository,
-  //     this.financialConceptRepository,
-  //     this.availabilityAccountRepository
-  //   ).handle(
-  //     {
-  //       churchId: req.churchId,
-  //       availabilityAccountId: req.availabilityAccountId,
-  //       voucher,
-  //       amount: req.amount.getValue(),
-  //       date: new Date(),
-  //       description: `pagamento de conta a pagar: parcela: ${req.installmentIds.join(",")}`,
-  //     },
-  //     concept,
-  //     costCenter
-  //   )
-  //
-  //   unitOfWork.register(async () => {
-  //     await this.financialRecordRepository.deleteByFinancialRecordId(
-  //       financialRecord.getFinancialRecordId()
-  //     )
-  //   })
-  //
-  //   return {
-  //     concept,
-  //     financialRecordId: financialRecord.getFinancialRecordId(),
-  //     voucher,
-  //   }
-  // }
 }

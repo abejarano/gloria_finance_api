@@ -44,7 +44,6 @@ accountsPayableRoute.post(
       {
         ...req.body,
         createdBy: req["user"].name,
-        churchId: req["user"].churchId,
         installmentIds,
         amount: AmountValue.create(req.body.amount),
         file: req?.files?.file,

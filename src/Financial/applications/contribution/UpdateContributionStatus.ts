@@ -11,7 +11,7 @@ import { IOnlineContributionsRepository } from "../../domain/interfaces"
 import { Logger } from "../../../Shared/adapter"
 import { TypeBankingOperation } from "../../../MovementBank/domain"
 import { IQueueService } from "../../../Shared/domain"
-import { DispatchFinancialRecordCreate } from "../DispatchFinancialRecordCreate"
+import { DispatchCreateFinancialRecord } from "../DispatchCreateFinancialRecord"
 import { DateBR } from "../../../Shared/helpers"
 import { DispatchUpdateAvailabilityAccountBalance } from "../DispatchUpdateAvailabilityAccountBalance"
 
@@ -58,7 +58,7 @@ export class UpdateContributionStatus {
       amount: contribution.getAmount(),
     })
 
-    new DispatchFinancialRecordCreate(this.queueService).execute({
+    new DispatchCreateFinancialRecord(this.queueService).execute({
       financialConcept: contribution.getFinancialConcept(),
       amount: contribution.getAmount(),
       churchId: contribution.getMember().getChurchId(),

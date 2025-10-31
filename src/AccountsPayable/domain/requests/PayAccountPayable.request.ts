@@ -7,7 +7,6 @@ export type PayAccountPayableRequest = {
   installmentId: string
   installmentIds: string[]
   availabilityAccountId: string
-  churchId: string
   amount: AmountValue
   file?: any
   voucher?: string
