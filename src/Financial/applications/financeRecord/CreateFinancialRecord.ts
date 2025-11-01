@@ -30,6 +30,8 @@ export class CreateFinancialRecord implements IQueue {
 
     await new FinancialMonthValidator(this.financialYearRepository).validate({
       churchId: args.churchId,
+      month: new Date(args.date).getMonth() + 1,
+      year: new Date(args.date).getFullYear(),
     })
 
     const unitOfWork = new UnitOfWork()

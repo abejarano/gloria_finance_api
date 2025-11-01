@@ -19,7 +19,11 @@ accountsReceivableRoutes.post(
   [PermissionMiddleware, CreateAccountReceivableValidator],
   async (req, res) => {
     await CreateAccountReceivableController(
-      { ...req.body, churchId: req["user"].churchId },
+      {
+        ...req.body,
+        churchId: req["user"].churchId,
+        createdBy: req["user"].name,
+      },
       res
     )
   }

@@ -57,15 +57,25 @@ export class FinanceRecord extends AggregateRoot {
     } = params
     const financialRecord: FinanceRecord = new FinanceRecord()
     financialRecord.financialRecordId = IdentifyEntity.get(`financialRecord`)
-    financialRecord.financialConcept = financialConcept
+
+    if (typeof financialConcept === "object") {
+      financialRecord.financialConcept =
+        FinancialConcept.fromPrimitives(financialConcept)
+    } else {
+      financialRecord.financialConcept = financialConcept
+    }
+
     financialRecord.churchId = churchId
     financialRecord.amount = Number(amount)
     financialRecord.date = date
     financialRecord.type = type
-    financialRecord.availabilityAccount = {
-      availabilityAccountId: availabilityAccount.getAvailabilityAccountId(),
-      accountName: availabilityAccount.getAccountName(),
-      accountType: availabilityAccount.getType(),
+
+    if (availabilityAccount) {
+      financialRecord.availabilityAccount = {
+        availabilityAccountId: availabilityAccount.getAvailabilityAccountId(),
+        accountName: availabilityAccount.getAccountName(),
+        accountType: availabilityAccount.getType(),
+      }
     }
     financialRecord.voucher = voucher
     financialRecord.description = description
