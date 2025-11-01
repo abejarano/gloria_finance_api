@@ -1,6 +1,7 @@
 import { AggregateRoot } from "@abejarano/ts-mongodb-criteria"
 import IdentifyAvailabilityAccountMaster from "../applications/helpers/MasterBalanceIdentifier"
 import { AvailabilityAccount } from "./AvailabilityAccount"
+import { DateBR } from "@/Shared/helpers"
 
 export class AvailabilityAccountMaster extends AggregateRoot {
   private id?: string
@@ -15,6 +16,7 @@ export class AvailabilityAccountMaster extends AggregateRoot {
   private year: number
   private totalOutput: number
   private totalInput: number
+  private updatedAt?: Date
 
   static create(availabilityAccount: AvailabilityAccount) {
     const availabilityAccountMaster = new AvailabilityAccountMaster()
@@ -34,6 +36,8 @@ export class AvailabilityAccountMaster extends AggregateRoot {
         availabilityAccount.getAvailabilityAccountId()
       )
     availabilityAccountMaster.churchId = availabilityAccount.getChurchId()
+
+    availabilityAccountMaster.updatedAt = DateBR()
 
     return availabilityAccountMaster
   }
@@ -84,6 +88,8 @@ export class AvailabilityAccountMaster extends AggregateRoot {
     } else {
       this.totalOutput += amount
     }
+
+    this.updatedAt = DateBR()
     return this
   }
 
@@ -96,6 +102,7 @@ export class AvailabilityAccountMaster extends AggregateRoot {
       availabilityAccount: this.availabilityAccount,
       availabilityAccountMasterId: this.availabilityAccountMasterId,
       churchId: this.churchId,
+      updatedAt: this.updatedAt,
     }
   }
 }
