@@ -38,6 +38,7 @@ export class FinanceRecord extends AggregateRoot {
   private createdBy: string
   private createdAt: Date
   private updatedAt: Date
+  private reconciledAt?: Date
 
   static create(params: CreateFinanceRecord): FinanceRecord {
     const {
@@ -119,6 +120,7 @@ export class FinanceRecord extends AggregateRoot {
     financialRecord.createdBy = plainData.createdBy ?? ""
     financialRecord.status = plainData.status
     financialRecord.reference = plainData.reference ?? undefined
+    financialRecord.reconciledAt = plainData.reconciledAt ?? undefined
 
     return financialRecord
   }
@@ -189,6 +191,7 @@ export class FinanceRecord extends AggregateRoot {
       source: this.source,
       createdBy: this.createdBy,
       reference: this.reference,
+      reconciledAt: this.reconciledAt,
     }
   }
 }

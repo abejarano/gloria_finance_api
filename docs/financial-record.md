@@ -30,7 +30,7 @@ B --> D[void]
 
 ### 🧠 Recomendaciones
 
-- Registrar `clearedAt`, `reconciledAt` y `voidAt` (timestamps).
+- Registrar `clearedAt`, `reconciledAt` (timestamps).
 - Emitir evento `FinancialRecordStatusChanged` cada vez que cambie el estado.
 - En reportes:
     - **DRE**: incluir `cleared` y `reconciled`.
