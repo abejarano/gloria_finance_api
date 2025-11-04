@@ -1,4 +1,4 @@
-import { TypeBankingOperation } from "@/MovementBank/domain"
+import { TypeBankingOperation } from "../enums/TypeBankingOperation.enum"
 
 export type MovementBankRequest = {
   amount: number

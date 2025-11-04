@@ -1,16 +1,14 @@
 import { AccountType, AvailabilityAccountRequest } from "../../../domain"
 import {
   CreateOrUpdateAvailabilityAccount,
-  FinBankByBankId,
   SearchAvailabilityAccountByChurchId,
 } from "../../../applications"
-import {
-  AvailabilityAccountMongoRepository,
-  FinancialConfigurationMongoRepository,
-} from "../../persistence"
+import { AvailabilityAccountMongoRepository } from "../../persistence"
 import { HttpStatus } from "@/Shared/domain"
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { Response } from "express"
+import { FinBankByBankId } from "@/banking/applications"
+import { BankMongoRepository } from "@/banking/infrastructure/persistence"
 
 export const createOrUpdateAvailabilityAccount = async (
   request: AvailabilityAccountRequest,
@@ -33,7 +31,7 @@ export const createOrUpdateAvailabilityAccount = async (
 
     if (request.accountType === AccountType.BANK && request.source != "") {
       request.source = await new FinBankByBankId(
-        FinancialConfigurationMongoRepository.getInstance()
+        BankMongoRepository.getInstance()
       ).execute(request.source)
     }
 

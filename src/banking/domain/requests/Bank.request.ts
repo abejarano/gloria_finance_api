@@ -1,4 +1,4 @@
-import { TypeBankAccount } from "../enums/TypeBankAccount.enum"
+import { TypeBankAccount } from "@/banking/domain"
 
 export type BankRequest = {
   bankId?: string

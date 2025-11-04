@@ -1,8 +1,7 @@
-import { TypeBankAccount } from "./enums/TypeBankAccount.enum"
-
 import { Church } from "@/Church/domain"
 import { IdentifyEntity } from "@/Shared/adapter"
 import { AggregateRoot } from "@abejarano/ts-mongodb-criteria"
+import { TypeBankAccount } from "@/banking/domain"
 
 export class Bank extends AggregateRoot {
   private id?: string
@@ -78,7 +77,11 @@ export class Bank extends AggregateRoot {
     this.bankInstruction = instruction
   }
 
-  setAccountType(accountType: TypeBankAccount): void {
+  setStatus(active: boolean): void {
+    this.active = active
+  }
+
+  setAccountType({ accountType }: { accountType: TypeBankAccount }): void {
     this.accountType = accountType
   }
 

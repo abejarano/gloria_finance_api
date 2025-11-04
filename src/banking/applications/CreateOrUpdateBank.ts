@@ -1,14 +1,10 @@
-import { Bank, BankRequest } from "../../domain"
-import {
-  Church,
-  ChurchNotFound,
-  IChurchRepository,
-} from "../../../Church/domain"
-import { IFinancialConfigurationRepository } from "../../domain/interfaces"
+import { Church, ChurchNotFound, IChurchRepository } from "@/Church/domain"
+import { BankRequest, IBankRepository } from "@/banking/domain"
+import { Bank } from "@/banking/domain/Bank"
 
 export class CreateOrUpdateBank {
   constructor(
-    private readonly financialConfigurationRepository: IFinancialConfigurationRepository,
+    private readonly bankRepository: IBankRepository,
     private readonly churchRepository: IChurchRepository
   ) {}
 
@@ -18,16 +14,15 @@ export class CreateOrUpdateBank {
       return
     }
 
-    const bank: Bank =
-      await this.financialConfigurationRepository.findBankByBankId(
-        requestBank.bankId
-      )
+    const bank: Bank = await this.bankRepository.one(requestBank.bankId)
 
     bank.setBankInstruction(requestBank.bankInstruction)
-    bank.setAccountType(requestBank.accountType)
+    bank.setAccountType({ accountType: requestBank.accountType })
     bank.setInstancePaymentAddress(requestBank.addressInstancePayment)
     bank.setTag(requestBank.tag)
-    await this.financialConfigurationRepository.upsertBank(bank)
+    bank.setStatus(requestBank.active)
+
+    await this.bankRepository.upsert(bank)
   }
 
   private async registerBank(requestBank: BankRequest): Promise<void> {
@@ -41,7 +36,7 @@ export class CreateOrUpdateBank {
       requestBank.bankInstruction,
       await this.getChurch(requestBank.churchId)
     )
-    await this.financialConfigurationRepository.upsertBank(bank)
+    await this.bankRepository.upsert(bank)
   }
 
   private async getChurch(churchId: string): Promise<Church> {

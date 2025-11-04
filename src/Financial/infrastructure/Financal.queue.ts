@@ -1,6 +1,4 @@
 import { IDefinitionQueue } from "@/Shared/domain"
-import { MovementBankRecord } from "@/MovementBank/applications"
-import { MovementBankMongoRepository } from "@/MovementBank/infrastructure/persistence"
 import {
   AvailabilityAccountMasterMongoRepository,
   AvailabilityAccountMongoRepository,
@@ -23,13 +21,7 @@ export const FinancialQueue = (): IDefinitionQueue[] => [
       CostCenterMasterMongoRepository.getInstance(),
     ],
   },
-  {
-    useClass: MovementBankRecord,
-    inject: [
-      MovementBankMongoRepository.getInstance(),
-      FinancialConfigurationMongoRepository.getInstance(),
-    ],
-  },
+
   {
     useClass: CreateFinancialRecord,
     inject: [

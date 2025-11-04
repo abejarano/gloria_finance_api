@@ -11,8 +11,10 @@ import { SendMail } from "./SendMail/SendMail"
 import { TelegramNotification } from "./Shared/infrastructure"
 import { FinancialConceptMongoRepository } from "@/Financial/infrastructure/persistence"
 import { PatrimonyQueue } from "@/Patrimony/infrastructure/Patrimony.queue"
+import { BankingQueue } from "@/banking/infrastructure/Banking.queue"
 
 export const Queues = (): IDefinitionQueue[] => [
+  ...BankingQueue(),
   ...FinancialQueue(),
   ...PatrimonyQueue(),
   {

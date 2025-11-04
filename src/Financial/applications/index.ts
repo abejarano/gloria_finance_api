@@ -2,9 +2,6 @@ export { SearchCostCenterByChurchId } from "./costCenter/SearchCostCenterByChurc
 export { FindCostCenterByCostCenterId } from "./costCenter/FindCostCenterByCostCenterId"
 export { CreateOrUpdateFinancialConcept } from "./financialConcept/CreateOrUpdateFinancialConcept"
 
-export { FinBankByBankId } from "./bank/FinBankByBankId"
-export { SearchBankByChurchId } from "./bank/SearchBankByChurchId"
-export { CreateOrUpdateBank } from "./bank/CreateOrUpdateBank"
 export { InitialLoadingFinancialConcepts } from "./financialConfiguration/InitialLoadingFinancialConcepts"
 
 export { RegisterContributionsOnline } from "./contribution/RegisterContributionsOnline"

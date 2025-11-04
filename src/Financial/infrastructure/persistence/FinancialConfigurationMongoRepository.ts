@@ -1,5 +1,5 @@
 import { MongoRepository } from "@abejarano/ts-mongodb-criteria"
-import { Bank, CostCenter, FinancialConcept } from "../../domain"
+import { CostCenter, FinancialConcept } from "../../domain"
 import { IFinancialConfigurationRepository } from "../../domain/interfaces"
 
 export class FinancialConfigurationMongoRepository
@@ -22,54 +22,6 @@ export class FinancialConfigurationMongoRepository
 
   collectionName(): string {
     return "churches"
-  }
-
-  async searchBanksByChurchId(churchId: string): Promise<Bank[]> {
-    /*const collection = await this.collection<{
-      banks: Bank[]
-      churchId: string
-    }>()*/
-    const collection = await this.collection()
-
-    const result = await collection.findOne<any>(
-      {
-        churchId,
-      },
-      {
-        projection: {
-          _id: 1,
-          churchId: 1,
-          banks: 1,
-        },
-      }
-    )
-
-    if (!("banks" in result)) {
-      return []
-    }
-
-    return result.banks.map((bank: any) =>
-      Bank.fromPrimitives({
-        id: result._id.toString(),
-        churchId: result.churchId,
-        ...bank,
-      })
-    )
-  }
-
-  async upsertBank(bank: Bank): Promise<void> {
-    const collection = await this.collection()
-
-    await collection.updateOne(
-      { churchId: bank.getChurchId() },
-      { $pull: { banks: { bankId: bank.getBankId() } } }
-    )
-
-    await collection.updateOne(
-      { churchId: bank.getChurchId() },
-      { $push: { banks: bank.toPrimitives() } },
-      { upsert: true }
-    )
   }
 
   async upsertFinancialConcept(concept: FinancialConcept): Promise<void> {
@@ -138,30 +90,6 @@ export class FinancialConfigurationMongoRepository
     return CostCenter.fromPrimitives({
       churchId: result.churchId,
       ...result.costCenters[0],
-    })
-  }
-
-  async findBankByBankId(bankId: string): Promise<Bank> {
-    /*const collection = await this.collection<{
-      banks: Bank[]
-      churchId: string
-    }>()*/
-
-    const collection = await this.collection()
-
-    const result = await collection.findOne<any>(
-      { "banks.bankId": bankId },
-      { projection: { _id: 1, churchId: 1, "banks.$": 1 } }
-    )
-
-    if (!result) {
-      return undefined
-    }
-
-    return Bank.fromPrimitives({
-      id: result._id.toString(),
-      churchId: result.churchId,
-      ...result.banks[0],
     })
   }
 

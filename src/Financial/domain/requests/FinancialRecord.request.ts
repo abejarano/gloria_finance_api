@@ -1,4 +1,3 @@
-import { TypeBankingOperation } from "@/MovementBank/domain"
 import {
   CostCenter,
   FinancialConcept,
@@ -6,6 +5,7 @@ import {
   FinancialRecordStatus,
   FinancialRecordType,
 } from "@/Financial/domain"
+import { TypeBankingOperation } from "@/banking/domain"
 
 export type FinancialRecordCreateQueue = {
   churchId: string
