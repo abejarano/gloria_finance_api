@@ -15,7 +15,7 @@ components:
     ImportBankStatementResponse:
       type: object
       properties:
-        bank:
+        bankId:
           type: string
           example: NUBANK
         month:
@@ -42,14 +42,10 @@ components:
         churchId:
           type: string
           example: CHURCH-ABC123
-        bank:
+        bankId:
           type: string
-          description: Código do banco associado ao extrato.
+          description: Identificador do banco.
           example: NUBANK
-        accountName:
-          type: string
-          nullable: true
-          description: Nome da conta associado ao extrato, quando informado no upload.
         postedAt:
           type: string
           format: date-time
@@ -149,14 +145,14 @@ paths:
             schema:
               type: object
               required:
-                - bank
+                - bankId
                 - month
                 - year
                 - file
               properties:
-                bank:
+                bankId:
                   type: string
-                  description: Código do banco (ex. `NUBANK`). Valor convertido para maiúsculas no backend.
+                  description: Identificador do banco (ex. `NUBANK`). Valor convertido para maiúsculas no backend.
                   example: NUBANK
                 month:
                   type: integer
@@ -169,12 +165,6 @@ paths:
                   minimum: 2000
                   description: Ano de referência do extrato.
                   example: 2024
-                accountName:
-                  type: string
-                  description: Nome amigável da conta (opcional) utilizado em mensagens e relatórios.
-                churchId:
-                  type: string
-                  description: Para superusuários, permite importar em nome de outra igreja.
                 file:
                   type: string
                   format: binary
@@ -199,10 +189,10 @@ paths:
         - bearerAuth: [ ]
       parameters:
         - in: query
-          name: bank
+          name: bankId
           schema:
             type: string
-          description: Código do banco (ex. `NUBANK`).
+          description: Identificador do banco cadastrado na igreja (field `bankId`). Será convertido internamente para a tag utilizada na importação.
         - in: query
           name: status
           schema:
@@ -239,15 +229,38 @@ paths:
             type: string
             format: date
           description: Data final para filtrar pela data de lançamento (`postedAt`).
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          description: Página atual (default 1).
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Quantidade de registros por página (default 20).
       responses:
         '200':
-          description: Lista de extratos encontrados.
+          description: Lista paginada de extratos encontrados.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BankStatement'
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: Total de registros encontrados.
+                  nextPag:
+                    type: integer
+                    nullable: true
+                    description: Próxima página disponível ou null.
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BankStatement'
         '422':
           description: Parâmetros de filtro inválidos.
   /api/v1/bank/statements/{bankStatementId}/retry:

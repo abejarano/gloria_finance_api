@@ -17,7 +17,7 @@ import patrimonyRouter from "@/Patrimony/infrastructure/http/routes/Asset.routes
 import accountsReceivableRoutes from "@/AccountsReceivable/infrastructure/http/AccountsReceivable.routes"
 import groupAccountsPayableRoutes from "@/AccountsPayable/infrastructure/http/routes"
 import { Queues } from "@/queues"
-import bankingRoutes from "@/banking/infrastructure/http/routes"
+import bankingRoutes from "@/Banking/infrastructure/http/routes"
 
 export const APP_DIR = __dirname
 
