@@ -1,10 +1,20 @@
 export { Profile } from "./types/profile.type"
 export { User } from "./User"
+export { Permission } from "./Permission"
+export { Role } from "./Role"
+export { UserAssignment } from "./UserAssignment"
+export { BASE_PERMISSIONS, BASE_ROLES } from "./constants/rbac"
 
 export { ProfileType } from "./enums/profileType.enum"
 
 export { IUserRepository } from "./interfaces/UserRepository.interface"
 export { IAuthToken } from "./interfaces/auth-token.interface"
+export {
+  IPermissionRepository,
+  IRolePermissionRepository,
+  IRoleRepository,
+  IUserAssignmentRepository,
+} from "./interfaces/rbac"
 
 export { UserAuthDTO } from "./types/user-auth.type"
 

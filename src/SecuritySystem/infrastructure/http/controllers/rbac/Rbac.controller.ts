@@ -1,0 +1,198 @@
+import { Request, Response } from "express"
+import domainResponse from "@/Shared/helpers/domainResponse"
+import { HttpStatus } from "@/Shared/domain"
+import {
+  AssignPermissionsToRole,
+  AssignRolesToUser,
+  BootstrapPermissions,
+  CreateRole,
+  GetUserPermissions,
+  ListPermissions,
+  ListRoles,
+} from "@/SecuritySystem/applications"
+import {
+  PermissionMongoRepository,
+  RoleMongoRepository,
+  RolePermissionMongoRepository,
+  UserAssignmentMongoRepository,
+} from "@/SecuritySystem/infrastructure"
+import { AuthorizationService } from "@/SecuritySystem/applications/rbac/AuthorizationService"
+import { UserPermissionsCache } from "@/Shared/infrastructure"
+import { Can } from "@/Shared/infrastructure"
+
+export class RbacController {
+  private readonly authorizationService = AuthorizationService.getInstance(
+    UserAssignmentMongoRepository.getInstance(),
+    RolePermissionMongoRepository.getInstance(),
+    PermissionMongoRepository.getInstance(),
+    UserPermissionsCache.getInstance()
+  )
+
+  @Can("rbac", "bootstrap")
+  async bootstrap(req: Request, res: Response) {
+    try {
+      const auth = req["auth"]
+      const targetUserId = req.body.userId ?? auth.userId
+
+      await new BootstrapPermissions(
+        PermissionMongoRepository.getInstance(),
+        RoleMongoRepository.getInstance(),
+        RolePermissionMongoRepository.getInstance(),
+        UserAssignmentMongoRepository.getInstance()
+      ).execute({
+        churchId: auth.churchId,
+        userId: targetUserId,
+      })
+
+      await this.authorizationService.invalidateUserCache(
+        auth.churchId,
+        targetUserId
+      )
+
+      res.status(HttpStatus.CREATED).send({
+        message: "RBAC bootstrap completed",
+      })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  @Can("rbac", "manage_roles")
+  async createRole(req: Request, res: Response) {
+    try {
+      const auth = req["auth"]
+      const role = await new CreateRole(
+        RoleMongoRepository.getInstance()
+      ).execute({
+        churchId: auth.churchId,
+        name: req.body.name,
+        description: req.body.description,
+      })
+
+      res.status(HttpStatus.CREATED).send({
+        message: "Role created",
+        data: role.toPrimitives(),
+      })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  @Can("rbac", "manage_roles")
+  async assignPermissionsToRole(req: Request, res: Response) {
+    try {
+      const auth = req["auth"]
+      const roleId = req.params.id
+      const permissionIds: string[] = req.body.permissionIds ?? []
+
+      const role = await new AssignPermissionsToRole(
+        RoleMongoRepository.getInstance(),
+        PermissionMongoRepository.getInstance(),
+        RolePermissionMongoRepository.getInstance()
+      ).execute({
+        churchId: auth.churchId,
+        roleId,
+        permissionIds,
+      })
+
+      await this.invalidateCacheForRole(auth.churchId, roleId)
+
+      res.status(HttpStatus.OK).send({
+        message: "Permissions updated",
+        data: role.toPrimitives(),
+      })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  @Can("rbac", "assign_roles")
+  async assignRolesToUser(req: Request, res: Response) {
+    try {
+      const auth = req["auth"]
+      const userId = req.params.id
+      const roles: string[] = req.body.roles ?? []
+
+      const assignment = await new AssignRolesToUser(
+        RoleMongoRepository.getInstance(),
+        UserAssignmentMongoRepository.getInstance(),
+        this.authorizationService
+      ).execute({
+        churchId: auth.churchId,
+        userId,
+        roles,
+      })
+
+      res.status(HttpStatus.OK).send({
+        message: "Roles assigned",
+        data: assignment.toPrimitives(),
+      })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  @Can("rbac", "read")
+  async getUserPermissions(req: Request, res: Response) {
+    try {
+      const auth = req["auth"]
+      const userId = req.params.id
+
+      const permissions = await new GetUserPermissions(
+        this.authorizationService
+      ).execute({
+        churchId: auth.churchId,
+        userId,
+      })
+
+      res.status(HttpStatus.OK).send({
+        data: permissions,
+      })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  @Can("rbac", "read")
+  async listRoles(req: Request, res: Response) {
+    try {
+      const auth = req["auth"]
+      const roles = await new ListRoles(
+        RoleMongoRepository.getInstance()
+      ).execute(auth.churchId)
+
+      res.status(HttpStatus.OK).send({ data: roles })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  @Can("rbac", "read")
+  async listPermissions(_req: Request, res: Response) {
+    try {
+      const permissions = await new ListPermissions(
+        PermissionMongoRepository.getInstance()
+      ).execute()
+
+      res.status(HttpStatus.OK).send({ data: permissions })
+    } catch (error) {
+      domainResponse(error, res)
+    }
+  }
+
+  private async invalidateCacheForRole(
+    churchId: string,
+    roleId: string
+  ): Promise<void> {
+    const userIds = await UserAssignmentMongoRepository.getInstance().findUserIdsByRole(
+      churchId,
+      roleId
+    )
+
+    await Promise.all(
+      userIds.map((userId) =>
+        this.authorizationService.invalidateUserCache(churchId, userId)
+      )
+    )
+  }
+}
