@@ -14,4 +14,3 @@ export const LinkBankStatementValidator = async (req, res, next) => {
 
   next()
 }
-

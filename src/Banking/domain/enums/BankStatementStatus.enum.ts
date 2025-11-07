@@ -3,4 +3,3 @@ export enum BankStatementStatus {
   RECONCILED = "RECONCILED",
   UNMATCHED = "UNMATCHED",
 }
-

@@ -3,4 +3,3 @@ export type LinkBankStatementRequest = {
   financialRecordId: string
   churchId: string
 }
-
