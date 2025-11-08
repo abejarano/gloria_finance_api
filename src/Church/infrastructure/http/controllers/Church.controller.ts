@@ -1,3 +1,4 @@
+import { Request } from "express"
 import { HttpStatus } from "../../../../Shared/domain"
 import domainResponse from "../../../../Shared/helpers/domainResponse"
 import { Church, ChurchPaginateRequest, ChurchRequest } from "../../../domain"
@@ -15,14 +16,31 @@ import { FirstLoadFinancialConcepts } from "../../../../Financial/applications"
 import { FinancialConceptMongoRepository } from "../../../../Financial/infrastructure/persistence"
 import { GenerateFinancialMonths } from "../../../../ConsolidatedFinancial/applications"
 import { FinancialYearMongoRepository } from "../../../../ConsolidatedFinancial/infrastructure"
+import { BootstrapPermissions } from "@/SecuritySystem/applications"
+import {
+  PermissionMongoRepository,
+  RoleMongoRepository,
+  RolePermissionMongoRepository,
+  UserAssignmentMongoRepository,
+} from "@/SecuritySystem/infrastructure"
 // import {
 //   MinisterMongoRepository,
 //   RegionMongoRepository,
 // } from "../../../../OrganizacionalStructure/infrastructure";
 
+type AuthContext = {
+  userId: string
+  churchId: string
+  roles: string[]
+  permissions: string[]
+}
+
 export class ChurchController {
-  static async createOrUpdate(request: ChurchRequest, res) {
+  static async createOrUpdate(req: Request, res) {
     try {
+      const request = req.body as ChurchRequest
+      const auth = (req as any)["auth"] as AuthContext | undefined
+
       const church = await new CreateOrUpdateChurch(
         ChurchMongoRepository.getInstance()
         //RegionMongoRepository.getInstance(),
@@ -40,6 +58,18 @@ export class ChurchController {
           churchId: church.getChurchId(),
           year: new Date().getFullYear(),
         })
+
+        if (auth?.userId) {
+          await new BootstrapPermissions(
+            PermissionMongoRepository.getInstance(),
+            RoleMongoRepository.getInstance(),
+            RolePermissionMongoRepository.getInstance(),
+            UserAssignmentMongoRepository.getInstance()
+          ).execute({
+            churchId: church.getChurchId(),
+            userId: auth.userId,
+          })
+        }
       }
 
       res.status(HttpStatus.CREATED).send({ message: "Registered Church" })

@@ -1,12 +1,12 @@
 import { ChurchController } from "../controllers/Church.controller"
-import { ChurchPaginateRequest, ChurchRequest } from "../../../domain"
+import { ChurchPaginateRequest } from "../../../domain"
 import { Router } from "express"
 import { PermissionMiddleware } from "../../../../Shared/infrastructure"
 
 const churchRoute = Router()
 
 churchRoute.post("/", PermissionMiddleware, async (req, res) => {
-  await ChurchController.createOrUpdate(req.body as ChurchRequest, res)
+  await ChurchController.createOrUpdate(req, res)
 })
 
 churchRoute.get("/", PermissionMiddleware, async (req, res) => {
