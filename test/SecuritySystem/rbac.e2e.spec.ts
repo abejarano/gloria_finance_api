@@ -309,7 +309,7 @@ describe("RBAC endpoints", () => {
       expect.arrayContaining([
         "financial_records:read",
         "financial_records:create",
-        "accounts_payable:*",
+        "accounts_payable:manage",
       ])
     )
   })
