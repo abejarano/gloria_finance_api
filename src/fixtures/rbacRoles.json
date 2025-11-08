@@ -2,7 +2,7 @@
   {
     "roleId": "ADMIN",
     "name": "Administrador",
-    "description": "Acceso total a la plataforma y a la configuración de seguridad",
+    "description": "Acesso total à plataforma e às configurações de segurança",
     "permissions": [
       "church:upsert",
       "church:search",
@@ -47,7 +47,7 @@
   {
     "roleId": "PASTOR",
     "name": "Pastor",
-    "description": "Supervisa la iglesia, miembros y reportes pastorales",
+    "description": "Supervisiona a igreja, membros e relatórios pastorais",
     "permissions": [
       "church:upsert",
       "church:search",
@@ -68,8 +68,8 @@
   },
   {
     "roleId": "TESORERO",
-    "name": "Tesorero",
-    "description": "Gestiona operaciones financieras y bancarias de la iglesia",
+    "name": "Tesoureiro",
+    "description": "Gerencia operações financeiras e bancárias da igreja",
     "permissions": [
       "church:search",
       "accounts_payable:suppliers_manage",
@@ -104,7 +104,7 @@
   {
     "roleId": "CONTADOR",
     "name": "Contador",
-    "description": "Control contable y seguimiento de reportes",
+    "description": "Controla a contabilidade e o acompanhamento de relatórios",
     "permissions": [
       "church:search",
       "accounts_payable:read",
@@ -126,7 +126,7 @@
   {
     "roleId": "AUDITOR",
     "name": "Auditor",
-    "description": "Audita registros financieros y bancarios",
+    "description": "Audita registros financeiros e bancários",
     "permissions": [
       "church:search",
       "accounts_payable:read",

@@ -78,16 +78,16 @@ export class AuthorizationService {
       return emptyContext
     }
 
-    const permissionIds = await this.rolePermissionRepository.findPermissionIdsByRoles(
-      churchId,
-      roles
-    )
+    const permissionIds =
+      await this.rolePermissionRepository.findPermissionIdsByRoles(
+        churchId,
+        roles
+      )
 
     const uniquePermissionIds = [...new Set(permissionIds)]
 
-    const permissions = await this.permissionRepository.findByIds(
-      uniquePermissionIds
-    )
+    const permissions =
+      await this.permissionRepository.findByIds(uniquePermissionIds)
 
     const permissionCodes = permissions.map(
       (permission) => `${permission.getModule()}:${permission.getAction()}`

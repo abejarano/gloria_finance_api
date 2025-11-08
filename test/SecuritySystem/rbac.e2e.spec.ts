@@ -285,6 +285,23 @@ describe("RBAC endpoints", () => {
     expect(storedRoles.some((role) => role.getName() === "Supervisor")).toBe(true)
   })
 
+  it("prevents updating permissions for system roles", async () => {
+    const token = buildToken({
+      userId: "user-admin",
+      churchId: "church-1",
+      email: "admin@test.com",
+      name: "Admin",
+    })
+
+    const response = await request(app)
+      .post("/api/v1/rbac/roles/ADMIN/permissions")
+      .set("Authorization", `Bearer ${token}`)
+      .send({ permissionIds: [] })
+      .expect(400)
+
+    expect(response.body.code).toBe("SYSTEM_ROLE_MODIFICATION_NOT_ALLOWED")
+  })
+
   it("rejects role assignment when user lacks permission", async () => {
     const token = buildToken({
       userId: "user-auditor",

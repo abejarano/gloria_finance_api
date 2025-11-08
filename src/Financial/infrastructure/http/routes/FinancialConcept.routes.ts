@@ -11,13 +11,13 @@ financialConceptRoutes.post(
   PermissionMiddleware,
   Can("financial_configuration", "manage_concepts"),
   async (req, res) => {
-  await CreateOrUpdateFinancialConceptController(
-    {
-      ...req.body,
-      churchId: req["user"].churchId,
-    },
-    res
-  )
+    await CreateOrUpdateFinancialConceptController(
+      {
+        ...req.body,
+        churchId: req["user"].churchId,
+      },
+      res
+    )
   }
 )
 

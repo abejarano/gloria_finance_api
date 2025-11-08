@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express"
+import { BASE_PERMISSIONS } from "@/SecuritySystem/domain"
 
 interface AuthContext {
   permissions?: string[]
@@ -13,8 +14,13 @@ type AuthenticatedRequest = Request & {
 export function Can(module: string, action: string) {
   const permissionKey = `${module}:${action}`
   const moduleWildcard = `${module}:*`
+  const permissionDescription = PERMISSION_DESCRIPTION.get(permissionKey)
 
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  return (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): void => {
     const auth = req.auth ?? req.user
 
     if (!auth) {
@@ -24,12 +30,16 @@ export function Can(module: string, action: string) {
 
     const permissions = auth.permissions ?? []
     const isAllowed =
-      permissions.includes(permissionKey) || permissions.includes(moduleWildcard)
+      permissions.includes(permissionKey) ||
+      permissions.includes(moduleWildcard)
 
     if (!isAllowed) {
       res.status(403).send({
-        message: "Forbidden.",
+        message: permissionDescription
+          ? "Acesso negado. Você precisa da permissão listada para continuar."
+          : "Acesso negado.",
         requiredPermission: permissionKey,
+        permissionDescription,
       })
       return
     }
@@ -39,3 +49,10 @@ export function Can(module: string, action: string) {
     next()
   }
 }
+
+const PERMISSION_DESCRIPTION = new Map(
+  BASE_PERMISSIONS.map((permission) => [
+    `${permission.module}:${permission.action}`,
+    permission.description,
+  ])
+)

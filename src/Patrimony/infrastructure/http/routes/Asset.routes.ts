@@ -90,7 +90,11 @@ const resolveInventoryPerformerDetails = (user: any): AssetInventoryChecker => {
 
 router.post(
   "/",
-  [PermissionMiddleware, Can("patrimony", "manage_assets"), CreateAssetValidator],
+  [
+    PermissionMiddleware,
+    Can("patrimony", "manage_assets"),
+    CreateAssetValidator,
+  ],
   async (req: Request, res: Response) => {
     //const { attachments, provided } = collectAttachmentsFromRequest(req)
 
@@ -112,7 +116,11 @@ router.post(
 
 router.get(
   "/",
-  [PermissionMiddleware, Can("patrimony", "manage_assets"), ListAssetsValidator],
+  [
+    PermissionMiddleware,
+    Can("patrimony", "manage_assets"),
+    ListAssetsValidator,
+  ],
   async (req: Request, res: Response) => {
     const performedBy = resolveUserId(req)
 
@@ -153,7 +161,11 @@ router.get(
 
 router.put(
   "/:assetId",
-  [PermissionMiddleware, Can("patrimony", "manage_assets"), UpdateAssetValidator],
+  [
+    PermissionMiddleware,
+    Can("patrimony", "manage_assets"),
+    UpdateAssetValidator,
+  ],
   async (req: Request, res: Response) => {
     //const { attachments, provided } = collectAttachmentsFromRequest(req)
 
@@ -175,7 +187,11 @@ router.put(
 
 router.post(
   "/:assetId/disposal",
-  [PermissionMiddleware, Can("patrimony", "manage_assets"), DisposeAssetValidator],
+  [
+    PermissionMiddleware,
+    Can("patrimony", "manage_assets"),
+    DisposeAssetValidator,
+  ],
   async (req: Request, res: Response) => {
     await disposeAssetController(
       {

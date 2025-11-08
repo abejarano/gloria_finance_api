@@ -1,6 +1,4 @@
-import {
-  AuthorizationService,
-} from "@/SecuritySystem/applications/rbac/AuthorizationService"
+import { AuthorizationService } from "@/SecuritySystem/applications/rbac/AuthorizationService"
 
 export type GetUserPermissionsRequest = {
   churchId: string
