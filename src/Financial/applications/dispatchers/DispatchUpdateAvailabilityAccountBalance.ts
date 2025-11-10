@@ -24,7 +24,7 @@ export class DispatchUpdateAvailabilityAccountBalance {
     const { createdAt, concept, operationType, availabilityAccount, amount } =
       params
 
-    this.queueService.dispatch(QueueName.UpdateAvailabilityAccountBalance, {
+    this.queueService.dispatch(QueueName.UpdateAvailabilityAccountBalanceJob, {
       availabilityAccountId: availabilityAccount.getAvailabilityAccountId(),
       amount: amount,
       operationType: operationType,
