@@ -1,5 +1,5 @@
 import { Request, Router } from "express"
-import { PermissionMiddleware, Can } from "../../../../Shared/infrastructure"
+import { Can, PermissionMiddleware } from "../../../../Shared/infrastructure"
 import ContributionValidator from "../validators/Contribution.validator"
 import {
   listOnlineContributionsController,
@@ -18,7 +18,8 @@ financeContribution.post(
   "/",
   [
     PermissionMiddleware,
-    Can("financial_records", "contributions"),
+    Can("financial_records", "adm_contributions"),
+    Can("financial_records", "add_contributions"),
     ContributionValidator,
   ],
   async (req: Request, res) => {
@@ -37,7 +38,8 @@ financeContribution.post(
 financeContribution.get(
   "/",
   PermissionMiddleware,
-  Can("financial_records", "contributions"),
+  Can("financial_records", "adm_contributions"),
+  Can("financial_records", "list_contributions"),
   async (req, res) => {
     let filter = {
       ...(req.query as unknown as FilterContributionsRequest),
@@ -56,7 +58,7 @@ financeContribution.get(
 financeContribution.patch(
   "/:contributionId/status/:status",
   PermissionMiddleware,
-  Can("financial_records", "contributions"),
+  Can("financial_records", "adm_contributions"),
   async (req, res) => {
     await UpdateContributionStatusController(
       req.params.contributionId,

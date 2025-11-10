@@ -5,6 +5,7 @@ import {
 } from "../../../applications"
 import {
   AuthTokenAdapter,
+  UserAssignmentMongoRepository,
   UserMongoRepository,
 } from "@/SecuritySystem/infrastructure"
 import { PasswordAdapter } from "../../adapters/Password.adapter"
@@ -35,12 +36,19 @@ export class UserController {
         new AuthTokenAdapter()
       ).execute(payload.email, payload.password)
 
+      const roles =
+        await UserAssignmentMongoRepository.getInstance().findByUser(
+          user.getChurchId(),
+          user.getUserId()
+        )
+
       const responseUser = user.toPrimitives()
 
       delete responseUser.password
 
       res.status(HttpStatus.OK).send({
         ...responseUser,
+        roles: roles.getRoles(),
         token,
       })
     } catch (e) {

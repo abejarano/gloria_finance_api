@@ -133,10 +133,24 @@
     "isSystem": true
   },
   {
-    "permissionId": "financial_records:contributions",
+    "permissionId": "financial_records:adm_contributions",
     "module": "financial_records",
-    "action": "contributions",
+    "action": "adm_contributions",
     "description": "Registrar e administrar contribuições on-line",
+    "isSystem": true
+  },
+  {
+    "permissionId": "financial_records:add_contributions",
+    "module": "financial_records",
+    "action": "add_contributions",
+    "description": "Registrar contribuições on-line",
+    "isSystem": true
+  },
+  {
+    "permissionId": "financial_records:list_contributions",
+    "module": "financial_records",
+    "action": "list_contributions",
+    "description": "Listar contribuições on-line",
     "isSystem": true
   },
   {

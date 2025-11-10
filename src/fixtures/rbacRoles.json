@@ -23,7 +23,7 @@
       "financial_records:read",
       "financial_records:cancel",
       "financial_records:reports",
-      "financial_records:contributions",
+      "financial_records:adm_contributions",
       "consolidated_financial:generate_months",
       "banking:manage",
       "banking:read",
@@ -67,7 +67,7 @@
     "isSystem": true
   },
   {
-    "roleId": "TESORERO",
+    "roleId": "TREASURER",
     "name": "Tesoureiro",
     "description": "Gerencia operações financeiras e bancárias da igreja",
     "permissions": [
@@ -138,6 +138,16 @@
       "reports:monthly_tithes",
       "reports:income_statements",
       "rbac:read"
+    ],
+    "isSystem": true
+  },
+  {
+    "roleId": "MEMBER",
+    "name": "Membro",
+    "description": "Acesso ao aplicativo como membro da igreja.",
+    "permissions": [
+      "financial_records:list_contributions",
+      "financial_records:add_contributions"
     ],
     "isSystem": true
   }
