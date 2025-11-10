@@ -11,8 +11,11 @@ import {
 } from "@/Financial/domain"
 import { Logger } from "@/Shared/adapter"
 import { DateBR, UnitOfWork } from "@/Shared/helpers"
-import { IAvailabilityAccountRepository, IFinancialRecordRepository, } from "@/Financial/domain/interfaces"
-import { IQueueService } from "@/Shared/domain"
+import {
+  IAvailabilityAccountRepository,
+  IFinancialRecordRepository,
+} from "@/Financial/domain/interfaces"
+import { GenericException, IQueueService } from "@/Shared/domain"
 import {
   DispatchUpdateAvailabilityAccountBalance,
   DispatchUpdateCostCenterMaster,
@@ -76,11 +79,23 @@ export class CancelFinancialRecord {
         case FinancialRecordType.INCOME:
           await this.cancelIncomeRecord(financialRecordSnapshot, createdBy)
           break
+        default:
+          this.logger.error(
+            `Unsupported FinancialRecordType for cancellation: ${financialRecordSnapshot.getType()}`,
+            { financialRecordId, type: financialRecordSnapshot.getType() }
+          )
+          throw new GenericException(
+            `Cannot cancel financial record of type ${financialRecordSnapshot.getType()}`
+          )
       }
 
       await this.unitOfWork.commit()
       this.logger.info(`Financial record reversed successfully`)
     } catch (e) {
+      if (e instanceof GenericException) {
+        throw e
+      }
+
       this.logger.error(`Error reversing financial record:`, e)
       await this.unitOfWork.rollback()
       throw e
