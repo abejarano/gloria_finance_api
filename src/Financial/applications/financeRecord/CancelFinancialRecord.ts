@@ -10,12 +10,12 @@ import {
   TypeOperationMoney,
 } from "@/Financial/domain"
 import { Logger } from "@/Shared/adapter"
-import { DateBR } from "@/Shared/helpers"
+import { DateBR, UnitOfWork } from "@/Shared/helpers"
 import {
   IAvailabilityAccountRepository,
   IFinancialRecordRepository,
 } from "@/Financial/domain/interfaces"
-import { IQueueService } from "@/Shared/domain"
+import { GenericException, IQueueService } from "@/Shared/domain"
 import {
   DispatchUpdateAvailabilityAccountBalance,
   DispatchUpdateCostCenterMaster,
@@ -25,17 +25,20 @@ import { FinancialMonthValidator } from "@/ConsolidatedFinancial/applications"
 
 /**
  * Este caso de uso se encarga de anular un registro financiero.
- * Si el registro es de tipo DESCARGO, se procede a revertirlo.
+ * Si el registro es de tipo DESCARGO o INGRESO, se procede a revertirlo.
  */
 export class CancelFinancialRecord {
   private logger = Logger(CancelFinancialRecord.name)
+  private unitOfWork: UnitOfWork
 
   constructor(
     private readonly financialYearRepository: IFinancialYearRepository,
     private readonly financialRecordRepository: IFinancialRecordRepository,
     private readonly availabilityAccountRepository: IAvailabilityAccountRepository,
     private readonly queueService: IQueueService
-  ) {}
+  ) {
+    this.unitOfWork = new UnitOfWork()
+  }
 
   async execute(params: {
     financialRecordId: string
@@ -46,26 +49,56 @@ export class CancelFinancialRecord {
 
     const { financialRecordId, churchId, createdBy } = params
 
-    const financialRecord = await this.financialRecordRepository.one({
+    const financialRecordSnapshot = await this.financialRecordRepository.one({
       financialRecordId,
       churchId,
     })
 
-    if (!financialRecord) {
+    if (!financialRecordSnapshot) {
       this.logger.error(`Movement not found`, params)
       throw new FinancialMovementNotFound()
     }
 
-    const date = financialRecord.getDate()
+    const date = financialRecordSnapshot.getDate()
 
     await new FinancialMonthValidator(this.financialYearRepository).validate({
-      churchId: financialRecord.getChurchId(),
+      churchId: financialRecordSnapshot.getChurchId(),
       month: date.getUTCMonth() + 1,
       year: date.getFullYear(),
     })
 
-    if (financialRecord.getType() === FinancialRecordType.OUTGO) {
-      await this.cancelOutgoRecord(financialRecord, createdBy)
+    this.unitOfWork.registerRollbackActions(async () => {
+      await this.financialRecordRepository.upsert(financialRecordSnapshot)
+    })
+
+    try {
+      switch (financialRecordSnapshot.getType()) {
+        case FinancialRecordType.OUTGO:
+          await this.cancelOutgoRecord(financialRecordSnapshot, createdBy)
+          break
+        case FinancialRecordType.INCOME:
+          await this.cancelIncomeRecord(financialRecordSnapshot, createdBy)
+          break
+        default:
+          this.logger.error(
+            `Unsupported FinancialRecordType for cancellation: ${financialRecordSnapshot.getType()}`,
+            { financialRecordId, type: financialRecordSnapshot.getType() }
+          )
+          throw new GenericException(
+            `Cannot cancel financial record of type ${financialRecordSnapshot.getType()}`
+          )
+      }
+
+      await this.unitOfWork.commit()
+      this.logger.info(`Financial record reversed successfully`)
+    } catch (e) {
+      if (e instanceof GenericException) {
+        throw e
+      }
+
+      this.logger.error(`Error reversing financial record:`, e)
+      await this.unitOfWork.rollback()
+      throw e
     }
   }
 
@@ -73,6 +106,42 @@ export class CancelFinancialRecord {
     financialRecord: FinanceRecord,
     createdBy: string
   ) {
+    this.logger.info(`Canceling outgo record`)
+
+    await this.cancelRecord({
+      financialRecord,
+      createdBy,
+      availabilityOperation: TypeOperationMoney.MONEY_IN,
+    })
+
+    this.unitOfWork.execPostCommit(() => {
+      new DispatchUpdateCostCenterMaster(this.queueService).execute({
+        costCenterId: financialRecord.getCostCenterId(),
+        amount: financialRecord.getAmount(),
+        churchId: financialRecord.getChurchId(),
+        operation: "subtract",
+      })
+    })
+  }
+
+  private async cancelIncomeRecord(
+    financialRecord: FinanceRecord,
+    createdBy: string
+  ) {
+    await this.cancelRecord({
+      financialRecord,
+      createdBy,
+      availabilityOperation: TypeOperationMoney.MONEY_OUT,
+    })
+  }
+
+  private async cancelRecord(params: {
+    financialRecord: FinanceRecord
+    createdBy: string
+    availabilityOperation: TypeOperationMoney
+  }) {
+    const { financialRecord, createdBy, availabilityOperation } = params
+
     const availabilityAccount = await this.availabilityAccountRepository.one({
       availabilityAccountId: financialRecord.getAvailabilityAccountId(),
     })
@@ -91,22 +160,17 @@ export class CancelFinancialRecord {
         source: FinancialRecordSource.MANUAL,
         createdBy,
       },
-      operation: TypeOperationMoney.MONEY_IN,
+      operation: availabilityOperation,
     })
 
-    new DispatchUpdateCostCenterMaster(this.queueService).execute({
-      costCenterId: financialRecord.getCostCenterId(),
-      amount: financialRecord.getAmount(),
-      churchId: financialRecord.getChurchId(),
-      operation: "subtract",
-    })
-
-    new DispatchUpdateStatusFinancialRecord(this.queueService).execute({
-      financialRecord: {
-        ...financialRecord.toPrimitives(),
-        id: financialRecord.getId(),
-      },
-      status: FinancialRecordStatus.VOID,
+    this.unitOfWork.execPostCommit(() => {
+      new DispatchUpdateStatusFinancialRecord(this.queueService).execute({
+        financialRecord: {
+          ...financialRecord.toPrimitives(),
+          id: financialRecord.getId(),
+        },
+        status: FinancialRecordStatus.VOID,
+      })
     })
   }
 
@@ -118,18 +182,27 @@ export class CancelFinancialRecord {
     this.logger.info(`Reversing financial record`, params)
     const { availabilityAccount, financeRecordReversal, operation } = params
 
+    const financialRecordReversalAggregate = FinanceRecord.create(
+      financeRecordReversal
+    )
     await this.financialRecordRepository.upsert(
-      FinanceRecord.create(financeRecordReversal)
+      financialRecordReversalAggregate
     )
 
-    new DispatchUpdateAvailabilityAccountBalance(this.queueService).execute({
-      availabilityAccount: availabilityAccount,
-      amount: Math.abs(financeRecordReversal.amount),
-      concept: financeRecordReversal.description,
-      operationType: operation,
-      createdAt: financeRecordReversal.date,
+    this.unitOfWork.registerRollbackActions(async () => {
+      await this.financialRecordRepository.deleteByFinancialRecordId(
+        financialRecordReversalAggregate.getFinancialRecordId()
+      )
     })
 
-    this.logger.info(`Financial record reversed successfully`)
+    this.unitOfWork.execPostCommit(() => {
+      new DispatchUpdateAvailabilityAccountBalance(this.queueService).execute({
+        availabilityAccount: availabilityAccount,
+        amount: Math.abs(financeRecordReversal.amount),
+        concept: financeRecordReversal.description,
+        operationType: operation,
+        createdAt: financeRecordReversal.date,
+      })
+    })
   }
 }
