@@ -92,6 +92,8 @@ export class DRE {
       resultadoOperacional,
       resultadosExtraordinarios,
       resultadoLiquido,
+      year: params.year,
+      month: params.month,
     }
   }
 }

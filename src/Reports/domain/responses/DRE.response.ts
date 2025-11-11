@@ -7,4 +7,6 @@ export type DREResponse = {
   resultadoOperacional: number
   resultadosExtraordinarios: number
   resultadoLiquido: number
+  year?: number
+  month?: number
 }

@@ -276,6 +276,8 @@ describe("DRE Report", () => {
     assert.strictEqual(result.resultadoOperacional, 3015.55)
     assert.strictEqual(result.resultadosExtraordinarios, 0)
     assert.strictEqual(result.resultadoLiquido, 3015.55)
+    assert.strictEqual(result.year, 2024)
+    assert.strictEqual(result.month, 5)
   })
 
   it("excludes CAPEX from DRE calculations", async () => {

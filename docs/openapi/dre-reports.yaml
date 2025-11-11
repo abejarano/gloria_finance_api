@@ -1,0 +1,212 @@
+openapi: 3.0.1
+info:
+  title: Church Finance API - DRE Reports
+  description: |
+    Endpoints para geração de relatórios DRE (Demonstração do Resultado do Exercício).
+    O DRE é um relatório contábil que apresenta o resultado das operações da igreja em um período específico.
+  version: '1.0'
+servers:
+  - url: /api/v1
+paths:
+  /reports/finance/dre:
+    get:
+      summary: Gera relatório DRE em formato JSON
+      description: |
+        Retorna a Demonstração do Resultado do Exercício (DRE) para uma igreja específica.
+        O relatório filtra apenas registros financeiros com status CLEARED ou RECONCILED e que afetam o resultado (affectsResult = true).
+      tags: [DRE Reports]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: churchId
+          in: query
+          required: true
+          description: Identificador único da igreja
+          schema:
+            type: string
+            example: church-001
+        - name: year
+          in: query
+          required: true
+          description: Ano de referência do relatório
+          schema:
+            type: integer
+            example: 2024
+        - name: month
+          in: query
+          required: false
+          description: Mês de referência (1-12). Se omitido, retorna o ano completo
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 5
+      responses:
+        '200':
+          description: Relatório DRE gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DREResponse'
+              example:
+                receitaBruta: 3117.05
+                receitaLiquida: 3117.05
+                custosDiretos: 0
+                resultadoBruto: 3117.05
+                despesasOperacionais: 101.5
+                resultadoOperacional: 3015.55
+                resultadosExtraordinarios: 0
+                resultadoLiquido: 3015.55
+        '400':
+          description: Parâmetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Não autenticado
+        '403':
+          description: Sem permissão para acessar relatórios DRE
+        '404':
+          description: Igreja não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /reports/finance/dre/pdf:
+    get:
+      summary: Gera relatório DRE em formato PDF
+      description: |
+        Retorna a Demonstração do Resultado do Exercício (DRE) como um arquivo PDF para download.
+        O PDF é formatado seguindo o padrão brasileiro de demonstrações contábeis.
+      tags: [DRE Reports]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: churchId
+          in: query
+          required: true
+          description: Identificador único da igreja
+          schema:
+            type: string
+            example: church-001
+        - name: year
+          in: query
+          required: true
+          description: Ano de referência do relatório
+          schema:
+            type: integer
+            example: 2024
+        - name: month
+          in: query
+          required: false
+          description: Mês de referência (1-12). Se omitido, retorna o ano completo
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 5
+      responses:
+        '200':
+          description: PDF gerado com sucesso
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Nome do arquivo para download
+              schema:
+                type: string
+                example: 'attachment; filename="dre-2024-5.pdf"'
+        '400':
+          description: Parâmetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Não autenticado
+        '403':
+          description: Sem permissão para acessar relatórios DRE
+        '404':
+          description: Igreja não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    DREResponse:
+      type: object
+      required:
+        - receitaBruta
+        - receitaLiquida
+        - custosDiretos
+        - resultadoBruto
+        - despesasOperacionais
+        - resultadoOperacional
+        - resultadosExtraordinarios
+        - resultadoLiquido
+      properties:
+        receitaBruta:
+          type: number
+          format: double
+          description: Total de receitas brutas do período (categoria REVENUE)
+          example: 3117.05
+        receitaLiquida:
+          type: number
+          format: double
+          description: Receita líquida após deduções (igual à receita bruta neste modelo)
+          example: 3117.05
+        custosDiretos:
+          type: number
+          format: double
+          description: Custos diretos dos serviços prestados (categoria COGS)
+          example: 0
+        resultadoBruto:
+          type: number
+          format: double
+          description: Resultado bruto (receita líquida - custos diretos)
+          example: 3117.05
+        despesasOperacionais:
+          type: number
+          format: double
+          description: Despesas operacionais administrativas (categoria OPEX)
+          example: 101.5
+        resultadoOperacional:
+          type: number
+          format: double
+          description: Resultado operacional (resultado bruto - despesas operacionais)
+          example: 3015.55
+        resultadosExtraordinarios:
+          type: number
+          format: double
+          description: Receitas e despesas não operacionais (categoria OTHER)
+          example: 0
+        resultadoLiquido:
+          type: number
+          format: double
+          description: Resultado líquido do período (resultado operacional + resultados extraordinários)
+          example: 3015.55
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensagem de erro
+          example: Igreja não encontrada
+        code:
+          type: string
+          description: Código do erro
+          example: CHURCH_NOT_FOUND
