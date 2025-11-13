@@ -51,10 +51,31 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
       return brlFormatter.format(safeValue)
     })
 
+    handlebars.registerHelper("formatExpense", (value: unknown) => {
+      const numericValue = Number(value)
+      const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+      
+      // For expenses, always show with minus sign
+      if (safeValue > 0) {
+        return `- ${brlFormatter.format(safeValue)}`
+      } else if (safeValue < 0) {
+        // If already negative (edge case), show as positive with minus
+        return `- ${brlFormatter.format(Math.abs(safeValue))}`
+      }
+      
+      return brlFormatter.format(0)
+    })
+
     handlebars.registerHelper("isNegative", (value: unknown) => {
       const numericValue = Number(value)
 
       return Number.isFinite(numericValue) && numericValue < 0
+    })
+
+    handlebars.registerHelper("isExpense", (value: unknown) => {
+      const numericValue = Number(value)
+      // An expense is considered as any positive cost value
+      return Number.isFinite(numericValue) && numericValue > 0
     })
 
     handlebars.registerHelper("translateCategory", (category: string) => {

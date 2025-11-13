@@ -154,8 +154,8 @@
     </tr>
     <tr class="line-item">
       <td class="label">Custos dos Serviços Prestados</td>
-      <td class="amount {{#if (isNegative custosDiretos)}}negative{{/if}}">
-        {{formatCurrency custosDiretos}}
+      <td class="amount {{#if (isExpense custosDiretos)}}negative{{/if}}">
+        {{formatExpense custosDiretos}}
       </td>
     </tr>
     <tr class="subtotal">
@@ -171,8 +171,8 @@
     </tr>
     <tr class="line-item">
       <td class="label">Despesas Administrativas e Operacionais</td>
-      <td class="amount {{#if (isNegative despesasOperacionais)}}negative{{/if}}">
-        {{formatCurrency despesasOperacionais}}
+      <td class="amount {{#if (isExpense despesasOperacionais)}}negative{{/if}}">
+        {{formatExpense despesasOperacionais}}
       </td>
     </tr>
     <tr class="subtotal">
