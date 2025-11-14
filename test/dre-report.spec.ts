@@ -551,4 +551,87 @@ describe("DRE Report", () => {
     assert.strictEqual(result.receitaBruta, 1000)
     assert.strictEqual(result.resultadoLiquido, 1000)
   })
+
+  it("subtracts reversals from the relevant line items", async () => {
+    const records: SampleRecord[] = [
+      {
+        financialRecordId: "rec-001",
+        churchId: "church-001",
+        amount: 1000,
+        date: new Date("2024-05-01T00:00:00.000Z"),
+        type: ConceptType.INCOME,
+        description: "Dízimos",
+        financialConcept: {
+          name: "Dízimos",
+          statementCategory: StatementCategory.REVENUE,
+          affectsResult: true,
+        },
+        status: FinancialRecordStatus.CLEARED,
+      },
+      {
+        financialRecordId: "rec-002",
+        churchId: "church-001",
+        amount: 200,
+        date: new Date("2024-05-02T00:00:00.000Z"),
+        type: ConceptType.REVERSAL,
+        description: "Estorno de dízimo",
+        financialConcept: {
+          name: "Estorno",
+          statementCategory: StatementCategory.REVENUE,
+          affectsResult: true,
+        },
+        status: FinancialRecordStatus.CLEARED,
+      },
+      {
+        financialRecordId: "rec-003",
+        churchId: "church-001",
+        amount: 100,
+        date: new Date("2024-05-03T00:00:00.000Z"),
+        type: ConceptType.DISCHARGE,
+        description: "Energia elétrica",
+        financialConcept: {
+          name: "Energia",
+          statementCategory: StatementCategory.OPEX,
+          affectsResult: true,
+        },
+        status: FinancialRecordStatus.CLEARED,
+      },
+      {
+        financialRecordId: "rec-004",
+        churchId: "church-001",
+        amount: 50,
+        date: new Date("2024-05-04T00:00:00.000Z"),
+        type: ConceptType.REVERSAL,
+        description: "Estorno de despesa",
+        financialConcept: {
+          name: "Estorno despesa",
+          statementCategory: StatementCategory.OPEX,
+          affectsResult: true,
+        },
+        status: FinancialRecordStatus.CLEARED,
+      },
+    ]
+
+    const financialRecordRepository = new FakeFinancialRecordRepository(records)
+    const dre = new DRE(financialRecordRepository, churchRepository)
+
+    const request: BaseReportRequest = {
+      churchId: "church-001",
+      year: 2024,
+      month: 5,
+    }
+
+    const result = await dre.execute(request)
+
+    // Revenue: 1000 (income) - 200 (reversal) = 800
+    assert.strictEqual(result.receitaBruta, 800)
+    assert.strictEqual(result.receitaLiquida, 800)
+    
+    // Operating expenses: 100 (expense) - 50 (reversal) = 50
+    assert.strictEqual(result.despesasOperacionais, 50)
+    
+    // Result: 800 (revenue) - 50 (expenses) = 750
+    assert.strictEqual(result.resultadoOperacional, 750)
+    assert.strictEqual(result.resultadoLiquido, 750)
+  })
 })

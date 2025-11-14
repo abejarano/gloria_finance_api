@@ -36,25 +36,27 @@ export class DRE {
 
     // Process each category and map to DRE line items
     for (const summary of statementByCategory) {
-      const net = summary.income - summary.expenses
+      // Calculate net considering reversals
+      // Reversals reduce the net result as they cancel out previous transactions
+      const net = summary.income - summary.expenses - summary.reversal
 
       switch (summary.category) {
         case StatementCategory.REVENUE:
           // REVENUE → Receita (gross revenue)
-          // Income increases revenue, expenses reduce it
+          // Income increases revenue, expenses reduce it, reversals cancel transactions
           receitaBruta += net
           break
 
         case StatementCategory.COGS:
           // COGS → Custos Diretos (cost of goods sold)
-          // Expenses increase costs, income reduces them (returns/refunds)
-          custosDiretos += summary.expenses - summary.income
+          // Expenses increase costs, income reduces them (returns/refunds), reversals cancel
+          custosDiretos += summary.expenses - summary.income - summary.reversal
           break
 
         case StatementCategory.OPEX:
           // OPEX → Despesas Operacionais (operating expenses)
-          // Expenses increase operating costs, income reduces them (reimbursements)
-          despesasOperacionais += summary.expenses - summary.income
+          // Expenses increase operating costs, income reduces them (reimbursements), reversals cancel
+          despesasOperacionais += summary.expenses - summary.income - summary.reversal
           break
 
         case StatementCategory.CAPEX:
@@ -64,7 +66,7 @@ export class DRE {
 
         case StatementCategory.OTHER:
           // OTHER → Resultados Extraordinários (extraordinary results)
-          // Net result of extraordinary income and expenses
+          // Net result of extraordinary income and expenses, minus reversals
           resultadosExtraordinarios += net
           break
 
