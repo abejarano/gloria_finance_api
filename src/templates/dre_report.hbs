@@ -1,0 +1,219 @@
+<style>
+  :root {
+    color-scheme: light;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .report {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    color: #1f2933;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #20364b;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    margin: 0 0 8px 0;
+    color: #20364b;
+    font-weight: 700;
+  }
+
+  .header .subtitle {
+    font-size: 14px;
+    color: #52606d;
+    margin: 4px 0;
+  }
+
+  .dre-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+
+  .dre-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #d9e2ec;
+  }
+
+  .dre-table .section-header td {
+    background: #e4ebf5;
+    color: #334e68;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-top: 2px solid #20364b;
+    border-bottom: 2px solid #20364b;
+  }
+
+  .dre-table .line-item td {
+    font-size: 12px;
+  }
+
+  .dre-table .line-item .label {
+    padding-left: 24px;
+    color: #52606d;
+  }
+
+  .dre-table .subtotal td {
+    font-weight: 600;
+    background: #f7f9fc;
+    border-top: 1px solid #cbd5e0;
+    border-bottom: 1px solid #cbd5e0;
+  }
+
+  .dre-table .total td {
+    font-weight: 700;
+    font-size: 14px;
+    background: #e4ebf5;
+    border-top: 2px solid #20364b;
+    border-bottom: 2px solid #20364b;
+    color: #20364b;
+  }
+
+  .amount {
+    text-align: right;
+    font-feature-settings: "tnum";
+    white-space: nowrap;
+  }
+
+  .negative {
+    color: #b42318;
+  }
+
+  .positive {
+    color: #027a48;
+  }
+
+  .metadata {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid #d9e2ec;
+    font-size: 10px;
+    color: #7b8794;
+    text-align: center;
+  }
+
+  .notes {
+    margin-top: 32px;
+    padding: 12px;
+    background: #f7f9fc;
+    border-left: 3px solid #2e5a8e;
+    font-size: 11px;
+    color: #52606d;
+  }
+
+  .notes h3 {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    color: #20364b;
+  }
+
+  .notes p {
+    margin: 4px 0;
+  }
+</style>
+
+<div class="report">
+  <header class="header">
+    <h1>Demonstração do Resultado do Exercício (DRE)</h1>
+    <p class="subtitle">{{#if month}}Período: {{month}}/{{year}}{{else}}Ano: {{year}}{{/if}}</p>
+    <p class="subtitle">Relatório de Resultado Contábil</p>
+  </header>
+
+  <table class="dre-table">
+    <!-- Receita Bruta -->
+    <tr class="section-header">
+      <td colspan="2">Receitas</td>
+    </tr>
+    <tr class="line-item">
+      <td class="label">Receita Bruta</td>
+      <td class="amount {{#if (isNegative receitaBruta)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency receitaBruta}}
+      </td>
+    </tr>
+    <tr class="subtotal">
+      <td>Receita Líquida</td>
+      <td class="amount {{#if (isNegative receitaLiquida)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency receitaLiquida}}
+      </td>
+    </tr>
+
+    <!-- Custos Diretos -->
+    <tr class="section-header">
+      <td colspan="2">Custos Diretos</td>
+    </tr>
+    <tr class="line-item">
+      <td class="label">Custos dos Serviços Prestados</td>
+      <td class="amount {{#if (isExpense custosDiretos)}}negative{{/if}}">
+        {{formatExpense custosDiretos}}
+      </td>
+    </tr>
+    <tr class="subtotal">
+      <td>Resultado Bruto</td>
+      <td class="amount {{#if (isNegative resultadoBruto)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency resultadoBruto}}
+      </td>
+    </tr>
+
+    <!-- Despesas Operacionais -->
+    <tr class="section-header">
+      <td colspan="2">Despesas Operacionais</td>
+    </tr>
+    <tr class="line-item">
+      <td class="label">Despesas Administrativas e Operacionais</td>
+      <td class="amount {{#if (isExpense despesasOperacionais)}}negative{{/if}}">
+        {{formatExpense despesasOperacionais}}
+      </td>
+    </tr>
+    <tr class="subtotal">
+      <td>Resultado Operacional</td>
+      <td class="amount {{#if (isNegative resultadoOperacional)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency resultadoOperacional}}
+      </td>
+    </tr>
+
+    <!-- Resultados Extraordinários -->
+    <tr class="section-header">
+      <td colspan="2">Resultados Não Operacionais</td>
+    </tr>
+    <tr class="line-item">
+      <td class="label">Receitas e Despesas Extraordinárias</td>
+      <td class="amount {{#if (isNegative resultadosExtraordinarios)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency resultadosExtraordinarios}}
+      </td>
+    </tr>
+
+    <!-- Resultado Líquido -->
+    <tr class="total">
+      <td>Resultado Líquido do Período</td>
+      <td class="amount {{#if (isNegative resultadoLiquido)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency resultadoLiquido}}
+      </td>
+    </tr>
+  </table>
+
+  <div class="notes">
+    <h3>Notas Explicativas</h3>
+    <p><strong>Receita Bruta:</strong> Total de entradas operacionais (dízimos, ofertas, doações).</p>
+    <p><strong>Custos Diretos:</strong> Custos diretamente relacionados à prestação de serviços e projetos.</p>
+    <p><strong>Despesas Operacionais:</strong> Gastos necessários para manter as atividades diárias (energia, água, materiais, etc.).</p>
+    <p><strong>Resultados Extraordinários:</strong> Receitas e despesas não recorrentes ou não operacionais.</p>
+    <p><strong>Nota:</strong> Este relatório considera apenas os valores que já foram confirmados e que impactam diretamente o resultado financeiro da igreja no período analisado.</p>
+  </div>
+
+  <div class="metadata">
+    <p>Demonstração do Resultado do Exercício (DRE)</p>
+    <p>Relatório gerado automaticamente pelo sistema de gestão financeira</p>
+    <p>{{#if month}}Competência: {{month}}/{{year}}{{else}}Competência: {{year}}{{/if}}</p>
+  </div>
+</div>

@@ -1,9 +1,11 @@
 import { Router } from "express"
 import { TithesController } from "../controllers/Tithes.controller"
-import { PermissionMiddleware, Can } from "@/Shared/infrastructure"
+import { Can, PermissionMiddleware } from "@/Shared/infrastructure"
 import { BaseReportRequest } from "../../../domain"
 import { IncomeStatementController } from "../controllers/IncomeStatement.controller"
 import { IncomeStatementPdfController } from "../controllers/IncomeStatementPdf.controller"
+import { DREController } from "../controllers/DRE.controller"
+import { DREPdfController } from "../controllers/DREPdf.controller"
 
 const reportFinanceRouter = Router()
 
@@ -37,6 +39,24 @@ reportFinanceRouter.get(
       req.query as unknown as BaseReportRequest,
       res
     )
+  }
+)
+
+reportFinanceRouter.get(
+  "/dre",
+  PermissionMiddleware,
+  //Can("reports", "dre"),
+  async (req, res) => {
+    await DREController(req.query as unknown as BaseReportRequest, res)
+  }
+)
+
+reportFinanceRouter.get(
+  "/dre/pdf",
+  PermissionMiddleware,
+  //Can("reports", "dre"),
+  async (req, res) => {
+    await DREPdfController(req.query as unknown as BaseReportRequest, res)
   }
 )
 
