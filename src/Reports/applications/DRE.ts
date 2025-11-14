@@ -69,7 +69,7 @@ export class DRE {
           break
 
         default:
-          this.logger.warn(
+          this.logger.error(
             `Unknown statement category: ${summary.category}, treating as OTHER`
           )
           resultadosExtraordinarios += net

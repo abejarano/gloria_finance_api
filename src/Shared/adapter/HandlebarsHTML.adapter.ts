@@ -54,7 +54,7 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
     handlebars.registerHelper("formatExpense", (value: unknown) => {
       const numericValue = Number(value)
       const safeValue = Number.isFinite(numericValue) ? numericValue : 0
-      
+
       // For expenses, always show with minus sign
       if (safeValue > 0) {
         return `- ${brlFormatter.format(safeValue)}`
@@ -62,7 +62,7 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
         // If already negative (edge case), show as positive with minus
         return `- ${brlFormatter.format(Math.abs(safeValue))}`
       }
-      
+
       return brlFormatter.format(0)
     })
 
