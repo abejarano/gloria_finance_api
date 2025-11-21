@@ -14,6 +14,8 @@ import {
   Paginate,
 } from "@abejarano/ts-mongodb-criteria"
 
+type Request = FilterMemberAccountReceivableRequest & { debtorDNI: string }
+
 export class ListMemberAccountReceivable {
   private logger = Logger(ListMemberAccountReceivable.name)
 
@@ -21,17 +23,13 @@ export class ListMemberAccountReceivable {
     private readonly accountReceivableRepository: IAccountsReceivableRepository
   ) {}
 
-  async execute(
-    request: FilterMemberAccountReceivableRequest
-  ): Promise<Paginate<AccountReceivable>> {
-    this.logger.info(
-      `Start List Member Account Receivable for debtor ${request.debtorDNI}`
-    )
+  async execute(request: Request): Promise<Paginate<AccountReceivable>> {
+    this.logger.info(`Start List Member Account Receivable`, request)
 
     return this.accountReceivableRepository.list(this.prepareCriteria(request))
   }
 
-  private prepareCriteria(request: FilterMemberAccountReceivableRequest) {
+  private prepareCriteria(request: Request) {
     const filters = []
 
     filters.push(

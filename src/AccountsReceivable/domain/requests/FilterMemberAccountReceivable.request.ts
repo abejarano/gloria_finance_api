@@ -5,7 +5,7 @@ import {
 import { ListParams } from "@/Shared/domain"
 
 export type FilterMemberAccountReceivableRequest = {
-  debtorDNI: string
+  memberId: string
   status?: AccountsReceivableStatus
   type?: AccountReceivableType
 } & ListParams
