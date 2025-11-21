@@ -12,17 +12,11 @@ servers:
 security:
   - bearerAuth: [ ]
 paths:
-  /api/v1/account-receivable/member/{debtorDNI}/commitments:
+  /api/v1/account-receivable/member/commitments:
     get:
       summary: Lista compromisos de contribución del miembro
       tags: [ Accounts Receivable ]
       parameters:
-        - in: path
-          name: debtorDNI
-          required: true
-          schema:
-            type: string
-          description: DNI del miembro (se usa como debtor.debtorDNI).
         - in: query
           name: status
           schema:
@@ -93,7 +87,7 @@ paths:
                 - amount
       responses:
         "200":
-          description: Contribución registrada en estado pendiente de verificación.
+          description: Contribución registrada en estado pendiente de verificación y la cuota queda marcada como IN_REVIEW.
           content:
             application/json:
               schema:
@@ -198,7 +192,7 @@ components:
           nullable: true
         status:
           type: string
-          enum: [ PENDING, PAID, PARTIAL_PAYMENT ]
+          enum: [ PENDING, IN_REVIEW, PAID, PARTIAL_PAYMENT ]
     AccountReceivable:
       type: object
       properties:

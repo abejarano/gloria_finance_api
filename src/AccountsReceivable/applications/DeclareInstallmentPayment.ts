@@ -74,5 +74,8 @@ export class DeclareInstallmentPayment {
       member,
       account.getFinancialConcept()
     )
+
+    account.markInstallmentInReview(request.installmentId)
+    await this.accountReceivableRepository.upsert(account)
   }
 }

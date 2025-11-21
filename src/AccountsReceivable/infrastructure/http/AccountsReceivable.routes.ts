@@ -55,9 +55,9 @@ accountsReceivableRoutes.get(
 )
 
 accountsReceivableRoutes.get(
-  "/member/:debtorDNI/commitments",
+  "/member/commitments",
   PermissionMiddleware,
-  Can("accounts_receivable", ["member_commitments", "read"]),
+  Can("accounts_receivable", ["member_commitments"]),
   async (req, res) => {
     const page = req.query.page ? Number(req.query.page) : 1
     const perPage = req.query.perPage ? Number(req.query.perPage) : 10
@@ -65,7 +65,7 @@ accountsReceivableRoutes.get(
     await ListMemberAccountReceivableController(
       {
         churchId: req.auth.churchId,
-        debtorDNI: req.params.debtorDNI,
+        memberId: req.auth.memberId,
         page,
         perPage,
         status: req.query.status as AccountsReceivableStatus,
