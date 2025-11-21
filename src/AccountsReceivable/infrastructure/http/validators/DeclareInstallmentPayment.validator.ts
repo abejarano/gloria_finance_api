@@ -13,6 +13,11 @@ export default async (req: Request, res: Response, next: NextFunction) => {
     payload.amount = Number(payload.amount)
   }
 
+  if (!payload.file && req.files && "file" in req.files) {
+    // Propaga el archivo subido para que la validación lo considere
+    payload.file = (req.files as any).file
+  }
+
   const rule = {
     accountReceivableId: "required|string",
     installmentId: "required|string",
