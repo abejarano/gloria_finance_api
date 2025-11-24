@@ -1,8 +1,6 @@
 {
-    "prettier.mode": "Enabled",
+    "prettier.mode": "Auto",
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "prettier",    
-    "prettier.specificBinary": "/node_module/prettier/bin/prettier.cjs",
     "plugins": [
         {
             "type": "add",
@@ -20,5 +18,10 @@
             "type": "add",
             "pluginName": "fleet.prettier"
         }
+    ],
+    "excluded": [],
+    "files.exclude": [
+        ".DS_Store",
+        ".git"
     ]
 }

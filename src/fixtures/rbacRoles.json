@@ -41,7 +41,8 @@
       "rbac:bootstrap",
       "rbac:manage_roles",
       "rbac:assign_roles",
-      "rbac:read"
+      "rbac:read",
+      "tools:admi"
     ],
     "isSystem": true
   },
