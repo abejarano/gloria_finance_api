@@ -11,4 +11,6 @@ export enum QueueName {
   ImportBankStatementJob = "ImportBankStatementJob",
   OnboardingCustomerJob = "OnboardingCustomerJob",
   BootstrapPermissionsJob = "BootstrapPermissionsJob",
+  RebuildAvailabilityMasterAccountJob = "RebuildAvailabilityMasterAccountJob",
+  RebuildCostCenterMasterJob = "RebuildCostCenterMasterJob",
 }

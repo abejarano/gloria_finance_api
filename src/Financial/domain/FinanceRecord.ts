@@ -83,6 +83,14 @@ export class FinanceRecord extends AggregateRoot {
         accountName: availabilityAccount.getAccountName(),
         accountType: availabilityAccount.getType(),
       }
+
+      financialRecord.setStatus(
+        availabilityAccount.getType() === AccountType.CASH
+          ? FinancialRecordStatus.RECONCILED
+          : status
+      )
+    } else {
+      financialRecord.setStatus(status)
     }
 
     financialRecord.voucher = voucher

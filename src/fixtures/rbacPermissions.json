@@ -320,5 +320,12 @@
     "action": "read",
     "description": "Consultar informações do sistema RBAC",
     "isSystem": true
+  },
+  {
+    "permissionId": "tools:admin",
+    "module": "tools",
+    "action": "admin",
+    "description": "Administracion de herramientas",
+    "isSystem": true
   }
 ]
