@@ -163,7 +163,11 @@ export class CostCenterMasterMongoRepository
     const docsToInsert = aggregated.map((item) => {
       const doc: any = {
         churchId,
-        costCenter: item.costCenter,
+        costCenter: {
+          costCenterName: item.costCenter.name,
+          costCenterId: item.costCenter.costCenterId,
+        },
+
         costCenterMasterId: `${month ?? 0}-${year}-${item.costCenter.costCenterId}`,
         total: item.total ?? 0,
         lastMove: item.lastMove ?? new Date(),
