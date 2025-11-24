@@ -236,7 +236,10 @@ export class FinanceRecordMongoRepository
         $lt: endDate,
       },
       status: { $in: REALIZED_STATUSES },
-      "financialConcept.affectsResult": true,
+      $or: [
+        { "financialConcept.affectsResult": true },
+        { "financialConcept.affectsBalance": true }, // incluye CAPEX
+      ],
     }
 
     const result = await collection
