@@ -1,4 +1,4 @@
-export type DREResponse = {
+export type DREStructure = {
   grossRevenue: number
   netRevenue: number
   directCosts: number
@@ -9,6 +9,4 @@ export type DREResponse = {
   extraordinaryResults: number
   operationalResult: number
   netResult: number
-  year?: number
-  month?: number
 }

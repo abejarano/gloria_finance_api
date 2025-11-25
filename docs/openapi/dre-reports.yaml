@@ -49,14 +49,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/DREResponse'
               example:
-                receitaBruta: 3117.05
-                receitaLiquida: 3117.05
-                custosDiretos: 0
-                resultadoBruto: 3117.05
-                despesasOperacionais: 101.5
-                resultadoOperacional: 3015.55
-                resultadosExtraordinarios: 0
-                resultadoLiquido: 3015.55
+                grossRevenue: 3117.05
+                netRevenue: 3117.05
+                directCosts: 0
+                grossProfit: 3117.05
+                operationalExpenses: 101.5
+                ministryTransfers: 0
+                capexInvestments: 0
+                operationalResult: 3015.55
+                extraordinaryResults: 0
+                netResult: 3015.55
         '400':
           description: Parâmetros inválidos
           content:
@@ -149,54 +151,66 @@ components:
     DREResponse:
       type: object
       required:
-        - receitaBruta
-        - receitaLiquida
-        - custosDiretos
-        - resultadoBruto
-        - despesasOperacionais
-        - resultadoOperacional
-        - resultadosExtraordinarios
-        - resultadoLiquido
+        - grossRevenue
+        - netRevenue
+        - directCosts
+        - grossProfit
+        - operationalExpenses
+        - ministryTransfers
+        - capexInvestments
+        - operationalResult
+        - extraordinaryResults
+        - netResult
       properties:
-        receitaBruta:
+        grossRevenue:
           type: number
           format: double
-          description: Total de receitas brutas do período (categoria REVENUE)
+          description: Total gross revenue for the period (categoria REVENUE)
           example: 3117.05
-        receitaLiquida:
+        netRevenue:
           type: number
           format: double
-          description: Receita líquida após deduções (igual à receita bruta neste modelo)
+          description: Receita líquida após deduções (espelha a receita bruta neste modelo)
           example: 3117.05
-        custosDiretos:
+        directCosts:
           type: number
           format: double
-          description: Custos diretos dos serviços prestados (categoria COGS)
+          description: Custos diretos/COGS dos serviços prestados (categoria COGS)
           example: 0
-        resultadoBruto:
+        grossProfit:
           type: number
           format: double
-          description: Resultado bruto (receita líquida - custos diretos)
+          description: Resultado bruto (netRevenue - directCosts)
           example: 3117.05
-        despesasOperacionais:
+        operationalExpenses:
           type: number
           format: double
-          description: Despesas operacionais administrativas (categoria OPEX)
+          description: Despesas operacionais e administrativas (categoria OPEX)
           example: 101.5
-        resultadoOperacional:
+        ministryTransfers:
           type: number
           format: double
-          description: Resultado operacional (resultado bruto - despesas operacionais)
-          example: 3015.55
-        resultadosExtraordinarios:
-          type: number
-          format: double
-          description: Receitas e despesas não operacionais (categoria OTHER)
+          description: Repasses e contribuições ministeriais (categoria MINISTRY_TRANSFERS)
           example: 0
-        resultadoLiquido:
+        capexInvestments:
           type: number
           format: double
-          description: Resultado líquido do período (resultado operacional + resultados extraordinários)
+          description: Investimentos CAPEX imobilizados (categoria CAPEX)
+          example: 0
+        operationalResult:
+          type: number
+          format: double
+          description: Resultado operacional (grossProfit - operationalExpenses - ministryTransfers)
+          example: 3015.55
+        extraordinaryResults:
+          type: number
+          format: double
+          description: Resultados não operacionais/extraordinários (categoria OTHER)
+          example: 0
+        netResult:
+          type: number
+          format: double
+          description: Resultado líquido do período (operationalResult + extraordinaryResults - capexInvestments)
           example: 3015.55
 
     Error:
