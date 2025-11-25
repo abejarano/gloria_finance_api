@@ -7,6 +7,7 @@ import { FinanceRecordMongoRepository } from "@/Financial/infrastructure"
 import { ChurchMongoRepository } from "@/Church/infrastructure"
 import { HandlebarsHTMLAdapter, PuppeteerAdapter } from "@/Shared/adapter"
 import { NoOpStorage } from "@/Shared/infrastructure"
+import { DREMongoRepository } from "@/Reports/infrastructure/persistence/DREMongoRepository"
 
 /**
  * DREPdfController
@@ -31,12 +32,13 @@ import { NoOpStorage } from "@/Shared/infrastructure"
  * [PDF binary data]
  */
 export const DREPdfController = async (
-  req: BaseReportRequest,
+  req: BaseReportRequest & { month: number },
   res: Response
 ): Promise<void> => {
   try {
     const dreReport = await new DRE(
       FinanceRecordMongoRepository.getInstance(),
+      DREMongoRepository.getInstance(),
       ChurchMongoRepository.getInstance()
     ).execute(req)
 

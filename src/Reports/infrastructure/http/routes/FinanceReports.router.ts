@@ -45,18 +45,28 @@ reportFinanceRouter.get(
 reportFinanceRouter.get(
   "/dre",
   PermissionMiddleware,
-  //Can("reports", "dre"),
+  Can("financial_records", "reports"),
   async (req, res) => {
-    await DREController(req.query as unknown as BaseReportRequest, res)
+    await DREController(
+      req.query as unknown as BaseReportRequest & {
+        month: number
+      },
+      res
+    )
   }
 )
 
 reportFinanceRouter.get(
   "/dre/pdf",
   PermissionMiddleware,
-  //Can("reports", "dre"),
+  Can("financial_records", "reports"),
   async (req, res) => {
-    await DREPdfController(req.query as unknown as BaseReportRequest, res)
+    await DREPdfController(
+      req.query as unknown as BaseReportRequest & {
+        month: number
+      },
+      res
+    )
   }
 )
 

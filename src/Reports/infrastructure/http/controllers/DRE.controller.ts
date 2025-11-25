@@ -4,6 +4,7 @@ import { FinanceRecordMongoRepository } from "../../../../Financial/infrastructu
 import { DRE } from "../../../applications"
 import domainResponse from "../../../../Shared/helpers/domainResponse"
 import { ChurchMongoRepository } from "../../../../Church/infrastructure"
+import { DREMongoRepository } from "@/Reports/infrastructure/persistence/DREMongoRepository"
 
 /**
  * DREController
@@ -37,23 +38,24 @@ import { ChurchMongoRepository } from "../../../../Church/infrastructure"
  *
  * // Response
  * {
- *   "receitaBruta": 3117.05,
- *   "receitaLiquida": 3117.05,
- *   "custosDiretos": 0,
- *   "resultadoBruto": 3117.05,
- *   "despesasOperacionais": 101.5,
- *   "resultadoOperacional": 3015.55,
- *   "resultadosExtraordinarios": 0,
- *   "resultadoLiquido": 3015.55
+ *   "grossRevenue": 3117.05,
+ *   "netRevenue": 3117.05,
+ *   "directCosts": 0,
+ *   "grossProfit": 3117.05,
+ *   "operationalExpenses": 101.5,
+ *   "operationalResult": 3015.55,
+ *   "extraordinaryResults": 0,
+ *   "netResult": 3015.55
  * }
  */
 export const DREController = async (
-  req: BaseReportRequest,
+  req: BaseReportRequest & { month: number },
   res: Response
 ): Promise<void> => {
   try {
     const result = await new DRE(
       FinanceRecordMongoRepository.getInstance(),
+      DREMongoRepository.getInstance(),
       ChurchMongoRepository.getInstance()
     ).execute(req)
 

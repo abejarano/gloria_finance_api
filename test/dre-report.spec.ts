@@ -261,14 +261,14 @@ describe("DRE Report", () => {
     const result = await dre.execute(request)
 
     // Verify the calculations
-    assert.strictEqual(result.receitaBruta, 3117.05)
-    assert.strictEqual(result.receitaLiquida, 3117.05)
-    assert.strictEqual(result.custosDiretos, 0)
-    assert.strictEqual(result.resultadoBruto, 3117.05)
-    assert.strictEqual(result.despesasOperacionais, 101.5)
-    assert.strictEqual(result.resultadoOperacional, 3015.55)
-    assert.strictEqual(result.resultadosExtraordinarios, 0)
-    assert.strictEqual(result.resultadoLiquido, 3015.55)
+    assert.strictEqual(result.grossRevenue, 3117.05)
+    assert.strictEqual(result.netRevenue, 3117.05)
+    assert.strictEqual(result.directCosts, 0)
+    assert.strictEqual(result.grossProfit, 3117.05)
+    assert.strictEqual(result.operationalExpenses, 101.5)
+    assert.strictEqual(result.operationalResult, 3015.55)
+    assert.strictEqual(result.extraordinaryResults, 0)
+    assert.strictEqual(result.netResult, 3015.55)
     assert.strictEqual(result.year, 2024)
     assert.strictEqual(result.month, 5)
   })
@@ -317,11 +317,11 @@ describe("DRE Report", () => {
     const result = await dre.execute(request)
 
     // CAPEX should not affect the DRE
-    assert.strictEqual(result.receitaBruta, 1000)
-    assert.strictEqual(result.resultadoLiquido, 1000)
+    assert.strictEqual(result.grossRevenue, 1000)
+    assert.strictEqual(result.netResult, 1000)
   })
 
-  it("maps COGS to custosDiretos", async () => {
+  it("maps COGS to directCosts", async () => {
     const records: SampleRecord[] = [
       {
         financialRecordId: "rec-001",
@@ -364,14 +364,14 @@ describe("DRE Report", () => {
 
     const result = await dre.execute(request)
 
-    assert.strictEqual(result.receitaBruta, 1000)
-    assert.strictEqual(result.custosDiretos, 200)
-    assert.strictEqual(result.resultadoBruto, 800)
-    assert.strictEqual(result.despesasOperacionais, 0)
-    assert.strictEqual(result.resultadoOperacional, 800)
+    assert.strictEqual(result.grossRevenue, 1000)
+    assert.strictEqual(result.directCosts, 200)
+    assert.strictEqual(result.grossProfit, 800)
+    assert.strictEqual(result.operationalExpenses, 0)
+    assert.strictEqual(result.operationalResult, 800)
   })
 
-  it("maps OTHER to resultadosExtraordinarios", async () => {
+  it("maps OTHER to extraordinaryResults", async () => {
     const records: SampleRecord[] = [
       {
         financialRecordId: "rec-001",
@@ -428,11 +428,11 @@ describe("DRE Report", () => {
 
     const result = await dre.execute(request)
 
-    assert.strictEqual(result.receitaBruta, 1000)
-    assert.strictEqual(result.resultadoBruto, 1000)
-    assert.strictEqual(result.resultadoOperacional, 1000)
-    assert.strictEqual(result.resultadosExtraordinarios, 250)
-    assert.strictEqual(result.resultadoLiquido, 1250)
+    assert.strictEqual(result.grossRevenue, 1000)
+    assert.strictEqual(result.grossProfit, 1000)
+    assert.strictEqual(result.operationalResult, 1000)
+    assert.strictEqual(result.extraordinaryResults, 250)
+    assert.strictEqual(result.netResult, 1250)
   })
 
   it("only includes CLEARED and RECONCILED records", async () => {
@@ -493,8 +493,8 @@ describe("DRE Report", () => {
     const result = await dre.execute(request)
 
     // Only CLEARED (1000) and RECONCILED (200) should be included
-    assert.strictEqual(result.receitaBruta, 1200)
-    assert.strictEqual(result.resultadoLiquido, 1200)
+    assert.strictEqual(result.grossRevenue, 1200)
+    assert.strictEqual(result.netResult, 1200)
   })
 
   it("only includes records with affectsResult = true", async () => {
@@ -541,8 +541,8 @@ describe("DRE Report", () => {
     const result = await dre.execute(request)
 
     // Only records with affectsResult = true should be included
-    assert.strictEqual(result.receitaBruta, 1000)
-    assert.strictEqual(result.resultadoLiquido, 1000)
+    assert.strictEqual(result.grossRevenue, 1000)
+    assert.strictEqual(result.netResult, 1000)
   })
 
   it("subtracts reversals from the relevant line items", async () => {
@@ -617,14 +617,14 @@ describe("DRE Report", () => {
     const result = await dre.execute(request)
 
     // Revenue: 1000 (income) - 200 (reversal) = 800
-    assert.strictEqual(result.receitaBruta, 800)
-    assert.strictEqual(result.receitaLiquida, 800)
+    assert.strictEqual(result.grossRevenue, 800)
+    assert.strictEqual(result.netRevenue, 800)
 
     // Operating expenses: 100 (expense) - 50 (reversal) = 50
-    assert.strictEqual(result.despesasOperacionais, 50)
+    assert.strictEqual(result.operationalExpenses, 50)
 
     // Result: 800 (revenue) - 50 (expenses) = 750
-    assert.strictEqual(result.resultadoOperacional, 750)
-    assert.strictEqual(result.resultadoLiquido, 750)
+    assert.strictEqual(result.operationalResult, 750)
+    assert.strictEqual(result.netResult, 750)
   })
 })

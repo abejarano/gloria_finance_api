@@ -143,14 +143,14 @@
     </tr>
     <tr class="line-item">
       <td class="label">Receita Bruta</td>
-      <td class="amount {{#if (isNegative receitaBruta)}}negative{{else}}positive{{/if}}">
-        {{formatCurrency receitaBruta}}
+      <td class="amount {{#if (isNegative grossRevenue)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency grossRevenue}}
       </td>
     </tr>
     <tr class="subtotal">
       <td>Receita Líquida</td>
-      <td class="amount {{#if (isNegative receitaLiquida)}}negative{{else}}positive{{/if}}">
-        {{formatCurrency receitaLiquida}}
+      <td class="amount {{#if (isNegative netRevenue)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency netRevenue}}
       </td>
     </tr>
 
@@ -160,14 +160,14 @@
     </tr>
     <tr class="line-item">
       <td class="label">Custos dos Serviços Prestados</td>
-      <td class="amount {{#if (isExpense custosDiretos)}}negative{{/if}}">
-        {{formatExpense custosDiretos}}
+      <td class="amount {{#if (isExpense directCosts)}}negative{{/if}}">
+        {{formatExpense directCosts}}
       </td>
     </tr>
     <tr class="subtotal">
       <td>Resultado Bruto</td>
-      <td class="amount {{#if (isNegative resultadoBruto)}}negative{{else}}positive{{/if}}">
-        {{formatCurrency resultadoBruto}}
+      <td class="amount {{#if (isNegative grossProfit)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency grossProfit}}
       </td>
     </tr>
 
@@ -177,20 +177,20 @@
     </tr>
     <tr class="line-item">
       <td class="label">Despesas Administrativas e Operacionais</td>
-      <td class="amount {{#if (isExpense despesasOperacionais)}}negative{{/if}}">
-        {{formatExpense despesasOperacionais}}
+      <td class="amount {{#if (isExpense operationalExpenses)}}negative{{/if}}">
+        {{formatExpense operationalExpenses}}
       </td>
     </tr>
     <tr class="line-item">
       <td class="label">Repasses e Contribuições Ministeriais</td>
-      <td class="amount {{#if (isExpense repassesMinisteriais)}}negative{{/if}}">
-        {{formatExpense repassesMinisteriais}}
+      <td class="amount {{#if (isExpense ministryTransfers)}}negative{{/if}}">
+        {{formatExpense ministryTransfers}}
       </td>
     </tr>
     <tr class="subtotal">
       <td>Resultado Operacional</td>
-      <td class="amount {{#if (isNegative resultadoOperacional)}}negative{{else}}positive{{/if}}">
-        {{formatCurrency resultadoOperacional}}
+      <td class="amount {{#if (isNegative operationalResult)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency operationalResult}}
       </td>
     </tr>
 
@@ -200,8 +200,8 @@
     </tr>
     <tr class="line-item">
       <td class="label">Receitas e Despesas Extraordinárias</td>
-      <td class="amount {{#if (isNegative resultadosExtraordinarios)}}negative{{else}}positive{{/if}}">
-        {{formatCurrency resultadosExtraordinarios}}
+      <td class="amount {{#if (isNegative extraordinaryResults)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency extraordinaryResults}}
       </td>
     </tr>
 
@@ -211,16 +211,16 @@
     </tr>
     <tr class="line-item">
       <td class="label">Aquisições de mobiliário, equipamentos e outros bens permanentes</td>
-      <td class="amount {{#if (isExpense investimentosCAPEX)}}negative{{/if}}">
-        {{formatExpense investimentosCAPEX}}
+      <td class="amount {{#if (isExpense capexInvestments)}}negative{{/if}}">
+        {{formatExpense capexInvestments}}
       </td>
     </tr>
 
     <!-- Resultado Líquido -->
     <tr class="total">
       <td>Resultado Líquido do Período</td>
-      <td class="amount {{#if (isNegative resultadoLiquido)}}negative{{else}}positive{{/if}}">
-        {{formatCurrency resultadoLiquido}}
+      <td class="amount {{#if (isNegative netResult)}}negative{{else}}positive{{/if}}">
+        {{formatCurrency netResult}}
       </td>
     </tr>
   </table>
