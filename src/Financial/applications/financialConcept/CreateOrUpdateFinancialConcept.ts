@@ -26,31 +26,33 @@ export class CreateOrUpdateFinancialConcept {
       throw new ChurchNotFound()
     }
 
-    const financialConcept = await this.financialConceptRepository.one({
-      churchId: params.churchId,
-      financialConceptId: params.financialConceptId,
-    })
-
-    if (financialConcept) {
-      this.logger.info(`Updating financial concept`)
-
-      params.active ? financialConcept.enable() : financialConcept.disable()
-
-      financialConcept.setType(params.type)
-      financialConcept.setName(params.name)
-      financialConcept.setDescription(params.description)
-      financialConcept.setStatementCategory(params.statementCategory)
-
-      financialConcept.updateImpactFlags({
-        affectsCashFlow: params.affectsCashFlow,
-        affectsResult: params.affectsResult,
-        affectsBalance: params.affectsBalance,
-        isOperational: params.isOperational,
+    if (params?.financialConceptId) {
+      const financialConcept = await this.financialConceptRepository.one({
+        churchId: params.churchId,
+        financialConceptId: params?.financialConceptId,
       })
 
-      await this.financialConceptRepository.upsert(financialConcept)
+      if (financialConcept) {
+        this.logger.info(`Updating financial concept`)
 
-      return
+        params.active ? financialConcept.enable() : financialConcept.disable()
+
+        financialConcept.setType(params.type)
+        financialConcept.setName(params.name)
+        financialConcept.setDescription(params.description)
+        financialConcept.setStatementCategory(params.statementCategory)
+
+        financialConcept.updateImpactFlags({
+          affectsCashFlow: params.affectsCashFlow,
+          affectsResult: params.affectsResult,
+          affectsBalance: params.affectsBalance,
+          isOperational: params.isOperational,
+        })
+
+        await this.financialConceptRepository.upsert(financialConcept)
+
+        return
+      }
     }
 
     this.logger.info(`Creating new financial concept`)
