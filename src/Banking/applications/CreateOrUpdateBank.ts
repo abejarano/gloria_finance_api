@@ -1,5 +1,5 @@
 import { Church, ChurchNotFound, IChurchRepository } from "@/Church/domain"
-import { BankRequest, IBankRepository } from "@/Banking/domain"
+import { BankNotFound, BankRequest, IBankRepository } from "@/Banking/domain"
 import { Bank } from "@/Banking/domain/Bank"
 
 export class CreateOrUpdateBank {
@@ -15,6 +15,10 @@ export class CreateOrUpdateBank {
     }
 
     const bank: Bank = await this.bankRepository.one(requestBank.bankId)
+
+    if (!bank) {
+      throw new BankNotFound()
+    }
 
     bank.setBankInstruction(requestBank.bankInstruction)
     bank.setAccountType({ accountType: requestBank.accountType })
