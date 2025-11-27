@@ -5,7 +5,12 @@ import {
   AvailabilityAccount,
   TypeOperationMoney,
 } from "../../domain"
-import { TypeBankingOperation } from "@/Banking/domain"
+
+enum BankingOperationType {
+  DEPOSIT = "DEPOSIT",
+  WITHDRAWAL = "WITHDRAWAL",
+  INTEREST = "INTEREST",
+}
 
 export class DispatchUpdateAvailabilityAccountBalance {
   private logger = Logger(DispatchUpdateAvailabilityAccountBalance.name)
@@ -35,8 +40,8 @@ export class DispatchUpdateAvailabilityAccountBalance {
         amount: amount,
         bankingOperation:
           operationType === TypeOperationMoney.MONEY_OUT
-            ? TypeBankingOperation.WITHDRAWAL
-            : TypeBankingOperation.DEPOSIT,
+            ? BankingOperationType.WITHDRAWAL
+            : BankingOperationType.DEPOSIT,
         concept: concept,
         bankId: availabilityAccount.getSource().bankId,
         createdAt: new Date(createdAt),

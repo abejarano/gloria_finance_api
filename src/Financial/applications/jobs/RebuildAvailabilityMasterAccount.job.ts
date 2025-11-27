@@ -14,14 +14,22 @@ export class RebuildAvailabilityMasterAccountJob implements IQueue {
     year: number
     month: number
   }): Promise<any> {
-    this.logger.info(
-      `Rebuilt availability master account for church ${args.churchId} for ${args.month}/${args.year}`
-    )
+    this.logger.info(`Rebuilt availability master account`, {
+      jobName: RebuildAvailabilityMasterAccountJob.name,
+      churchId: args.churchId,
+      month: args.month,
+      year: args.year,
+    })
 
     await this.availabilityAccountMasterRepository.rebuildAvailabilityAccountsMaster(
       args
     )
 
-    this.logger.info(`Rebuild completed successfully.`)
+    this.logger.info(`Rebuild completed successfully.`, {
+      jobName: RebuildAvailabilityMasterAccountJob.name,
+      churchId: args.churchId,
+      month: args.month,
+      year: args.year,
+    })
   }
 }

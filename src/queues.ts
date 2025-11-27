@@ -5,6 +5,7 @@ import {
   UserMongoRepository,
 } from "./SecuritySystem/infrastructure"
 import { FinancialQueue } from "./Financial/infrastructure/Financal.queue"
+import { FinanceRecordMongoRepository } from "@/Financial/infrastructure/persistence"
 import { SendMailJob } from "./SendMail/SendMail.job"
 import { TelegramNotificationJob } from "./Shared/infrastructure"
 import { PatrimonyQueue } from "@/Patrimony/infrastructure/Patrimony.queue"
@@ -13,7 +14,9 @@ import { SecuritySystemQueue } from "@/SecuritySystem/infrastructure/SecuritySys
 import { CustomerQueue } from "@/Customers/infrastructure/Customer.queue"
 
 export const Queues = (): IDefinitionQueue[] => [
-  ...BankingQueue(),
+  ...BankingQueue({
+    financialRecordRepository: FinanceRecordMongoRepository.getInstance(),
+  }),
   ...FinancialQueue(),
   ...PatrimonyQueue(),
   ...SecuritySystemQueue(),

@@ -6,7 +6,6 @@ export { StartQueueService } from "./queue/StartQueueService"
 
 export { StorageGCP } from "./StorageGCP"
 export { NoOpStorage } from "./NoOpStorage"
-export { Schedule } from "./schedule/Schedule"
 export { TelegramNotificationJob } from "./telegram"
 
 export * from "./services/Cache.service"

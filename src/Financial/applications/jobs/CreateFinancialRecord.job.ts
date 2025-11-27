@@ -33,7 +33,10 @@ export class CreateFinancialRecordJob implements IQueue {
   }
 
   async handle(args: FinancialRecordCreateQueue): Promise<void> {
-    this.logger.info(`CreateFinancialRecord`, args)
+    this.logger.info(`CreateFinancialRecord`, {
+      ...args,
+      jobName: CreateFinancialRecordJob.name,
+    })
 
     await new FinancialMonthValidator(this.financialYearRepository).validate({
       churchId: args.churchId,
@@ -76,6 +79,11 @@ export class CreateFinancialRecordJob implements IQueue {
       })
 
       await this.unitOfWork.commit()
+      this.logger.info(`CreateFinancialRecord committed`, {
+        jobName: CreateFinancialRecordJob.name,
+        churchId: args.churchId,
+        financialRecordId: financialRecord.getFinancialRecordId(),
+      })
     } catch (e) {
       await this.unitOfWork.rollback()
       throw e

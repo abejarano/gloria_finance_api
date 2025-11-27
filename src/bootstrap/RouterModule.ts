@@ -1,4 +1,4 @@
-import { RoutesModule } from "@abejarano/ts-express-server"
+import { ControllersModule, RoutesModule } from "@abejarano/ts-express-server"
 import churchRouters from "@/Church/infrastructure/http/routes/Church.routers"
 import memberRouters from "@/Church/infrastructure/http/routes/Member.routers"
 import ministerRoute from "@/Church/infrastructure/http/routes/Minsiter.routers"
@@ -12,6 +12,8 @@ import reportsRouter from "@/Reports/infrastructure/http/routes"
 import purchaseRouter from "@/Purchases/infrastructure/http/routes"
 import patrimonyRouter from "@/Patrimony/infrastructure/http/routes/Asset.routes"
 import rbacRouter from "@/SecuritySystem/infrastructure/http/routes/rbac.routes"
+import { financialControllers } from "@/Financial/infrastructure/http/controllers"
+import { consolidatedFinancialControllers } from "@/ConsolidatedFinancial/infrastructure/http/controllers"
 
 export const routerModule = () =>
   new RoutesModule([
@@ -28,4 +30,10 @@ export const routerModule = () =>
     { path: "/api/v1/purchase", router: purchaseRouter },
     { path: "/api/v1/patrimony", router: patrimonyRouter },
     { path: "/api/v1/rbac", router: rbacRouter },
+  ])
+
+export const controllersModule = () =>
+  new ControllersModule([
+    ...financialControllers(),
+    ...consolidatedFinancialControllers(),
   ])

@@ -6,7 +6,7 @@ import { DRE } from "@/Reports/applications"
 import { FinanceRecordMongoRepository } from "@/Financial/infrastructure"
 import { DREMongoRepository } from "@/Reports/infrastructure/persistence/DREMongoRepository"
 
-export const closeFinancialMonth = async (): Promise<void> => {
+export const CloseFinancialMonthService = async (): Promise<void> => {
   const churches = await ChurchMongoRepository.getInstance().all()
 
   for (const church of churches) {
@@ -17,6 +17,7 @@ export const closeFinancialMonth = async (): Promise<void> => {
       churchId: church.getChurchId(),
       month: new Date().getMonth(),
       year: new Date().getFullYear(),
+      closedBy: "system",
     })
 
     await new DRE(
