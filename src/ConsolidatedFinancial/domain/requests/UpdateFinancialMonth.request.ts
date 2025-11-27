@@ -8,4 +8,5 @@ export type UpdateFinancialMonthRequest = {
   month: number
   churchId: string
   year: number
+  closedBy: string
 }

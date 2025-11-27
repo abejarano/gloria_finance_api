@@ -1,6 +1,6 @@
 import { Validator } from "node-input-validator"
-import { HttpStatus } from "../../../../Shared/domain"
-import { Logger } from "../../../../Shared/adapter"
+import { HttpStatus } from "@/Shared/domain"
+import { Logger } from "@/Shared/adapter"
 
 export default async (req, res, next) => {
   const payload = req.body
@@ -9,7 +9,6 @@ export default async (req, res, next) => {
   logger.info(`Validando contribucion`, payload)
 
   const rule = {
-    memberId: "required|string",
     amount: "required|numeric",
     availabilityAccountId: "required|string",
     financialConceptId: "required|string",

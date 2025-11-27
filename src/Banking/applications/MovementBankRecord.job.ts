@@ -16,7 +16,10 @@ export class MovementBankRecordJob implements IQueue {
   ) {}
 
   async handle(args: MovementBankRequest): Promise<void> {
-    this.logger.info(`MovementBankRecord`, args)
+    this.logger.info(`MovementBankRecord`, {
+      ...args,
+      jobName: MovementBankRecordJob.name,
+    })
     const bank = await this.bankRepository.one(args.bankId)
 
     const movementBank = MovementBank.create(
@@ -29,6 +32,10 @@ export class MovementBankRecordJob implements IQueue {
 
     await this.movementBankRepository.upsert(movementBank)
 
-    this.logger.info(`MovementBankRecord created`)
+    this.logger.info(`MovementBankRecord created`, {
+      jobName: MovementBankRecordJob.name,
+      bankId: movementBank.getBankId(),
+      churchId: movementBank.getChurchId(),
+    })
   }
 }

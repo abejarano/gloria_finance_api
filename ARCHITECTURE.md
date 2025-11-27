@@ -35,6 +35,55 @@ This project implements Domain-Driven Design **without relying on frameworks** l
 
 ---
 
+## Bounded Contexts
+
+- **ChurchContext**
+  - Directory: `src/Church`
+  - Entities: Church, Member, Minister
+  - Depends on: `Shared`
+  - Logical events: `MemberRegistered`, `ChurchCreated`
+
+- **SecurityContext**
+  - Directory: `src/SecuritySystem`
+  - Entities: User, Role, Permission
+  - Depends on: `Shared`, `Church` (when linking `memberId`)
+
+- **FinanceConfigContext**
+  - Directory: `src/Financial`
+  - Key submodules: `availabilityAccount`, `financialConcept`, `costCenter`, `contribution` (OnlineContributions)
+  - Depends on: `Church`, `Shared`
+
+- **TreasuryContext**
+  - Directories: `src/AccountsPayable`, `src/AccountsReceivable`, `src/Financial/applications/financeRecord`, `src/Financial/applications/dispatchers`, `src/Financial/applications/jobs`, `src/ConsolidatedFinancial`
+  - Depends on: `FinanceConfigContext`, `Church`, `Shared`
+
+- **BankingContext**
+  - Directory: `src/Banking`
+  - Entities: Bank, BankStatement, MovementBank, etc.
+  - Depends on: `FinanceConfigContext`, `TreasuryContext` (via interfaces when possible), `Shared`
+
+- **PatrimonyContext**
+  - Directory: `src/Patrimony`
+  - Depends on: `Church`, `Shared`
+
+- **PurchasesContext**
+  - Directory: `src/Purchases`
+  - Depends on: `FinanceConfigContext`, `TreasuryContext`, `Shared`
+
+- **ReportsContext**
+  - Directory: `src/Reports`
+  - Depends on: `TreasuryContext`, `FinanceConfigContext`, `BankingContext`, `Shared`
+
+- **CommunicationContext**
+  - Directory: `src/SendMail`
+  - Depends on: `Shared`
+
+- **WorldContext**
+  - Directory: `src/World`
+  - Depends on: `Shared`
+
+---
+
 ## Project Structure
 
 ```
@@ -578,6 +627,12 @@ describe("POST /churches", () => {
 ❌ **Don't mix HTTP concerns with business logic**
 ❌ **Don't use global state or singletons for domain entities**
 ❌ **Don't bypass the layered architecture**
+
+---
+
+## Deudas técnicas conocidas
+
+- `src/Banking/infrastructure/http/controllers/BankStatement.controller.ts` depende de repositorios concretos de Financial (`AvailabilityAccountMongoRepository`, `FinanceRecordMongoRepository`) para resolver cuentas y conciliaciones; idealmente debería recibir las interfaces (`IAvailabilityAccountRepository`, `IFinancialRecordRepository`) desde el wiring de rutas/bootstrap.
 
 ---
 

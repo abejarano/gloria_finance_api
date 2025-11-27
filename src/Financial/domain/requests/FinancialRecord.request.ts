@@ -5,7 +5,8 @@ import {
   FinancialRecordStatus,
   FinancialRecordType,
 } from "@/Financial/domain"
-import { TypeBankingOperation } from "@/Banking/domain"
+
+export type BankingOperationType = "DEPOSIT" | "WITHDRAWAL" | "INTEREST"
 
 export type FinancialRecordCreateQueue = {
   churchId: string
@@ -34,7 +35,7 @@ export type UpdateStatusFinancialRecordQueue = {
 
 export type FinancialRecordRequest = {
   file?: any
-  bankingOperation?: TypeBankingOperation
+  bankingOperation?: BankingOperationType
   financialConceptId?: string
   churchId: string
   amount: number

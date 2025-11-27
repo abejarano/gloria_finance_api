@@ -1,38 +1,15 @@
-import { Request, Router } from "express"
-import { Can, PermissionMiddleware } from "../../../../Shared/infrastructure"
-import ContributionValidator from "../validators/Contribution.validator"
+import { Router } from "express"
+import { Can, PermissionMiddleware } from "@/Shared/infrastructure"
 import {
   listOnlineContributionsController,
-  onlineContributionsController,
   UpdateContributionStatusController,
 } from "../controllers/OnlineContribution.controller"
 import {
-  ContributionRequest,
   FilterContributionsRequest,
   OnlineContributionsStatus,
 } from "../../../domain"
 
 const financeContribution = Router()
-
-financeContribution.post(
-  "/",
-  [
-    PermissionMiddleware,
-    Can("financial_records", ["add_contributions", "adm_contributions"]),
-    ContributionValidator,
-  ],
-  async (req: Request, res) => {
-    const file = req.files?.file ?? null
-
-    await onlineContributionsController(
-      {
-        ...(req.body as ContributionRequest),
-        bankTransferReceipt: file,
-      },
-      res
-    )
-  }
-)
 
 financeContribution.get(
   "/",

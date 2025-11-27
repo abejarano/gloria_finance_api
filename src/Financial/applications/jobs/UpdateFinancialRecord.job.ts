@@ -27,7 +27,14 @@ export class UpdateFinancialRecordJob implements IQueue {
   ) {}
 
   async handle(args: UpdateStatusFinancialRecordQueue): Promise<void> {
-    this.logger.info(`UpdateFinancialRecord handle:`, args)
+    this.logger.info(`UpdateFinancialRecord handle`, {
+      ...args,
+      jobName: UpdateFinancialRecordJob.name,
+      churchId: args.financialRecord?.churchId,
+      financialRecordId:
+        args.financialRecord?.financialRecordId ??
+        args.financialRecord?.financialRecordId,
+    })
 
     const financialRecord = FinanceRecord.fromPrimitives(args.financialRecord)
     const previousStatus = financialRecord.getStatus()
@@ -45,6 +52,13 @@ export class UpdateFinancialRecordJob implements IQueue {
     financialRecord.update()
 
     await this.financialRecordRepository.upsert(financialRecord)
+
+    this.logger.info(`UpdateFinancialRecord committed`, {
+      jobName: UpdateFinancialRecordJob.name,
+      churchId: financialRecord.getChurchId(),
+      financialRecordId: financialRecord.getFinancialRecordId(),
+      status: financialRecord.getStatus(),
+    })
 
     await this.dispatchRealizationSideEffects(financialRecord, previousStatus)
   }

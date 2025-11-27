@@ -10,10 +10,16 @@ import {
 } from "@/Banking/infrastructure/persistence"
 import { ImportBankStatementJob } from "@/Banking/infrastructure/jobs/ImportBankStatement.job"
 import { BankStatementParserFactory } from "@/Banking/infrastructure/parsers/BankStatementParserFactory"
-import { FinanceRecordMongoRepository } from "@/Financial/infrastructure/persistence"
 import { QueueService } from "@/Shared/infrastructure"
+import { IFinancialRecordRepository } from "@/Financial/domain/interfaces"
 
-export const BankingQueue = (): IDefinitionQueue[] => [
+type BankingQueueDeps = {
+  financialRecordRepository: IFinancialRecordRepository
+}
+
+export const BankingQueue = ({
+  financialRecordRepository,
+}: BankingQueueDeps): IDefinitionQueue[] => [
   {
     useClass: MovementBankRecordJob,
     inject: [
@@ -28,7 +34,7 @@ export const BankingQueue = (): IDefinitionQueue[] => [
       BankStatementMongoRepository.getInstance(),
       new BankStatementReconciler(
         BankStatementMongoRepository.getInstance(),
-        FinanceRecordMongoRepository.getInstance(),
+        financialRecordRepository,
         QueueService.getInstance()
       ),
       QueueService.getInstance(),

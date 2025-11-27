@@ -14,12 +14,20 @@ export class RebuildCostCenterMasterJob implements IQueue {
     year: number
     month: number
   }): Promise<any> {
-    this.logger.info(
-      `Rebuilt cost center master for church ${args.churchId} for ${args.month}/${args.year}`
-    )
+    this.logger.info(`Rebuilt cost center master`, {
+      jobName: RebuildCostCenterMasterJob.name,
+      churchId: args.churchId,
+      month: args.month,
+      year: args.year,
+    })
 
     await this.costCenterMasterRepository.rebuildCostCentersMaster(args)
 
-    this.logger.info(`Rebuild completed successfully.`)
+    this.logger.info(`Rebuild completed successfully.`, {
+      jobName: RebuildCostCenterMasterJob.name,
+      churchId: args.churchId,
+      month: args.month,
+      year: args.year,
+    })
   }
 }

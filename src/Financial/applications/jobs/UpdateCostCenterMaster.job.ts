@@ -25,6 +25,7 @@ export class UpdateCostCenterMasterJob implements IQueue {
     const { churchId, costCenterId, amount, operation } = args
 
     this.logger.info(`UpdateCostCenterMaster`, {
+      jobName: UpdateCostCenterMasterJob.name,
       churchId,
       costCenterId,
       amount,
@@ -48,6 +49,11 @@ export class UpdateCostCenterMasterJob implements IQueue {
 
     await this.costCenterMasterRepository.upsert(costCenterMaster)
 
-    this.logger.info(`UpdateCostCenterMaster finish`, costCenterMaster)
+    this.logger.info(`UpdateCostCenterMaster finish`, {
+      jobName: UpdateCostCenterMasterJob.name,
+      churchId,
+      costCenterId,
+      balance: costCenterMaster?.toPrimitives?.(),
+    })
   }
 }

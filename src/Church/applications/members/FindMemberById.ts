@@ -9,6 +9,12 @@ export class FindMemberById {
 
   async execute(memberId: string): Promise<Member> {
     this.logger.info(`search member by id: ${memberId}`)
+
+    if (!memberId) {
+      this.logger.error(`Member ID is required`)
+      throw new MemberNotFound()
+    }
+
     const member: Member = await this.memberRepository.one({ memberId })
 
     if (!member) {

@@ -31,7 +31,7 @@ export class UpdateFinancialMonth {
     }
 
     if (args.action === ActionsFinancialMonth.CLOSE) {
-      financialMonth.close()
+      financialMonth.close(args.closedBy)
     } else {
       financialMonth.open()
     }

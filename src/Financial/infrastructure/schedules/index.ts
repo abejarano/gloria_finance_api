@@ -1,6 +1,6 @@
-import { DateBR } from "../../helpers"
+import { DateBR } from "@/Shared/helpers"
 import * as cron from "node-cron"
-import { closeFinancialMonth } from "./index"
+import { CloseFinancialMonthService } from "../services/CloseFinancialMonth.service"
 
 const isLastDayMonth = (): boolean => {
   const currencyDate = DateBR()
@@ -14,13 +14,13 @@ const isLastDayMonth = (): boolean => {
   return dateTomorrow.getMonth() !== currentMonth
 }
 
-export const Schedule = () => {
+export const FinancialSchedules = () => {
   cron.schedule(
     "30 23 * * *",
 
     async () => {
       if (isLastDayMonth()) {
-        await closeFinancialMonth()
+        await CloseFinancialMonthService()
       }
     },
     {

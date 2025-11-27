@@ -21,7 +21,10 @@ export class UpdateAvailabilityAccountBalanceJob implements IQueue {
   ) {}
 
   async handle(args: UpdateAvailabilityAccountBalanceRequest): Promise<void> {
-    this.logger.info(`UpdateAvailabilityAccountBalance`, args)
+    this.logger.info(`UpdateAvailabilityAccountBalance`, {
+      ...args,
+      jobName: UpdateAvailabilityAccountBalanceJob.name,
+    })
     const account: AvailabilityAccount =
       await this.availabilityAccountRepository.one({
         availabilityAccountId: args.availabilityAccountId,
@@ -35,7 +38,13 @@ export class UpdateAvailabilityAccountBalanceJob implements IQueue {
 
     await this.availabilityAccountRepository.upsert(account)
 
-    this.logger.info(`UpdateAvailabilityAccountBalance finish`, account)
+    this.logger.info(`UpdateAvailabilityAccountBalance finish`, {
+      jobName: UpdateAvailabilityAccountBalanceJob.name,
+      availabilityAccountId: account.getAvailabilityAccountId(),
+      churchId: account.getChurchId(),
+      amount: args.amount,
+      operationType: args.operationType,
+    })
 
     await new UpdateAvailabilityAccountMaster(
       this.availabilityAccountMasterRepository

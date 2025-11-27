@@ -27,7 +27,7 @@ export class FinancialYearMongoRepository
     await this.persist(financialYear.getId(), financialYear)
   }
 
-  async one(filter: Object): Promise<FinancialMonth | undefined> {
+  async one(filter: object): Promise<FinancialMonth | undefined> {
     const collection = await this.collection()
     const result = await collection.findOne(filter)
 
@@ -39,5 +39,17 @@ export class FinancialYearMongoRepository
       id: result._id.toString(),
       ...result,
     })
+  }
+
+  async list(filter: object): Promise<FinancialMonth[]> {
+    const collection = await this.collection()
+    const results = await collection.find(filter).sort({ month: 1 }).toArray()
+
+    return results.map((result) =>
+      FinancialMonth.fromPrimitives({
+        id: result._id.toString(),
+        ...result,
+      })
+    )
   }
 }
