@@ -45,9 +45,9 @@ export class RecordPurchase {
     const purchase = Purchase.create(
       request.financialConceptId,
       request.churchId,
-      request.purchaseDate,
-      request.total,
-      request.tax,
+      new Date(request.purchaseDate),
+      Number(request.total),
+      Number(request.tax),
       request.description,
       request.invoice,
       account,
@@ -79,6 +79,10 @@ export class RecordPurchase {
         account.getType() !== AccountType.CASH
           ? FinancialRecordStatus.CLEARED
           : FinancialRecordStatus.RECONCILED,
+      reference: {
+        type: Purchase.name,
+        entityId: purchase.getPurchaseId(),
+      },
     })
 
     this.logger.info(`Purchase recorded`)

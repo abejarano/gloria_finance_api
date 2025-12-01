@@ -1,6 +1,7 @@
 import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
 import {
   AvailabilityAccount,
+  ConceptType,
   CreateFinanceRecord,
   FinanceRecord,
   FinancialMovementNotFound,
@@ -15,7 +16,7 @@ import {
   IAvailabilityAccountRepository,
   IFinancialRecordRepository,
 } from "@/Financial/domain/interfaces"
-import { GenericException, IQueueService } from "@/Shared/domain"
+import { GenericException, IQueueService, QueueName } from "@/Shared/domain"
 import {
   DispatchUpdateAvailabilityAccountBalance,
   DispatchUpdateCostCenterMaster,
@@ -122,6 +123,16 @@ export class CancelFinancialRecord {
         operation: "subtract",
       })
     })
+
+    if (
+      financialRecord.getFinancialConcept().getType() === ConceptType.PURCHASE
+    ) {
+      this.unitOfWork.execPostCommit(() => {
+        this.queueService.dispatch(QueueName.DeletePurchasesJob, {
+          purchaseIds: [financialRecord.getReference().entityId],
+        })
+      })
+    }
   }
 
   private async cancelIncomeRecord(

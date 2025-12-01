@@ -12,6 +12,7 @@ import { PatrimonyQueue } from "@/Patrimony/infrastructure/Patrimony.queue"
 import { BankingQueue } from "@/Banking/infrastructure/Banking.queue"
 import { SecuritySystemQueue } from "@/SecuritySystem/infrastructure/SecuritySystem.queue"
 import { CustomerQueue } from "@/Customers/infrastructure/Customer.queue"
+import { PurchasesQueue } from "@/Purchases/infrastructure/Purchases.queue"
 
 export const Queues = (): IDefinitionQueue[] => [
   ...BankingQueue({
@@ -21,6 +22,7 @@ export const Queues = (): IDefinitionQueue[] => [
   ...PatrimonyQueue(),
   ...SecuritySystemQueue(),
   ...CustomerQueue(),
+  ...PurchasesQueue(),
   {
     useClass: CreateUserForMemberJob,
     inject: [UserMongoRepository.getInstance(), new PasswordAdapter()],

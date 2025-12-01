@@ -13,4 +13,5 @@ export enum QueueName {
   BootstrapPermissionsJob = "BootstrapPermissionsJob",
   RebuildAvailabilityMasterAccountJob = "RebuildAvailabilityMasterAccountJob",
   RebuildCostCenterMasterJob = "RebuildCostCenterMasterJob",
+  DeletePurchasesJob = "DeletePurchasesJob",
 }
