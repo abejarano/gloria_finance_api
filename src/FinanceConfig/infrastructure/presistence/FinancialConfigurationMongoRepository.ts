@@ -74,7 +74,7 @@ export class FinancialConfigurationMongoRepository
   async findCostCenterByCostCenterId(
     costCenterId: string,
     churchId: string
-  ): Promise<CostCenter> {
+  ): Promise<CostCenter | undefined> {
     /*const collection = await this.collection<{
       costCenters: CostCenter[]
       churchId: string
@@ -83,7 +83,7 @@ export class FinancialConfigurationMongoRepository
 
     const result = await collection.findOne<any>(
       { "costCenters.costCenterId": costCenterId, churchId },
-      { projection: { _id: 1, churchId: 1, costCenters: 1 } }
+      { projection: { _id: 1, churchId: 1, "costCenters.$": 1 } }
     )
 
     if (!result) {
