@@ -158,6 +158,10 @@ export class FinanceRecord extends AggregateRoot {
     return this.financialRecordId
   }
 
+  getReference(): { type: string; entityId: string } | undefined {
+    return this.reference
+  }
+
   getType(): FinancialRecordType {
     return this.type
   }

@@ -100,6 +100,14 @@ export class Purchase extends AggregateRoot {
     return this.id
   }
 
+  getPurchaseId() {
+    return this.purchaseId
+  }
+
+  getInvoiceFile() {
+    return this.invoice
+  }
+
   toPrimitives() {
     return {
       purchaseId: this.purchaseId,

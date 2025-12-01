@@ -33,4 +33,22 @@ export class PurchaseMongoRepository
 
     return this.paginate<PurchaseModel>(result)
   }
+
+  async delete(purchaseIds: string[]): Promise<void> {
+    const collection = await this.collection()
+
+    await collection.deleteMany({ purchaseId: { $in: purchaseIds } })
+  }
+
+  async list(purchaseIds: string[]): Promise<Purchase[]> {
+    const collection = await this.collection()
+
+    const purchases = await collection
+      .find({ purchaseId: { $in: purchaseIds } })
+      .toArray()
+
+    return purchases.map((p) =>
+      Purchase.fromPrimitives({ ...p, id: p._id.toString() })
+    )
+  }
 }

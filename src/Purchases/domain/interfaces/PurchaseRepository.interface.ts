@@ -6,4 +6,8 @@ export interface IPurchaseRepository {
   upsert(purchase: Purchase): Promise<void>
 
   fetch(criteria: Criteria): Promise<Paginate<PurchaseModel>>
+
+  list(purchaseIds: string[]): Promise<Purchase[]>
+
+  delete(purchaseIds: string[]): Promise<void>
 }
