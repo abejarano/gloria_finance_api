@@ -5,7 +5,7 @@ export interface IFinancialConfigurationRepository {
   findCostCenterByCostCenterId(
     costCenterId: string,
     churchId: string
-  ): Promise<CostCenter>
+  ): Promise<CostCenter | undefined>
 
   upsertCostCenter(costCenter: CostCenter): Promise<void>
 
