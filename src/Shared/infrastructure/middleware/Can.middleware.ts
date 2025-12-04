@@ -29,6 +29,12 @@ export function Can(module: string, action: string | string[]) {
         return
       }
 
+      if (auth.isSuperuser) {
+        req.requiredPermission = moduleWildcard
+        next()
+        return
+      }
+
       const permissions = auth.permissions ?? []
       const matchedPermission = permissions.includes(moduleWildcard)
         ? moduleWildcard

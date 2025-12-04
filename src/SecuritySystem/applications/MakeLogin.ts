@@ -7,7 +7,7 @@ import {
   UserDisabled,
   UserNotFound,
 } from "../domain"
-import { Logger } from "../../Shared/adapter"
+import { Logger } from "@/Shared/adapter"
 
 export class MakeLogin {
   private logger = Logger("MakeLogin")
@@ -48,6 +48,7 @@ export class MakeLogin {
         email: user.getEmail(),
         name: user.getName(),
         memberId: user.getMemberId(),
+        isSuperUser: user.isSuperUser,
       }),
     }
   }

@@ -7,6 +7,7 @@ import {
 } from "@/SecuritySystem/infrastructure"
 import { AuthTokenPayload } from "@/SecuritySystem/infrastructure/adapters/AuthToken.adapter"
 import { CacheService } from "@/Shared/infrastructure/services/Cache.service"
+import { Request } from "express"
 
 const authorizationService = AuthorizationService.getInstance(
   UserAssignmentMongoRepository.getInstance(),
@@ -15,7 +16,7 @@ const authorizationService = AuthorizationService.getInstance(
   CacheService.getInstance()
 )
 
-export const PermissionMiddleware = async (req, res, next) => {
+export const PermissionMiddleware = async (req: Request, res, next) => {
   const authHeader = req.headers["authorization"]
 
   const token = authHeader && authHeader.split(" ")[1]
@@ -51,6 +52,7 @@ export const PermissionMiddleware = async (req, res, next) => {
     }
 
     req.auth = authContext
+
     res.locals.auth = authContext
 
     next()

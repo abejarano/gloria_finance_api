@@ -24,7 +24,6 @@ import {
   IFinancialConfigurationRepository,
   IFinancialRecordRepository,
 } from "@/Financial/domain/interfaces"
-import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
 import {
   AmountValue,
   InstallmentsStatus,
@@ -194,10 +193,10 @@ describe("PayAccountPayable", () => {
     fetchStatementCategories: jest.fn(),
   } as unknown as jest.Mocked<IFinancialRecordRepository>
 
-  const financialYearRepository = {
-    one: jest.fn(),
-    upsert: jest.fn(),
-  } as jest.Mocked<IFinancialYearRepository>
+  // const financialYearRepository = {
+  //   one: jest.fn(),
+  //   upsert: jest.fn(),
+  // } as jest.Mocked<IFinancialYearRepository>
 
   const storageService = {
     uploadFile: jest.fn(),
@@ -218,12 +217,6 @@ describe("PayAccountPayable", () => {
     ;(financialRecordRepository.upsert as jest.Mock).mockResolvedValue(
       undefined
     )
-    ;(
-      financialRecordRepository.deleteByFinancialRecordId as jest.Mock
-    ).mockResolvedValue(undefined)
-    financialYearRepository.one.mockResolvedValue({
-      isClosed: () => false,
-    } as any)
     availabilityAccountRepository.one.mockResolvedValue(
       createAvailabilityAccount()
     )
@@ -236,10 +229,7 @@ describe("PayAccountPayable", () => {
       accountPayableRepository,
       queueService,
       financialConceptRepository,
-      financialConfigurationRepository,
-      financialRecordRepository,
-      financialYearRepository,
-      storageService
+      financialConfigurationRepository
     )
   })
 

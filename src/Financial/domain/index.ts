@@ -15,7 +15,6 @@ export { AvailabilityAccount } from "../../FinanceConfig/domain/AvailabilityAcco
 export { AvailabilityAccountMaster } from "./AvailabilityAccountMaster"
 export { CostCenterMaster } from "./CostCenterMaster"
 
-export * from "./exceptions/FinancialConceptNotFound.exception"
 export { CostCenterNotFound } from "./exceptions/CostCenterNotFound.exception"
 export { FinancialConceptDisable } from "./exceptions/FinancialConceptDisable.exception"
 export { CostCenterExists } from "./exceptions/CostCenterExists.exception"

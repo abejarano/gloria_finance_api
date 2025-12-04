@@ -8,6 +8,7 @@ export type AuthTokenPayload = {
   name: string
   profiles?: any
   [key: string]: any
+  isSuperUser: boolean
 }
 
 export class AuthTokenAdapter implements IAuthToken {

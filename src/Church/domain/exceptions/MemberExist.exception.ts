@@ -1,6 +1,6 @@
-import { DomainException } from "../../../Shared/domain"
+import { DomainException } from "@/Shared/domain"
 
 export class MemberExist extends DomainException {
-  code = "MEMBER_EXIST"
+  name = "MEMBER_EXIST"
   message = "The member already exist"
 }

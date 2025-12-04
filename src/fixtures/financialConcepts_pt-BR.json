@@ -8,7 +8,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Perda de investimento",
@@ -19,7 +20,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Retornos Financeiros",
@@ -30,7 +32,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Contas a Pagar",
@@ -41,7 +44,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Conta a Receber",
@@ -52,7 +56,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Empréstimos Concedidos",
@@ -63,7 +68,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Confraternizações e Festividades",
@@ -74,7 +80,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Suprimentos Gerais",
@@ -85,7 +92,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Saldo inicial em contas de disponibilidade",
@@ -96,7 +104,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Dízmos de Dízmos",
@@ -107,7 +116,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Gastos de Pessoal",
@@ -118,7 +128,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Aluguel ou Arrendamento",
@@ -129,7 +140,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Produtos de Limpeza",
@@ -140,7 +152,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Suprimentos de Escritório",
@@ -151,7 +164,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Serviços Públicos",
@@ -162,7 +176,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Manutenção e Reparos",
@@ -173,7 +188,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Despesas de Eventos / Conferências e Convenções",
@@ -184,7 +200,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Combustível e Transporte",
@@ -195,7 +212,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Programas de Assistência",
@@ -206,7 +224,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Educação Religiosa",
@@ -217,7 +236,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Materiais de Evangelização e Ensino",
@@ -228,7 +248,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Publicidade e Promoção",
@@ -239,7 +260,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Compra de equipamento Tecnológico",
@@ -250,7 +272,8 @@
     "affectsCashFlow": true,
     "affectsResult": false,
     "affectsBalance": true,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Missões e Evangelismo",
@@ -261,7 +284,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Despesas de Viagem",
@@ -272,7 +296,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Treinamento e Desenvolvimento",
@@ -283,7 +308,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Benevolência",
@@ -294,7 +320,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Oferta de benevolência",
@@ -305,7 +332,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Despesas Legais e Contábeis",
@@ -316,7 +344,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Pagamento de Dívidas e Empréstimos",
@@ -327,7 +356,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Despesas de Culto",
@@ -338,7 +368,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Despesas de Decoração",
@@ -349,7 +380,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Despesas de Alimentação",
@@ -360,7 +392,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Ofertas de Culto",
@@ -371,7 +404,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Dízimos de Membros",
@@ -382,7 +416,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Oferta mensal pro Terreno",
@@ -393,7 +428,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Vendas de comida ou mercadorias",
@@ -404,7 +440,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": true
+    "isOperational": true,
+    "isSystem": true
   },
   {
     "name": "Ofertas para Missões",
@@ -415,7 +452,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Projeto de Grupos de Jovens",
@@ -426,7 +464,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Projeto de Grupos de Crianças",
@@ -437,7 +476,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Projeto de Grupos de Mulheres",
@@ -448,7 +488,8 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   },
   {
     "name": "Projeto de Grupos de Homens",
@@ -459,6 +500,7 @@
     "affectsCashFlow": true,
     "affectsResult": true,
     "affectsBalance": false,
-    "isOperational": false
+    "isOperational": false,
+    "isSystem": true
   }
 ]

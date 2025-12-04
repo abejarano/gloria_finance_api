@@ -54,8 +54,8 @@ jobs:
           rm -rf dist node_modules
           
            # Configurar .npmrc para GitHub Packages
-          echo '@abejarano:registry=https://npm.pkg.github.com' > .npmrc
-          echo '//npm.pkg.github.com/:_authToken=$GH_TOKEN' >> .npmrc
+          # echo '@abejarano:registry=https://npm.pkg.github.com' > .npmrc
+          # echo '//npm.pkg.github.com/:_authToken=$GH_TOKEN' >> .npmrc
 
           NODE_AUTH_TOKEN=$GH_TOKEN npm ci
           npm run build

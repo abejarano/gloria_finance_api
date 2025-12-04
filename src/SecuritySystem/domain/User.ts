@@ -5,6 +5,7 @@ import { UserPolicies } from "./types/user-policies.type"
 
 export class User extends AggregateRoot {
   isActive: boolean
+  isSuperUser?: boolean
   private id?: string
   private userId: string
   private email: string
@@ -15,6 +16,10 @@ export class User extends AggregateRoot {
   private memberId?: string
   private lastLogin?: Date
   private policies?: UserPolicies
+
+  private constructor() {
+    super()
+  }
 
   static create(
     name: string,
@@ -34,6 +39,8 @@ export class User extends AggregateRoot {
     u.isActive = true
     u.name = name
 
+    u.isSuperUser = false
+
     return u
   }
 
@@ -50,6 +57,7 @@ export class User extends AggregateRoot {
     u.memberId = data.memberId
     u.lastLogin = data.lastLogin ?? null
     u.policies = data.policies
+    u.isSuperUser = data.isSuperUser ?? false
 
     return u
   }
@@ -148,6 +156,7 @@ export class User extends AggregateRoot {
       memberId: this.memberId,
       lastLogin: this.lastLogin,
       policies: this.policies,
+      isSuperUser: this.isSuperUser,
     }
   }
 }
