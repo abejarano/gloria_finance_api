@@ -1,6 +1,7 @@
-import { DomainException } from "../../../Shared/domain"
+import { DomainException } from "@/Shared/domain"
 
 export class UserNotFound extends DomainException {
+  message: string
   name = "USER_NOT_FOUND"
 
   constructor(email: string) {

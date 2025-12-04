@@ -13,3 +13,6 @@ export * from "./interfaces/AvailabilityAccountRepository.interface"
 export * from "./enums/AccountType.enum"
 export * from "./enums/CostCenterCategory.enum"
 export * from "./enums/ConcepType.enum"
+
+export * from "./exceptions/FinancialConceptNotFound.exception"
+export * from "./exceptions/NotPossibleUpdateConcept.exception"

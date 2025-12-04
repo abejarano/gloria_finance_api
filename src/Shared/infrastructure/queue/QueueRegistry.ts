@@ -47,6 +47,8 @@ export class QueueRegistry {
           redis: this.redisConfig,
           defaultJobOptions: {
             delay: definition.delay ? definition.delay * 1000 : 0,
+            removeOnComplete: true,
+            removeOnFail: false,
           },
         })
 

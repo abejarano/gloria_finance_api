@@ -23,14 +23,15 @@ export class Customer extends AggregateRoot {
     street: string
     number: string
     city: string
-    postalCode: string
+    postalCode?: string
     country: string
   }
-  private tenantId: string
+  private tenantId: string // churchId
   private plan: string
   private status: CustomerStatus
   private onboardingStatus: OnboardingStatus
   private createdAt: Date
+  private lang: string
 
   private constructor() {
     super()
@@ -47,6 +48,7 @@ export class Customer extends AggregateRoot {
     customer.status = CustomerStatus.INACTIVE
     customer.onboardingStatus = OnboardingStatus.PENDING
     customer.createdAt = DateBR()
+    customer.lang = data.lang || "pt-BR"
 
     return customer
   }
@@ -63,12 +65,17 @@ export class Customer extends AggregateRoot {
     customer.tenantId = data.tenantId
     customer.plan = data.plan
     customer.createdAt = data.createdAt
+    customer.lang = data.lang
 
     return customer
   }
 
   getId(): string {
     return this.id
+  }
+
+  getCustomerId(): string {
+    return this.customerId
   }
 
   getName() {
@@ -112,6 +119,7 @@ export class Customer extends AggregateRoot {
       status: this.status,
       onboardingStatus: this.onboardingStatus,
       createdAt: this.createdAt,
+      lang: this.lang,
     }
   }
 }

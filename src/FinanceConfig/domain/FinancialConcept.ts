@@ -16,6 +16,7 @@ export type FinancialConceptImpactOverrides =
   Partial<FinancialConceptImpactFlags>
 
 export class FinancialConcept extends AggregateRoot {
+  isSystem: boolean = false
   private id?: string
   private financialConceptId: string
   private name: string
@@ -30,6 +31,10 @@ export class FinancialConcept extends AggregateRoot {
   private affectsBalance: boolean
   private isOperational: boolean
 
+  private constructor() {
+    super()
+  }
+
   static create(
     name: string,
     description: string,
@@ -37,7 +42,8 @@ export class FinancialConcept extends AggregateRoot {
     type: ConceptType,
     statementCategory: StatementCategory,
     church: Church,
-    impactOverrides: FinancialConceptImpactOverrides
+    impactOverrides: FinancialConceptImpactOverrides,
+    isSystem: boolean = false
   ): FinancialConcept {
     const concept: FinancialConcept = new FinancialConcept()
     concept.financialConceptId = IdentifyEntity.get(`financialConcept`)
@@ -52,6 +58,8 @@ export class FinancialConcept extends AggregateRoot {
     concept.affectsResult = impactOverrides.affectsResult
     concept.affectsCashFlow = impactOverrides.affectsCashFlow
     concept.isOperational = impactOverrides.isOperational
+    concept.isSystem = isSystem
+
     return concept
   }
 
@@ -77,6 +85,8 @@ export class FinancialConcept extends AggregateRoot {
     concept.affectsResult = plainData.affectsResult
     concept.affectsBalance = plainData.affectsBalance
     concept.isOperational = plainData.isOperational
+    concept.isSystem = plainData.isSystem
+
     return concept
   }
 
@@ -259,6 +269,7 @@ export class FinancialConcept extends AggregateRoot {
       affectsResult: this.affectsResult,
       affectsBalance: this.affectsBalance,
       isOperational: this.isOperational,
+      isSystem: this.isSystem,
     }
   }
 }

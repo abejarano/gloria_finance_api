@@ -10,21 +10,19 @@ import {
   IAvailabilityAccountRepository,
   IFinancialConceptRepository,
   IFinancialConfigurationRepository,
-  IFinancialRecordRepository,
 } from "@/Financial/domain/interfaces"
-import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
-import { IQueueService, IStorageService } from "@/Shared/domain"
+import { IQueueService } from "@/Shared/domain"
 import { DispatchCreateFinancialRecord } from "@/Financial/applications"
 import { PayInstallment } from "@/Shared/applications"
 import { DateBR, UnitOfWork } from "@/Shared/helpers"
 import {
   CostCenter,
-  FinancialConceptNotFound,
   FinancialRecordSource,
   FinancialRecordStatus,
   FinancialRecordType,
 } from "@/Financial/domain"
 import { FindAvailabilityAccountByAvailabilityAccountId } from "@/FinanceConfig/applications"
+import { FinancialConceptNotFound } from "@/FinanceConfig/domain"
 
 export class PayAccountPayable {
   private logger = Logger(PayAccountPayable.name)
@@ -34,10 +32,7 @@ export class PayAccountPayable {
     private readonly accountPayableRepository: IAccountPayableRepository,
     private readonly queueService: IQueueService,
     private readonly financialConceptRepository: IFinancialConceptRepository,
-    private readonly financialConfigurationRepository: IFinancialConfigurationRepository,
-    private readonly financialRecordRepository: IFinancialRecordRepository,
-    private readonly financialYearRepository: IFinancialYearRepository,
-    private readonly storageService: IStorageService
+    private readonly financialConfigurationRepository: IFinancialConfigurationRepository
   ) {}
 
   async execute(req: PayAccountPayableRequest) {
@@ -76,7 +71,7 @@ export class PayAccountPayable {
 
     if (!concept) {
       this.logger.debug(`Financial Concept 'Contas a Pagar' not found`)
-      throw new FinancialConceptNotFound("Contas a Pagar")
+      throw new FinancialConceptNotFound()
     }
 
     let costCenter: CostCenter

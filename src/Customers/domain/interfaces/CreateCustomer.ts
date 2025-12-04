@@ -15,4 +15,5 @@ export interface ICreateCustomer {
     phone: string
     rol: string
   }
+  lang: string
 }

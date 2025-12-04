@@ -25,15 +25,21 @@ export class CustomerMongoRepository
     return "customers"
   }
 
-  list(criteria: Criteria): Promise<Paginate<Customer>> {
-    return Promise.resolve(undefined)
+  async list(criteria: Criteria): Promise<Paginate<Customer>> {
+    const result = await this.searchByCriteria<Customer>(criteria)
+    return this.paginate<Customer>(result)
   }
 
-  one(filter: object): Promise<Customer | undefined> {
-    return Promise.resolve(undefined)
+  async one(filter: object): Promise<Customer | undefined> {
+    const collection = await this.collection()
+    const data = await collection.findOne(filter)
+    if (!data) {
+      return undefined
+    }
+    return Customer.fromPrimitives(data)
   }
 
-  upsert(customer: Customer): Promise<void> {
-    return Promise.resolve(undefined)
+  async upsert(customer: Customer): Promise<void> {
+    await this.persist(customer.getId(), customer)
   }
 }

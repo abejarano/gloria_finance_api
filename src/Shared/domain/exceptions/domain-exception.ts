@@ -1,6 +1,6 @@
 export abstract class DomainException implements Error {
-  message: string
-  name: string
+  abstract message: string
+  abstract name: string
 
   data?: []
 

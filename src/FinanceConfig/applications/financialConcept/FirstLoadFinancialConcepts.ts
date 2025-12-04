@@ -18,6 +18,7 @@ type rawFinancialConcept = {
   affectsResult: boolean
   affectsBalance: boolean
   isOperational: boolean
+  isSystem: boolean
 }
 
 export class FirstLoadFinancialConcepts {
@@ -26,13 +27,14 @@ export class FirstLoadFinancialConcepts {
     private readonly churchRepository: IChurchRepository
   ) {}
 
-  async execute(churchId: string) {
+  async execute(params: { churchId: string; lang?: string }): Promise<void> {
+    const { churchId, lang } = params
     const church = await this.churchRepository.one(churchId)
     if (!church) {
       throw new ChurchNotFound()
     }
 
-    const financialConcepts = this.readFinancialConcepts()
+    const financialConcepts = this.readFinancialConcepts(lang)
 
     for (const concept of financialConcepts) {
       await this.financialConceptRepository.upsert(
@@ -48,15 +50,18 @@ export class FirstLoadFinancialConcepts {
             affectsResult: concept.affectsResult,
             affectsBalance: concept.affectsBalance,
             isOperational: concept.isOperational,
-          }
+          },
+          concept.isSystem
         )
       )
     }
   }
 
-  private readFinancialConcepts(): rawFinancialConcept[] {
+  private readFinancialConcepts(lang?: string): rawFinancialConcept[] {
+    lang = lang || "pt-BR"
+
     const rawData = fs.readFileSync(
-      path.resolve(__dirname, "@/fixtures/financialConcepts.json"),
+      path.resolve(__dirname, `@/fixtures/financialConcepts_${lang}.json`),
       "utf-8"
     )
     return JSON.parse(rawData) as rawFinancialConcept[]

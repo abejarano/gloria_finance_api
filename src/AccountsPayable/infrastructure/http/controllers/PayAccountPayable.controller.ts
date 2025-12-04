@@ -1,12 +1,8 @@
 import domainResponse from "@/Shared/helpers/domainResponse"
 import { Response } from "express"
 import { PayAccountPayableRequest } from "@/AccountsPayable/domain"
-import { QueueService, StorageGCP } from "@/Shared/infrastructure"
-import {
-  AvailabilityAccountMongoRepository,
-  FinanceRecordMongoRepository,
-} from "@/Financial/infrastructure/persistence"
-import { FinancialYearMongoRepository } from "@/ConsolidatedFinancial/infrastructure"
+import { QueueService } from "@/Shared/infrastructure"
+import { AvailabilityAccountMongoRepository } from "@/Financial/infrastructure/persistence"
 import { HttpStatus } from "@/Shared/domain"
 import { PayAccountPayable } from "@/AccountsPayable/applications/PayAccountPayable"
 import { AccountsPayableMongoRepository } from "@/AccountsPayable/infrastructure/persistence/AccountsPayableMongoRepository"
@@ -34,10 +30,7 @@ export const PayAccountPayableController = async (
       AccountsPayableMongoRepository.getInstance(),
       QueueService.getInstance(),
       FinancialConceptMongoRepository.getInstance(),
-      FinancialConfigurationMongoRepository.getInstance(),
-      FinanceRecordMongoRepository.getInstance(),
-      FinancialYearMongoRepository.getInstance(),
-      StorageGCP.getInstance(process.env.BUCKET_FILES)
+      FinancialConfigurationMongoRepository.getInstance()
     ).execute(req)
 
     res

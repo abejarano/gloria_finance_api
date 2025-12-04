@@ -1,4 +1,5 @@
 export enum ChurchStatus {
+  DISABLED = "DISABLED",
   ACTIVE = "ACTIVE",
   INACTIVE = "INACTIVE",
   NO_MINISTER = "NO_MINISTER",
