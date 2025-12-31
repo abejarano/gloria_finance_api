@@ -42,7 +42,7 @@
       "rbac:manage_roles",
       "rbac:assign_roles",
       "rbac:read",
-      "tools:admi"
+      "tools:admin"
     ],
     "isSystem": true
   },
@@ -67,7 +67,8 @@
       "rbac:read",
       "reports:income_statements",
       "reports:monthly_tithes",
-      "patrimony:report_inventory"
+      "patrimony:report_inventory",
+      "schedule:configure"
     ],
     "isSystem": true
   },
@@ -137,7 +138,8 @@
       "financial_records:list_contributions",
       "financial_records:add_contributions",
       "financial_configuration:list_concepts",
-      "accounts_receivable:member_commitments"
+      "accounts_receivable:member_commitments",
+      "schedule:read"
     ],
     "isSystem": true
   }

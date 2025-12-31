@@ -33,6 +33,7 @@ import {
 } from "@/Schedule/domain/requests/ScheduleItem.request"
 import {
   AuthenticatedRequest,
+  Can,
   PermissionMiddleware,
 } from "@/Shared/infrastructure"
 import CreateScheduleItemValidator from "../validators/CreateScheduleItem.validator"
@@ -54,7 +55,7 @@ export class ScheduleController {
   @Post("/")
   @Use([
     PermissionMiddleware,
-    //Can("schedule", ["configure", "manage"]),
+    Can("schedule", ["configure"]),
     CreateScheduleItemValidator,
   ])
   async createScheduleItem(
@@ -84,7 +85,7 @@ export class ScheduleController {
   @Get("/")
   @Use([
     PermissionMiddleware,
-    // Can("schedule", ["configure", "manage", "read"]),
+    Can("schedule", ["configure", "read"]),
     ScheduleItemsQueryValidator,
   ])
   async listScheduleItems(
@@ -110,10 +111,7 @@ export class ScheduleController {
   }
 
   @Get("/:scheduleItemId")
-  @Use([
-    PermissionMiddleware,
-    //  Can("schedule", ["configure", "manage", "read"])
-  ])
+  @Use([PermissionMiddleware, Can("schedule", ["configure", "read"])])
   async getScheduleItem(
     @Param("scheduleItemId") scheduleItemId: string,
     @Res() res: Response,
@@ -139,7 +137,7 @@ export class ScheduleController {
   @Put("/:scheduleItemId")
   @Use([
     PermissionMiddleware,
-    //Can("schedule", ["configure", "manage"]),
+    Can("schedule", ["configure"]),
     UpdateScheduleItemValidator,
   ])
   async updateScheduleItem(
@@ -175,10 +173,7 @@ export class ScheduleController {
   }
 
   @Delete("/:scheduleItemId")
-  @Use([
-    PermissionMiddleware,
-    //  Can("schedule", ["configure", "manage"])
-  ])
+  @Use([PermissionMiddleware, Can("schedule", ["configure"])])
   async deactivateScheduleItem(
     @Param("scheduleItemId") scheduleItemId: string,
     @Res() res: Response,
@@ -205,10 +200,7 @@ export class ScheduleController {
   }
 
   @Post("/:scheduleItemId/reactivate")
-  @Use([
-    PermissionMiddleware,
-    //  Can("schedule", ["configure", "manage"])
-  ])
+  @Use([PermissionMiddleware, Can("schedule", ["configure"])])
   async activateScheduleItem(
     @Param("scheduleItemId") scheduleItemId: string,
     @Res() res: Response,
@@ -235,7 +227,11 @@ export class ScheduleController {
   }
 
   @Get("/weekly")
-  @Use([PermissionMiddleware, WeeklyScheduleQueryValidator])
+  @Use([
+    PermissionMiddleware,
+    Can("schedule", ["configure", "read"]),
+    WeeklyScheduleQueryValidator,
+  ])
   async weeklySchedule(
     @Query() query: WeeklyScheduleQuery,
     @Res() res: Response,
