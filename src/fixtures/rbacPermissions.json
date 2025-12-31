@@ -325,7 +325,21 @@
     "permissionId": "tools:admin",
     "module": "tools",
     "action": "admin",
-    "description": "Administracion de herramientas",
+    "description": "Administração de ferramentas",
+    "isSystem": true
+  },
+  {
+    "permissionId": "schedule:configure",
+    "module": "schedule",
+    "action": "configure",
+    "description": "Administração da programação semanal",
+    "isSystem": true
+  },
+  {
+    "permissionId": "schedule:read",
+    "module": "schedule",
+    "action": "read",
+    "description": "Consultar programação semanal",
     "isSystem": true
   }
 ]
