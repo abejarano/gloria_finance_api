@@ -12,8 +12,9 @@ import { GenerateFinancialMonths } from "@/ConsolidatedFinancial/applications"
 import { IFinancialConceptRepository } from "@/Financial/domain/interfaces"
 import { IFinancialYearRepository } from "@/ConsolidatedFinancial/domain"
 import { FirstLoadFinancialConcepts } from "@/FinanceConfig/applications"
+import { BootstrapPermissionsRequest } from "@/SecuritySystem/applications/rbac/Jobs/BootstrapPermissions.job"
 
-type OnboardingCustomerJobArgs = {
+export type OnboardingCustomerRequest = {
   customer: Customer
   church: {
     openingDate: Date
@@ -31,7 +32,7 @@ export class OnboardingCustomerJob implements IJob {
     private readonly financialYearRepository: IFinancialYearRepository
   ) {}
 
-  async handle(args: OnboardingCustomerJobArgs): Promise<any> {
+  async handle(args: OnboardingCustomerRequest): Promise<any> {
     this.logger.info(`  started`, args)
 
     const { church: churchData } = args
@@ -65,12 +66,16 @@ export class OnboardingCustomerJob implements IJob {
       year: new Date().getFullYear(),
     })
 
-    this.queueService.dispatch(QueueName.BootstrapPermissionsJob, {
-      churchId: church.getChurchId(),
-      user: {
-        name: customer.getName(),
-        email: customer.getEmail(),
-      },
-    })
+    this.queueService.dispatch<BootstrapPermissionsRequest>(
+      QueueName.BootstrapPermissionsJob,
+      {
+        churchId: church.getChurchId(),
+        user: {
+          isSuperUser: true,
+          name: customer.getName(),
+          email: customer.getEmail(),
+        },
+      }
+    )
   }
 }

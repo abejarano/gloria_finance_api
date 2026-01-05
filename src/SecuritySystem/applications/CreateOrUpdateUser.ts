@@ -20,7 +20,8 @@ export class CreateOrUpdateUser {
       userRequest.name,
       userRequest.email,
       await this.passwordAdapter.encrypt(userRequest.password),
-      userRequest.churchId
+      userRequest.churchId,
+      userRequest.isSuperUser
     )
 
     if (userRequest.memberId) {

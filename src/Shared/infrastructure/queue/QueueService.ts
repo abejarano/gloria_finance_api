@@ -51,7 +51,7 @@ export class QueueService {
     }
   }
 
-  dispatch(queueName: QueueName, data: any): void {
+  dispatch<T>(queueName: QueueName, data: T): void {
     this.dispatcher.dispatch(queueName, data)
   }
 

@@ -21,6 +21,7 @@ import {
   Order,
   OrderTypes,
 } from "@abejarano/ts-mongodb-criteria"
+import { OnboardingCustomerRequest } from "../../jobs/OnboardingCustomer.job"
 
 @Controller("/api/v1/onboarding")
 export class OnboardingController {
@@ -83,10 +84,13 @@ export class OnboardingController {
           customerId: req.customerId,
         })
 
-        QueueService.getInstance().dispatch(QueueName.OnboardingCustomerJob, {
-          church: req.church,
-          customer: { ...customer.toPrimitives(), id: customer.getId() },
-        })
+        QueueService.getInstance().dispatch<OnboardingCustomerRequest>(
+          QueueName.OnboardingCustomerJob,
+          {
+            church: req.church,
+            customer: { ...customer.toPrimitives(), id: customer.getId() },
+          }
+        )
       }
 
       res.status(HttpStatus.OK).send({ message: "Onboarding process started" })

@@ -39,8 +39,12 @@ import {
   PermissionMiddleware,
   QueueService,
 } from "@/Shared/infrastructure"
-import { FindMemberById } from "@/Church/applications"
-import { MemberMongoRepository } from "@/Church/infrastructure"
+import { FindChurchById, FindMemberById } from "@/Church/applications"
+import {
+  ChurchMongoRepository,
+  MemberMongoRepository,
+} from "@/Church/infrastructure"
+import { Member } from "@/Church/domain"
 
 export type userLoginPayload = {
   email: string
@@ -59,9 +63,33 @@ export class UserController {
         new PasswordAdapter()
       ).execute(payload.email, payload.password)
 
-      const member = await new FindMemberById(
-        MemberMongoRepository.getInstance()
-      ).execute(user.getMemberId())
+      let church: {
+        churchId: string
+        name: string
+        lang: string
+      }
+
+      if (!user.isSuperUser) {
+        const member = await new FindMemberById(
+          MemberMongoRepository.getInstance()
+        ).execute(user.getMemberId())
+
+        church = {
+          churchId: member?.getChurch()?.churchId,
+          name: member?.getChurch()?.name,
+          lang: member?.getSettings()?.lang,
+        }
+      } else {
+        const c = await new FindChurchById(
+          ChurchMongoRepository.getInstance()
+        ).execute(user.getChurchId())
+
+        church = {
+          churchId: c.getChurchId(),
+          name: c.getName(),
+          lang: c.getLang(),
+        }
+      }
 
       const roles =
         await UserAssignmentMongoRepository.getInstance().findByUser(
@@ -75,7 +103,7 @@ export class UserController {
         email: user.getEmail(),
         name: user.getName(),
         memberId: user.getMemberId(),
-        lang: member.getSettings().lang,
+        lang: church.lang,
         isSuperUser: user.isSuperUser,
       })
 
@@ -86,11 +114,7 @@ export class UserController {
 
       res.status(HttpStatus.OK).send({
         ...responseUser,
-        church: {
-          churchId: member?.getChurch()?.churchId,
-          name: member?.getChurch()?.name,
-          lang: member?.getSettings()?.lang,
-        },
+        church,
         roles: roles.getRoles(),
         token,
       })

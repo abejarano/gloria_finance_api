@@ -1,21 +1,20 @@
-import { IdentifyEntity } from "@/Shared/adapter"
+import { IdentifyEntity, Urn } from "@/Shared/adapter"
 import { DateBR } from "@/Shared/helpers"
 import { AggregateRoot } from "@abejarano/ts-mongodb-criteria"
 import { UserPolicies } from "./types/user-policies.type"
 
 export class User extends AggregateRoot {
   isActive: boolean
-  isSuperUser?: boolean
   private id?: string
   private userId: string
   private email: string
   private name: string
   private password: string
   private createdAt: Date
-  private churchId: string
   private memberId?: string
   private lastLogin?: Date
   private policies?: UserPolicies
+  isSuperUser: boolean
 
   private constructor() {
     super()
@@ -25,21 +24,20 @@ export class User extends AggregateRoot {
     name: string,
     email: string,
     password: string,
-    churchId: string
+    churchId: string,
+    isSuperUser: boolean = false
   ): User {
     const u = new User()
     u.email = email
     u.password = password
 
-    u.churchId = churchId
-
-    u.userId = IdentifyEntity.get(`user`)
+    u.userId = Urn.create({ entity: `user`, churchId: Urn.id(churchId) })
 
     u.createdAt = DateBR()
     u.isActive = true
     u.name = name
 
-    u.isSuperUser = false
+    u.isSuperUser = isSuperUser
 
     return u
   }
@@ -52,7 +50,6 @@ export class User extends AggregateRoot {
     u.id = data.id
     u.password = data.password
     u.userId = data.userId
-    u.churchId = data.churchId
     u.name = data.name
     u.memberId = data.memberId
     u.lastLogin = data.lastLogin ?? null
@@ -68,7 +65,7 @@ export class User extends AggregateRoot {
   }
 
   getChurchId(): string {
-    return this.churchId
+    return Urn.urnForKey(this.userId, "church")
   }
 
   getId(): string {
@@ -152,7 +149,6 @@ export class User extends AggregateRoot {
       createdAt: this.createdAt,
       isActive: this.isActive,
       userId: this.userId,
-      churchId: this.churchId,
       memberId: this.memberId,
       lastLogin: this.lastLogin,
       policies: this.policies,
