@@ -18,6 +18,7 @@ export type BootstrapPermissionsRequest = {
   churchId: string
   userId?: string
   user?: {
+    isSuperUser: boolean
     name: string
     email: string
   }
@@ -44,11 +45,9 @@ export class BootstrapPermissionsJob implements IJob {
     if (request.user) {
       const userId = await this.createUser(request)
       await this.assignAdminToCreator(request.churchId, userId)
-      await this.assignAdminToCreator(request.churchId, userId)
     }
 
     if (request.userId) {
-      await this.assignAdminToCreator(request.churchId, request.userId)
       await this.assignAdminToCreator(request.churchId, request.userId)
     }
 
@@ -57,7 +56,7 @@ export class BootstrapPermissionsJob implements IJob {
     )
   }
 
-  private async createUser(req: any): Promise<string> {
+  private async createUser(req: BootstrapPermissionsRequest): Promise<string> {
     const { churchId, user } = req
 
     return (
@@ -70,6 +69,7 @@ export class BootstrapPermissionsJob implements IJob {
         password: "ChangeMe123!",
         isActive: true,
         churchId: churchId,
+        isSuperUser: user.isSuperUser,
       })
     ).getUserId()
   }

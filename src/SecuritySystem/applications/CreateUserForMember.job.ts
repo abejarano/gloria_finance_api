@@ -38,6 +38,7 @@ export class CreateUserForMemberJob implements IJob {
       password: member.getDni().replace(".", "").replace("-", ""),
       isActive: true,
       churchId: member.getChurch().churchId,
+      isSuperUser: false,
     })
   }
 }

@@ -6,4 +6,5 @@ export type CreateUserRequest = {
   isActive: boolean
   churchId: string
   memberId?: string
+  isSuperUser: boolean
 }
