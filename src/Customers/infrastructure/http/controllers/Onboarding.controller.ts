@@ -74,6 +74,7 @@ export class OnboardingController {
       church: {
         openingDate: Date
         registerNumber?: string
+        symbol: string
       }
     },
     @Res() res: Response
