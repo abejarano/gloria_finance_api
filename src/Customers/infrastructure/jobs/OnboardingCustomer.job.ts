@@ -19,6 +19,7 @@ export type OnboardingCustomerRequest = {
   church: {
     openingDate: Date
     registerNumber?: string
+    symbol: string
   }
 }
 export class OnboardingCustomerJob implements IJob {
@@ -47,6 +48,7 @@ export class OnboardingCustomerJob implements IJob {
       status: ChurchStatus.ACTIVE,
       registerNumber: churchData.registerNumber,
       openingDate: churchData.openingDate,
+      symbolFormatMoney: churchData.symbol,
       lang: customer.getLang(),
     })
 
