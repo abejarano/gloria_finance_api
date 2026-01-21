@@ -61,22 +61,32 @@ export class ListBankStatements {
       )
     }
 
-    if (typeof request.month === "number") {
+    const monthValue =
+      request.month !== undefined && request.month !== null
+        ? String(request.month)
+        : undefined
+
+    if (monthValue) {
       filters.push(
         new Map<string, any>([
           ["field", "month"],
           ["operator", Operator.EQUAL],
-          ["value", request.month],
+          ["value", monthValue],
         ])
       )
     }
 
-    if (typeof request.year === "number") {
+    const yearValue =
+      request.year !== undefined && request.year !== null
+        ? String(request.year)
+        : undefined
+
+    if (yearValue) {
       filters.push(
         new Map<string, any>([
           ["field", "year"],
           ["operator", Operator.EQUAL],
-          ["value", request.year],
+          ["value", yearValue],
         ])
       )
     }
