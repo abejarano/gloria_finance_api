@@ -16,6 +16,7 @@
 
     // Best practices
     "strict": true,
+    "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
@@ -42,6 +43,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "src/Shared/domain/enums/QueueName.enum.ts"
+    "src/package/queue/domain/enums/QueueName.enum.ts"
   ]
 }

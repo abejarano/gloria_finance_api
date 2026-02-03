@@ -209,16 +209,19 @@ export class FinanceReportsController {
    * GET /reports/finance/dre?churchId=123&year=2024&month=5
    *
    * // Response
-   * {
-   *   "grossRevenue": 3117.05,
-   *   "netRevenue": 3117.05,
+   * [{
+   *   "symbol": "USDT",
+   *   "grossRevenue": 36,
+   *   "netRevenue": 36,
    *   "directCosts": 0,
-   *   "grossProfit": 3117.05,
-   *   "operationalExpenses": 101.5,
-   *   "operationalResult": 3015.55,
+   *   "grossProfit": 36,
+   *   "operationalExpenses": 10,
+   *   "ministryTransfers": 0,
+   *   "capexInvestments": 0,
    *   "extraordinaryResults": 0,
-   *   "netResult": 3015.55
-   * }
+   *   "operationalResult": 26,
+   *   "netResult": 26
+   * }]
    */
   @Get("/dre")
   @Use([PermissionMiddleware, Can("financial_records", "reports")])
@@ -233,7 +236,7 @@ export class FinanceReportsController {
         ChurchMongoRepository.getInstance()
       ).execute(query)
 
-      res.status(HttpStatus.OK).json(result)
+      res.status(HttpStatus.OK).json(result.totalsBySymbol)
     } catch (e) {
       domainResponse(e, res)
     }
