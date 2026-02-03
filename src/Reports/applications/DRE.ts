@@ -39,7 +39,6 @@ export class DRE {
   }
 
   async generateDRE(params: BaseReportRequest): Promise<DREMaster> {
-    // consolidates by accounting category (REVENUE, OPEX, CAPEX, etc.)
     const statementByCategory =
       await this.financialRecordRepository.fetchStatementCategories(params)
 
@@ -47,93 +46,121 @@ export class DRE {
       `Statement categories fetched: ${JSON.stringify(statementByCategory)}`
     )
 
-    let grossRevenue = 0
-    let directCosts = 0
-    let operationalExpenses = 0
-    let ministryTransfers = 0
-    let extraordinaryResults = 0
-    let capexInvestments = 0
+    type DREAccumulator = {
+      grossRevenue: number
+      directCosts: number
+      operationalExpenses: number
+      ministryTransfers: number
+      extraordinaryResults: number
+      capexInvestments: number
+    }
 
-    for (const summary of statementByCategory) {
-      // income / expenses already aggregated by category
-      // reversals already handled in IncomeStatement (won't subtract twice here)
-      const income = summary.income ?? 0
-      const expenses = summary.expenses ?? 0
+    const createAccumulator = (): DREAccumulator => ({
+      grossRevenue: 0,
+      directCosts: 0,
+      operationalExpenses: 0,
+      ministryTransfers: 0,
+      extraordinaryResults: 0,
+      capexInvestments: 0,
+    })
+
+    const applyCategory = (
+      accumulator: DREAccumulator,
+      category: StatementCategory,
+      income: number,
+      expenses: number
+    ) => {
       const net = income - expenses
 
-      switch (summary.category) {
+      switch (category) {
         case StatementCategory.REVENUE:
-          // operational revenues (tithes, offerings, donations)
-          grossRevenue += net
+          accumulator.grossRevenue += net
           break
-
         case StatementCategory.COGS:
-          // direct costs (if the church uses this category)
-          // stored as positive cost value
-          directCosts += expenses - income
+          accumulator.directCosts += expenses - income
           break
-
         case StatementCategory.OPEX:
-          // administrative and operational expenses
-          operationalExpenses += expenses - income
+          accumulator.operationalExpenses += expenses - income
           break
-
         case StatementCategory.MINISTRY_TRANSFERS:
-          // transfers to field, convention, missions, etc.
-          ministryTransfers += expenses - income
+          accumulator.ministryTransfers += expenses - income
           break
-
         case StatementCategory.CAPEX:
-          // investments in furniture, equipment, etc.
-          // not included in operational result, but will be deducted
-          // when calculating final net result
-          capexInvestments += expenses
+          accumulator.capexInvestments += expenses
           break
-
         case StatementCategory.OTHER:
-          // non-operational / extraordinary revenues and expenses
-          extraordinaryResults += net
+          accumulator.extraordinaryResults += net
           break
-
         default:
-          // any unknown category falls into "other results"
-          extraordinaryResults += net
+          accumulator.extraordinaryResults += net
           break
       }
     }
 
-    // DRE assembly in stages
-    const netRevenue = grossRevenue
-    const grossProfit = netRevenue - directCosts
+    const buildSummary = (accumulator: DREAccumulator) => {
+      const netRevenue = accumulator.grossRevenue
+      const grossProfit = netRevenue - accumulator.directCosts
+      const operationalResult =
+        grossProfit -
+        accumulator.operationalExpenses -
+        accumulator.ministryTransfers
+      const netResult =
+        operationalResult +
+        accumulator.extraordinaryResults -
+        accumulator.capexInvestments
 
-    // operational result before CAPEX and extraordinary results
-    const operationalResult =
-      grossProfit - operationalExpenses - ministryTransfers
+      return {
+        grossRevenue: accumulator.grossRevenue,
+        netRevenue,
+        directCosts: accumulator.directCosts,
+        grossProfit,
+        operationalExpenses: accumulator.operationalExpenses,
+        ministryTransfers: accumulator.ministryTransfers,
+        capexInvestments: accumulator.capexInvestments,
+        extraordinaryResults: accumulator.extraordinaryResults,
+        operationalResult,
+        netResult,
+      }
+    }
 
-    // >>>> CRITICAL POINT: unified with Income Statement
-    // Net result after:
-    // - operational expenses
-    // - ministry transfers
-    // - extraordinary results
-    // - CAPEX investments (chairs, furniture, etc.)
-    const netResult =
-      operationalResult + extraordinaryResults - capexInvestments
+    const dreBySymbol = new Map<string, DREAccumulator>()
+
+    for (const summary of statementByCategory) {
+      const income = summary.income ?? 0
+      const expenses = summary.expenses ?? 0
+      const symbol = summary.symbol ?? "R$"
+
+      const symbolAccumulator = dreBySymbol.get(symbol) ?? createAccumulator()
+      applyCategory(symbolAccumulator, summary.category, income, expenses)
+      dreBySymbol.set(symbol, symbolAccumulator)
+    }
+
+    const totalsBySymbol = Array.from(dreBySymbol.entries())
+      .map(([symbol, accumulator]) => ({
+        symbol,
+        ...buildSummary(accumulator),
+      }))
+      .sort((a, b) => b.grossRevenue - a.grossRevenue)
+
+    const globalAccumulator = createAccumulator()
+    for (const item of totalsBySymbol) {
+      globalAccumulator.grossRevenue += item.grossRevenue
+      globalAccumulator.directCosts += item.directCosts
+      globalAccumulator.operationalExpenses += item.operationalExpenses
+      globalAccumulator.ministryTransfers += item.ministryTransfers
+      globalAccumulator.capexInvestments += item.capexInvestments
+      globalAccumulator.extraordinaryResults += item.extraordinaryResults
+    }
+
+    const globalSummary = buildSummary(globalAccumulator)
 
     return DREMaster.create({
       churchId: params.churchId,
       month: params.month!,
       year: params.year,
       dre: {
-        grossRevenue,
-        netRevenue,
-        directCosts,
-        grossProfit,
-        operationalExpenses,
-        ministryTransfers,
-        capexInvestments,
-        extraordinaryResults,
-        operationalResult,
-        netResult,
+        ...globalSummary,
+        totalsBySymbol,
       },
     })
   }

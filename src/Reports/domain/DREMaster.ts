@@ -32,7 +32,10 @@ export class DREMaster extends AggregateRoot {
     dreMaster.churchId = primitives.churchId
     dreMaster.month = primitives.month
     dreMaster.year = primitives.year
-    dreMaster.dre = primitives.dre
+    dreMaster.dre = {
+      ...primitives.dre,
+      totalsBySymbol: primitives.dre?.totalsBySymbol ?? [],
+    }
 
     return dreMaster
   }
@@ -53,6 +56,7 @@ export class DREMaster extends AggregateRoot {
       extraordinaryResults: this.dre.extraordinaryResults,
       operationalResult: this.dre.operationalResult,
       netResult: this.dre.netResult,
+      totalsBySymbol: this.dre.totalsBySymbol ?? [],
       year: this.year,
       month: this.month,
     }
