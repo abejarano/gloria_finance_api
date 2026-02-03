@@ -1,3 +1,5 @@
+import type { DRESummaryBySymbol } from "../types/DREStructure.type"
+
 export type DREResponse = {
   grossRevenue: number //receitaBruta
   netRevenue: number //receitaLiquida
@@ -9,6 +11,7 @@ export type DREResponse = {
   extraordinaryResults: number //resultadosExtraordinarios
   operationalResult: number //resultadoOperacional
   netResult: number //resultadoLiquido
+  totalsBySymbol: DRESummaryBySymbol[]
   year?: number
   month?: number
 }
