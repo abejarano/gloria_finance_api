@@ -1,18 +1,19 @@
-# Que es Church Finance
+# Que es Gloria Finance
 
-Church Finance API es una solución moderna y flexible para la gestión financiera de iglesias. Permite administrar
+Gloria Finance API es una solución moderna y flexible para la gestión financiera de iglesias. Permite administrar
 miembros, donaciones, conceptos financieros y notificaciones de manera eficiente y segura.
 
 ¡Optimiza la administración de tu iglesia con tecnología de vanguardia!
 
 # Stack
 
-- [`node v22`](https://nodejs.org/)
-- [`express`](https://expressjs.com/)
+- [`Bun`](https://bun.com/)
+- [`Server bun platform toolkit`](https://github.com/abejarano/bun-platform-kit)
 - [`typescript`](https://www.typescriptlang.org/)
 - [`docker`](https://www.docker.com/) [`docker-compose`](https://docs.docker.com/compose/)
 - [`redis`](https://redis.io/)
-- [`bull`](https://github.com/OptimalBits/bull)
+- [`bullMQ`](https://bullmq.io/)
+- [`GCP Storage`](https://cloud.google.com/storage)
 
 # Ejecutar el proyecto en local
 
@@ -24,10 +25,7 @@ Debe tener instalado docker y nodejs en la version 22
 NODE_ENV=local
 APP_PORT=5200
 
-MONGO_PASS=
-MONGO_USER=
-MONGO_DB=
-MONGO_SERVER=
+MONGO_URI=
 
 JWT_SECRET=
 JWT_REFRESH_SECRET=
@@ -44,13 +42,16 @@ REDIS_PORT=
 
 BULL_USER=
 BULL_PASS=
-```
+
+GOOGLE_APPLICATION_CREDENTIALS=
+SEND_MAIL_CLIENT_ID=
+SEND_MAIL_PRIVATE_KEY=
 
 - ejecutar el proyecto
 
 ```
-npm i
-npm run dev
+bun install
+bun dev
 ```
 
 ## Conventional Commits
