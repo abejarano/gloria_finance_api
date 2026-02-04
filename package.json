@@ -34,7 +34,6 @@
     "ioredis": "^5.9.1",
     "jsonwebtoken": "^9.0.3",
     "migrate-mongo": "^14.0.7",
-    "node-cron": "^4.2.1",
     "node-input-validator": "^4.6.0",
     "nodemailer": "^7.0.12",
     "nodemailer-express-handlebars": "^7.0.0",
