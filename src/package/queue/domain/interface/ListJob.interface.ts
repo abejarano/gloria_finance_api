@@ -8,4 +8,8 @@ export interface IListQueue {
    * Delay in seconds
    */
   delay?: number
+  scheduler?: {
+    pattern: string
+    tz: string
+  }
 }

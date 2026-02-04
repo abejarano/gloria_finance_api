@@ -15,7 +15,7 @@ import { PurchasesQueue } from "@/Purchases/infrastructure/Purchases.queue"
 import { NotifyFCMJob } from "@/Notifications/infrastructure/NotifyFCM.job"
 import { NotificationMongoRepository } from "@/Notifications/infrastructure/persistence"
 import { FCMNotificationService } from "@/Notifications/infrastructure/services/FCMNotification.service"
-import type { IListQueue } from "@/package/queue/domain"
+import type { IJob, IListQueue } from "@/package/queue/domain"
 
 export const Queues = (): IListQueue[] => [
   ...BankingQueue({

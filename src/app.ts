@@ -12,7 +12,6 @@ import { controllersModule } from "./bootstrap"
 import { FactoryService } from "./bootstrap/FactoryService"
 import { StartQueueService } from "@/Shared/infrastructure"
 import { Queues } from "./queues"
-import { FinancialSchedules } from "./Financial/infrastructure/schedules"
 
 export const APP_DIR = __dirname
 
@@ -51,4 +50,4 @@ StartQueueService({
     password: process.env.BULL_PASS!,
   },
 })
-server.start().then(() => FinancialSchedules())
+server.start()

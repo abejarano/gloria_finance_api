@@ -18,6 +18,7 @@ import { FinancialConfigurationMongoRepository } from "@/FinanceConfig/infrastru
 import { AvailabilityAccountMasterMongoRepository } from "@/Financial/infrastructure/persistence/AvailabilityAccountMasterMongoRepository"
 import { UpdateAvailabilityAccountBalanceJob } from "@/Financial/applications/jobs/UpdateAvailabilityAccountBalance.job"
 import type { IListQueue } from "@/package/queue/domain"
+import { CloseFinancialMonth } from "@/Financial/infrastructure/jobs"
 
 export const FinancialQueue = (): IListQueue[] => [
   {
@@ -67,5 +68,13 @@ export const FinancialQueue = (): IListQueue[] => [
       AvailabilityAccountMongoRepository.getInstance(),
       AvailabilityAccountMasterMongoRepository.getInstance(),
     ],
+  },
+  {
+    name: "CloseFinancialMonth",
+    useClass: CloseFinancialMonth,
+    scheduler: {
+      pattern: "30 23 * * *",
+      tz: "America/Sao_Paulo",
+    },
   },
 ]

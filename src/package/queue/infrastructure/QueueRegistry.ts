@@ -63,6 +63,12 @@ export class QueueRegistry {
         await queue.waitUntilReady()
         console.log(`Queue ${queueName} connected to Redis`)
 
+        if (definition.scheduler) {
+          await queue.upsertJobScheduler(definition.name, {
+            ...definition.scheduler,
+          })
+        }
+
         // Configurar manejo de errores
         queue.on("error", (error: Error) =>
           console.error(`Queue ${queueName} error:`, error)

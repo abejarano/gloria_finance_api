@@ -1,7 +1,7 @@
-import { IJob } from "@/Shared/domain"
-import { Mail } from "./types/mail.type"
+import type { Mail } from "./types/mail.type"
 import { SendMailService } from "./service/SendMail.service"
 import { Logger } from "@/Shared/adapter"
+import type { IJob } from "@/package/queue/domain"
 
 export class SendMailJob implements IJob {
   private logger = Logger("SendMail")
