@@ -1,5 +1,5 @@
 import jwt, { type Secret, type SignOptions } from "jsonwebtoken"
-import { IAuthToken } from "../../domain"
+import type { IAuthToken } from "../../domain"
 
 export type AuthTokenPayload = {
   userId: string
@@ -15,6 +15,28 @@ export type AuthTokenPayload = {
 }
 
 export class AuthTokenAdapter implements IAuthToken {
+  createAccessToken(user: AuthTokenPayload): string {
+    const options: SignOptions = {
+      expiresIn: this.accessTokenExpiresIn() as SignOptions["expiresIn"],
+    }
+    return jwt.sign(user, this.accessTokenSecret() as Secret, options)
+  }
+
+  createRefreshToken(user: AuthTokenPayload): string {
+    const options: SignOptions = {
+      expiresIn: this.refreshTokenExpiresIn() as SignOptions["expiresIn"],
+    }
+    return jwt.sign(user, this.refreshTokenSecret() as Secret, options)
+  }
+
+  verifyRefreshToken(token: string): AuthTokenPayload {
+    return jwt.verify(token, this.refreshTokenSecret()) as AuthTokenPayload
+  }
+
+  createToken(user: AuthTokenPayload): string {
+    return this.createAccessToken(user)
+  }
+
   private accessTokenSecret(): string {
     const secret = process.env.JWT_SECRET
     if (!secret) {
@@ -37,27 +59,5 @@ export class AuthTokenAdapter implements IAuthToken {
 
   private refreshTokenExpiresIn(): string {
     return process.env.JWT_REFRESH_EXPIRES_IN ?? "30d"
-  }
-
-  createAccessToken(user: AuthTokenPayload): string {
-    const options: SignOptions = {
-      expiresIn: this.accessTokenExpiresIn() as SignOptions["expiresIn"],
-    }
-    return jwt.sign(user, this.accessTokenSecret() as Secret, options)
-  }
-
-  createRefreshToken(user: AuthTokenPayload): string {
-    const options: SignOptions = {
-      expiresIn: this.refreshTokenExpiresIn() as SignOptions["expiresIn"],
-    }
-    return jwt.sign(user, this.refreshTokenSecret() as Secret, options)
-  }
-
-  verifyRefreshToken(token: string): AuthTokenPayload {
-    return jwt.verify(token, this.refreshTokenSecret()) as AuthTokenPayload
-  }
-
-  createToken(user: AuthTokenPayload): string {
-    return this.createAccessToken(user)
   }
 }

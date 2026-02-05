@@ -1,4 +1,8 @@
-import { ConceptType, ConceptTypeLabels, type FinanceRecordReportRequest, } from "../../domain"
+import {
+  ConceptType,
+  ConceptTypeLabels,
+  type FinanceRecordReportRequest,
+} from "../../domain"
 import type { IFinancialRecordRepository } from "../../domain/interfaces"
 import { Logger } from "@/Shared/adapter/CustomLogger"
 import { PuppeteerAdapter } from "@/Shared/adapter/GeneratePDF.adapter"
@@ -204,8 +208,7 @@ export class GenerateFinanceRecordReport {
         const isReversal = type === ConceptType.REVERSAL
         const signedTotal = isExpense || isReversal ? -data.amount : data.amount
         const roundedAmount = roundAmount(data.amount)
-        const shouldShow =
-          !(data.count === 0 && Math.abs(roundedAmount) === 0)
+        const shouldShow = !(data.count === 0 && Math.abs(roundedAmount) === 0)
 
         if (type === ConceptType.INCOME) {
           totalsByNature.income += data.amount
@@ -245,10 +248,7 @@ export class GenerateFinanceRecordReport {
       totalIncome: totalsByNature.income,
       totalIncomeFormatted: formatAmount(totalsByNature.income, symbol),
       totalExpenses: totalsByNature.expenses,
-      totalExpensesFormatted: formatAmount(
-        totalsByNature.expenses,
-        symbol
-      ),
+      totalExpensesFormatted: formatAmount(totalsByNature.expenses, symbol),
       totalReversal: totalsByNature.reversal,
       totalReversalFormatted: formatAmount(
         -Math.abs(totalsByNature.reversal),
@@ -257,9 +257,7 @@ export class GenerateFinanceRecordReport {
     }
   }
 
-  private buildSummaryBySymbol(
-    records: any[]
-  ): FinanceRecordSummaryBySymbol[] {
+  private buildSummaryBySymbol(records: any[]): FinanceRecordSummaryBySymbol[] {
     const groups = new Map<
       string,
       {

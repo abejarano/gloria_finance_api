@@ -4,7 +4,8 @@ export interface IHTMLAdapter {
    *
    * @param templateName - Ruta de la plantilla HTML
    * @param data - Datos a inyectar en la plantilla
+   * @param locale - Idioma preferido para i18n
    * @returns Un buffer con el archivo HTML generado
    */
-  generateHTML(templateName: string, data: any): string
+  generateHTML(templateName: string, data: any, locale?: string): string
 }

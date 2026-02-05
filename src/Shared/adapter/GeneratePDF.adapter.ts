@@ -1,9 +1,9 @@
-import { IStorageService } from "@/Shared/domain"
-import puppeteer, { Browser, LaunchOptions } from "puppeteer"
+import { type IStorageService } from "@/Shared/domain"
+import puppeteer, { Browser, type LaunchOptions } from "puppeteer"
 import { v4 } from "uuid"
 import * as path from "path"
 import { promises as fs } from "node:fs"
-import { IHTMLAdapter } from "@/Shared/domain/interfaces/GenerateHTML.interface"
+import type { IHTMLAdapter } from "@/Shared/domain/interfaces/GenerateHTML.interface"
 import { Logger } from "@/Shared/adapter/CustomLogger"
 
 export abstract class GeneratePDFAdapter {
@@ -14,7 +14,7 @@ export abstract class GeneratePDFAdapter {
     protected readonly storeService: IStorageService
   ) {}
 
-  abstract htmlTemplate(template: string, data: any): this
+  abstract htmlTemplate(template: string, data: any, locale?: string): this
 
   abstract toPDF(upload: boolean): Promise<string>
 }
@@ -26,12 +26,16 @@ export class PuppeteerAdapter extends GeneratePDFAdapter {
     super(htmlAdapter, storeService)
   }
 
-  htmlTemplate(template: string, data: any) {
-    this.htmlString = this.htmlAdapter.generateHTML(template, data)
+  htmlTemplate(template: string, data: any, locale?: string) {
+    this.htmlString = this.htmlAdapter.generateHTML(template, data, locale)
 
     return this
   }
 
+  /**
+   * upload file
+   * @param upload
+   */
   async toPDF(upload: boolean = true): Promise<string> {
     this.logger.info("Generating PDF from HTML string")
 

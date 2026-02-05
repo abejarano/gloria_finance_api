@@ -227,7 +227,7 @@ export class FinancialRecordController {
           NoOpStorage.getInstance()
         ),
         new XLSExportAdapter()
-      ).execute(normalizedRequest)
+      ).execute({ ...normalizedRequest, lang: req.auth.lang })
 
       const { path, filename } = file
 

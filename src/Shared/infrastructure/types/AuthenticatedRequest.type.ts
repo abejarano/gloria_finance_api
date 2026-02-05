@@ -9,6 +9,7 @@ export type AuthenticatedRequest = ServerRequest & {
     churchId: string
     permissions?: string[]
     symbolFormatMoney: string
+    lang: string
   }
   requiredPermission?: string
 }

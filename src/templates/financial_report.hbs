@@ -123,6 +123,13 @@
     margin-bottom: 6px;
   }
 
+  .category-description {
+    display: block;
+    font-size: 10px;
+    color: #7b8794;
+    margin-top: 3px;
+  }
+
   .footnote {
     font-size: 10px;
     color: #7b8794;
@@ -132,47 +139,46 @@
 
 <div class="report">
   <header class="header">
-    <h1>Relatório Financeiro Mensal</h1>
-    <p>Período analisado: {{period.month}}/{{period.year}}</p>
+    <h1>{{t "financial_report.title"}}</h1>
+    <p>{{t "financial_report.period_label"}} {{period.month}}/{{period.year}}</p>
     {{#if summary}}
-      <p>O relatório consolida entradas, saídas e saldos para informar a
-        congregação.</p>
+      <p>{{t "financial_report.summary_note"}}</p>
     {{/if}}
   </header>
 
   {{#if summary}}
     <section>
-      <h2>Painel Resumido</h2>
+      <h2>{{t "financial_report.summary.title"}}</h2>
       <div class="summary-grid">
         {{#with (lookup summary 0)}}
           {{#if summary}}
             <div class="summary-card">
-              <span class="label">Receita Líquida ({{symbol}})</span>
+              <span class="label">{{t "financial_report.summary.net_revenue"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.revenue)}}negative{{/if}}">
                 {{formatCurrency summary.revenue}}
               </span>
-              <span class="caption">Entradas provenientes das atividades regulares.</span>
+              <span class="caption">{{t "financial_report.summary.caption.net_revenue"}}</span>
             </div>
             <div class="summary-card">
-              <span class="label">Despesas Operacionais ({{symbol}})</span>
+              <span class="label">{{t "financial_report.summary.operating_expenses"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.operatingExpenses)}}negative{{/if}}">
                 {{formatCurrency summary.operatingExpenses}}
               </span>
-              <span class="caption">Custos necessários para manter a igreja ativa.</span>
+              <span class="caption">{{t "financial_report.summary.caption.operating_expenses"}}</span>
             </div>
             <div class="summary-card">
-              <span class="label">Resultado Operacional ({{symbol}})</span>
+              <span class="label">{{t "financial_report.summary.operating_income"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.operatingIncome)}}negative{{/if}}">
                 {{formatCurrency summary.operatingIncome}}
               </span>
-              <span class="caption">Receitas menos despesas operacionais.</span>
+              <span class="caption">{{t "financial_report.summary.caption.operating_income"}}</span>
             </div>
             <div class="summary-card">
-              <span class="label">Resultado Líquido ({{symbol}})</span>
+              <span class="label">{{t "financial_report.summary.net_income"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.netIncome)}}negative{{/if}}">
                 {{formatCurrency summary.netIncome}}
               </span>
-              <span class="caption">Saldo final após itens extraordinários.</span>
+              <span class="caption">{{t "financial_report.summary.caption.net_income"}}</span>
             </div>
           {{/if}}
         {{/with}}
@@ -182,21 +188,28 @@
 
   {{#if breakdown}}
     <section>
-      <h2>Receitas e Despesas por Categoria</h2>
+      <h2>{{t "financial_report.breakdown.title"}}</h2>
       <table>
         <thead>
           <tr>
-            <th>Categoria</th>
-            <th>Entradas</th>
-            <th>Saídas</th>
-            <th>Saldo</th>
+            <th>{{t "financial_report.breakdown.headers.category"}}</th>
+            <th>{{t "financial_report.breakdown.headers.income"}}</th>
+            <th>{{t "financial_report.breakdown.headers.expenses"}}</th>
+            <th>{{t "financial_report.breakdown.headers.net"}}</th>
           </tr>
         </thead>
         <tbody>
           {{#with (lookup breakdown 0)}}
             {{#each breakdown}}
               <tr>
-                <td>{{translateCategory category}}</td>
+                <td>
+                  {{translateCategory category}}
+                  {{#if (categoryDescription category)}}
+                    <span class="category-description">
+                      {{categoryDescription category}}
+                    </span>
+                  {{/if}}
+                </td>
                 <td class="number-cell {{#if (isNegative income)}}negative{{/if}}">
                   {{formatCurrency income}}
                 </td>
@@ -216,23 +229,23 @@
 
   {{#with cashFlowSnapshot.availabilityAccounts}}
     <section>
-      <h2>Fluxo de Caixa por Conta de Disponibilidade</h2>
+      <h2>{{t "financial_report.cash_flow.title"}}</h2>
       <p class="totals">
-        Entradas totais:
+        {{t "financial_report.cash_flow.totals.income"}}
         {{formatCurrency income}}
-        | Saídas totais:
+        | {{t "financial_report.cash_flow.totals.expenses"}}
         {{formatCurrency expenses}}
-        | Saldo consolidado:
+        | {{t "financial_report.cash_flow.totals.total"}}
         {{formatCurrency total}}
       </p>
       {{#if accounts}}
         <table>
           <thead>
             <tr>
-              <th>Conta</th>
-              <th>Entradas</th>
-              <th>Saídas</th>
-              <th>Saldo do Período</th>
+              <th>{{t "financial_report.cash_flow.headers.account"}}</th>
+              <th>{{t "financial_report.cash_flow.headers.income"}}</th>
+              <th>{{t "financial_report.cash_flow.headers.expenses"}}</th>
+              <th>{{t "financial_report.cash_flow.headers.period_balance"}}</th>
             </tr>
           </thead>
           <tbody>
@@ -259,14 +272,14 @@
   {{#with cashFlowSnapshot.costCenters}}
     {{#if costCenters}}
       <section>
-        <h2>Uso dos Centros de Custo</h2>
-        <p class="totals">Total aplicado: {{formatCurrency total}}</p>
+        <h2>{{t "financial_report.cost_centers.title"}}</h2>
+        <p class="totals">{{t "financial_report.cost_centers.total_label"}} {{formatCurrency total}}</p>
         <table>
           <thead>
             <tr>
-              <th>Centro de Custo</th>
-              <th>Total Aplicado</th>
-              <th>Último Movimento</th>
+              <th>{{t "financial_report.cost_centers.headers.cost_center"}}</th>
+              <th>{{t "financial_report.cost_centers.headers.total_applied"}}</th>
+              <th>{{t "financial_report.cost_centers.headers.last_move"}}</th>
             </tr>
           </thead>
           <tbody>
@@ -286,7 +299,6 @@
   {{/with}}
 
   <p class="footnote">
-    Este relatório foi preparado para prestar contas aos membros da igreja sobre
-    o movimento financeiro do período informado.
+    {{t "financial_report.footnote"}}
   </p>
 </div>

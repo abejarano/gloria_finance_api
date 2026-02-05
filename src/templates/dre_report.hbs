@@ -125,30 +125,30 @@
 
 <div class="report">
   <header class="header">
-    <h1>Demonstração do Resultado do Exercício (DRE)</h1>
+    <h1>{{t "dre_report.title"}}</h1>
     <p class="subtitle">
       {{#if month}}
-        Período: {{month}}/{{year}}
+        {{t "dre_report.period_label"}} {{month}}/{{year}}
       {{else}}
-        Ano: {{year}}
+        {{t "dre_report.year_label"}} {{year}}
       {{/if}}
     </p>
-    <p class="subtitle">Relatório de Resultado Contábil</p>
+    <p class="subtitle">{{t "dre_report.subtitle"}}</p>
   </header>
 
   <table class="dre-table">
     <!-- Receitas -->
     <tr class="section-header">
-      <td colspan="2">Receitas</td>
+      <td colspan="2">{{t "dre_report.sections.revenues"}}</td>
     </tr>
     <tr class="line-item">
-      <td class="label">Receita Bruta</td>
+      <td class="label">{{t "dre_report.labels.gross_revenue"}}</td>
       <td class="amount {{#if (isNegative grossRevenue)}}negative{{else}}positive{{/if}}">
         {{formatCurrency grossRevenue}}
       </td>
     </tr>
     <tr class="subtotal">
-      <td>Receita Líquida</td>
+      <td>{{t "dre_report.labels.net_revenue"}}</td>
       <td class="amount {{#if (isNegative netRevenue)}}negative{{else}}positive{{/if}}">
         {{formatCurrency netRevenue}}
       </td>
@@ -156,16 +156,16 @@
 
     <!-- Custos Diretos -->
     <tr class="section-header">
-      <td colspan="2">Custos Diretos</td>
+      <td colspan="2">{{t "dre_report.sections.direct_costs"}}</td>
     </tr>
     <tr class="line-item">
-      <td class="label">Custos dos Serviços Prestados</td>
+      <td class="label">{{t "dre_report.labels.direct_costs"}}</td>
       <td class="amount {{#if (isExpense directCosts)}}negative{{/if}}">
         {{formatExpense directCosts}}
       </td>
     </tr>
     <tr class="subtotal">
-      <td>Resultado Bruto</td>
+      <td>{{t "dre_report.labels.gross_profit"}}</td>
       <td class="amount {{#if (isNegative grossProfit)}}negative{{else}}positive{{/if}}">
         {{formatCurrency grossProfit}}
       </td>
@@ -173,22 +173,22 @@
 
     <!-- Despesas Operacionais + Repasses Ministeriais -->
     <tr class="section-header">
-      <td colspan="2">Despesas Operacionais</td>
+      <td colspan="2">{{t "dre_report.sections.operational_expenses"}}</td>
     </tr>
     <tr class="line-item">
-      <td class="label">Despesas Administrativas e Operacionais</td>
+      <td class="label">{{t "dre_report.labels.operational_expenses"}}</td>
       <td class="amount {{#if (isExpense operationalExpenses)}}negative{{/if}}">
         {{formatExpense operationalExpenses}}
       </td>
     </tr>
     <tr class="line-item">
-      <td class="label">Repasses e Contribuições Ministeriais</td>
+      <td class="label">{{t "dre_report.labels.ministry_transfers"}}</td>
       <td class="amount {{#if (isExpense ministryTransfers)}}negative{{/if}}">
         {{formatExpense ministryTransfers}}
       </td>
     </tr>
     <tr class="subtotal">
-      <td>Resultado Operacional</td>
+      <td>{{t "dre_report.labels.operational_result"}}</td>
       <td class="amount {{#if (isNegative operationalResult)}}negative{{else}}positive{{/if}}">
         {{formatCurrency operationalResult}}
       </td>
@@ -196,10 +196,10 @@
 
     <!-- Resultados Extraordinários -->
     <tr class="section-header">
-      <td colspan="2">Resultados Não Operacionais</td>
+      <td colspan="2">{{t "dre_report.sections.non_operational"}}</td>
     </tr>
     <tr class="line-item">
-      <td class="label">Receitas e Despesas Extraordinárias</td>
+      <td class="label">{{t "dre_report.labels.extraordinary_results"}}</td>
       <td class="amount {{#if (isNegative extraordinaryResults)}}negative{{else}}positive{{/if}}">
         {{formatCurrency extraordinaryResults}}
       </td>
@@ -207,10 +207,10 @@
 
     <!-- Investimentos (CAPEX) - informativo, não afeta o resultado -->
     <tr class="section-header">
-      <td colspan="2">Investimentos (CAPEX)</td>
+      <td colspan="2">{{t "dre_report.sections.capex"}}</td>
     </tr>
     <tr class="line-item">
-      <td class="label">Aquisições de mobiliário, equipamentos e outros bens permanentes</td>
+      <td class="label">{{t "dre_report.labels.capex_detail"}}</td>
       <td class="amount {{#if (isExpense capexInvestments)}}negative{{/if}}">
         {{formatExpense capexInvestments}}
       </td>
@@ -218,7 +218,7 @@
 
     <!-- Resultado Líquido -->
     <tr class="total">
-      <td>Resultado Líquido do Período</td>
+      <td>{{t "dre_report.labels.net_result"}}</td>
       <td class="amount {{#if (isNegative netResult)}}negative{{else}}positive{{/if}}">
         {{formatCurrency netResult}}
       </td>
@@ -226,31 +226,24 @@
   </table>
 
   <div class="notes">
-    <h3>Notas Explicativas</h3>
-    <p><strong>Receita Bruta:</strong> Total de entradas operacionais (dízimos, ofertas, doações e contribuições
-      recorrentes).</p>
-    <p><strong>Custos Diretos:</strong> Custos diretamente relacionados à realização de projetos, eventos e atividades
-      específicas.</p>
-    <p><strong>Despesas Operacionais:</strong> Gastos necessários para manter as atividades diárias da igreja (aluguel,
-      energia, água, materiais, transporte, etc.).</p>
-    <p><strong>Repasses e Contribuições Ministeriais:</strong> Valores enviados,para a diretoria ou missões.</p>
-    <p><strong>Investimentos (CAPEX):</strong> Aquisição de bens permanentes usados na estrutura da igreja (cadeiras,
-      mesas, equipamentos, mobiliário, etc.). Estes valores impactam o patrimônio da igreja, mas não o resultado
-      operacional do período.</p>
-    <p><strong>Resultados Extraordinários:</strong> Receitas e despesas não recorrentes ou que não fazem parte da
-      operação normal da igreja.</p>
-    <p><strong>Nota:</strong> Este relatório considera apenas lançamentos já confirmados que impactam diretamente o
-      resultado ou o patrimônio da igreja no período analisado.</p>
+    <h3>{{t "dre_report.notes.title"}}</h3>
+    <p><strong>{{t "dre_report.notes.labels.gross_revenue"}}</strong> {{t "dre_report.notes.texts.gross_revenue"}}</p>
+    <p><strong>{{t "dre_report.notes.labels.direct_costs"}}</strong> {{t "dre_report.notes.texts.direct_costs"}}</p>
+    <p><strong>{{t "dre_report.notes.labels.operational_expenses"}}</strong> {{t "dre_report.notes.texts.operational_expenses"}}</p>
+    <p><strong>{{t "dre_report.notes.labels.ministry_transfers"}}</strong> {{t "dre_report.notes.texts.ministry_transfers"}}</p>
+    <p><strong>{{t "dre_report.notes.labels.capex"}}</strong> {{t "dre_report.notes.texts.capex"}}</p>
+    <p><strong>{{t "dre_report.notes.labels.extraordinary_results"}}</strong> {{t "dre_report.notes.texts.extraordinary_results"}}</p>
+    <p><strong>{{t "dre_report.notes.labels.note"}}</strong> {{t "dre_report.notes.texts.note"}}</p>
   </div>
 
   <div class="metadata">
-    <p>Demonstração do Resultado do Exercício (DRE)</p>
-    <p>Relatório gerado automaticamente pelo sistema de gestão financeira</p>
+    <p>{{t "dre_report.metadata.title"}}</p>
+    <p>{{t "dre_report.metadata.generated"}}</p>
     <p>
       {{#if month}}
-        Competência: {{month}}/{{year}}
+        {{t "dre_report.metadata.competence"}} {{month}}/{{year}}
       {{else}}
-        Competência: {{year}}
+        {{t "dre_report.metadata.competence"}} {{year}}
       {{/if}}
     </p>
   </div>
