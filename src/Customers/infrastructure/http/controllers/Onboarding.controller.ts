@@ -79,6 +79,13 @@ export class OnboardingController {
         registerNumber?: string
         symbol: string
       }
+      address: {
+        street: string
+        number: string
+        city: string
+        postalCode: string
+        country: string
+      }
     },
     @Res() res: ServerResponse
   ) {
