@@ -1,6 +1,13 @@
 import * as fs from "fs"
-import type { ServerResponse } from "bun-platform-kit"
-import { Controller, Get, Query, Res, Use } from "bun-platform-kit"
+import {
+  Controller,
+  Get,
+  Query,
+  Req,
+  Res,
+  type ServerResponse,
+  Use,
+} from "bun-platform-kit"
 import type {
   BaseReportRequest,
   DREResponse,
@@ -9,7 +16,12 @@ import type {
 import { DRE, IncomeStatement, MonthlyTithes } from "@/Reports/applications"
 import { DREMongoRepository } from "@/Reports/infrastructure/persistence/DREMongoRepository"
 import domainResponse from "@/Shared/helpers/domainResponse"
-import { Can, NoOpStorage, PermissionMiddleware } from "@/Shared/infrastructure"
+import {
+  type AuthenticatedRequest,
+  Can,
+  NoOpStorage,
+  PermissionMiddleware,
+} from "@/Shared/infrastructure"
 import { HttpStatus } from "@/Shared/domain"
 import { FinanceRecordMongoRepository } from "@/Financial/infrastructure"
 import { ChurchMongoRepository } from "@/Church/infrastructure"
@@ -25,7 +37,7 @@ export class FinanceReportsController {
    *
    * @description Fetch a list of tithes for the given church and date range.
    *
-   * @param {BaseReportRequest} req - The request object.
+   * @param query
    * @param {Response} res - The response object.
    *
    * @returns {Promise<void>} - A promise that resolves when the request has been
@@ -71,7 +83,7 @@ export class FinanceReportsController {
    * @description Generates a financial income statement for the specified church
    * summarizing revenues, margins, and a cash snapshot used for validation.
    *
-   * @param {BaseReportRequest} req - The request object with filtering parameters.
+   * @param query
    * @param {Response} res - The response object.
    *
    * @returns {Promise<void>} - A promise that resolves when the request has been</void>
@@ -142,6 +154,7 @@ export class FinanceReportsController {
   @Use([PermissionMiddleware, Can("reports", "income_statements")])
   async incomeStatementPdf(
     @Query() query: BaseReportRequest,
+    @Req() req: AuthenticatedRequest,
     @Res() res: ServerResponse
   ): Promise<void> {
     try {
@@ -156,7 +169,7 @@ export class FinanceReportsController {
         new HandlebarsHTMLAdapter(),
         NoOpStorage.getInstance()
       )
-        .htmlTemplate("financial_report", incomeStatement)
+        .htmlTemplate("financial_report", incomeStatement, req.auth.lang)
         .toPDF(false)
 
       const year = incomeStatement.period.year ?? query.year
@@ -197,7 +210,7 @@ export class FinanceReportsController {
    * - affectsResult = true in the financial concept
    * - date within the specified month/year
    *
-   * @param {BaseReportRequest} req - The request object with filtering parameters (churchId, year, month).
+   * @param query
    * @param {Response} res - The response object.
    *
    * @returns {Promise<void>} - A promise that resolves when the request has been processed.
@@ -248,7 +261,8 @@ export class FinanceReportsController {
    * @description Generates a PDF version of the DRE (Demonstração do Resultado do Exercício)
    * report for the specified church, month, and year. Returns a downloadable PDF file.
    *
-   * @param {BaseReportRequest} req - The request object with filtering parameters (churchId, year, month).
+   * @param query
+   * @param req
    * @param {Response} res - The response object.
    *
    * @returns {Promise<void>} - A promise that resolves when the PDF has been sent.
@@ -268,6 +282,7 @@ export class FinanceReportsController {
   @Use([PermissionMiddleware, Can("financial_records", "reports")])
   async drePdf(
     @Query() query: BaseReportRequest & { month: number },
+    @Req() req: AuthenticatedRequest,
     @Res() res: ServerResponse
   ): Promise<void> {
     try {
@@ -281,7 +296,7 @@ export class FinanceReportsController {
         new HandlebarsHTMLAdapter(),
         NoOpStorage.getInstance()
       )
-        .htmlTemplate("dre_report", dreReport)
+        .htmlTemplate("dre_report", dreReport, req.auth.lang)
         .toPDF(false)
 
       const year = query.year

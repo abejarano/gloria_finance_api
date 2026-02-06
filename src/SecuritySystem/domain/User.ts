@@ -1,10 +1,11 @@
-import { IdentifyEntity, Urn } from "@/Shared/adapter"
+import { Urn } from "@/Shared/adapter"
 import { DateBR } from "@/Shared/helpers"
 import { AggregateRoot } from "@abejarano/ts-mongodb-criteria"
 import { UserPolicies } from "./types/user-policies.type"
 
 export class User extends AggregateRoot {
   isActive: boolean
+  isSuperUser: boolean
   private id?: string
   private userId: string
   private email: string
@@ -15,7 +16,6 @@ export class User extends AggregateRoot {
   private lastLogin?: Date
   private policies?: UserPolicies
   private churchId: string
-  isSuperUser: boolean
 
   private constructor() {
     super()

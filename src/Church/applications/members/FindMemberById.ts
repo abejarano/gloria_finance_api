@@ -1,4 +1,8 @@
-import { IMemberRepository, Member, MemberNotFound } from "../../domain"
+import {
+  type IMemberRepository,
+  type Member,
+  MemberNotFound,
+} from "../../domain"
 
 import { Logger } from "@/Shared/adapter"
 
@@ -7,7 +11,7 @@ export class FindMemberById {
 
   constructor(private readonly memberRepository: IMemberRepository) {}
 
-  async execute(memberId: string): Promise<Member> {
+  async execute(memberId: string | undefined): Promise<Member> {
     this.logger.info(`search member by id: ${memberId}`)
 
     if (!memberId) {
@@ -15,7 +19,7 @@ export class FindMemberById {
       throw new MemberNotFound()
     }
 
-    const member: Member = await this.memberRepository.one({ memberId })
+    const member = await this.memberRepository.one({ memberId })
 
     if (!member) {
       this.logger.error(`Member not found`)

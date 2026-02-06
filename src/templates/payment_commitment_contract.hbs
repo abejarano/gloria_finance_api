@@ -1,7 +1,7 @@
-<html lang="pt-br">
+<html lang="{{i18nLang}}">
   <head>
     <meta charset="UTF-8" />
-    <title>Contrato de Compromisso de Pagamento</title>
+    <title>{{t "payment_commitment_contract.title"}}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,59 +62,64 @@
   </head>
   <body>
 
-    <h1>Contrato de Compromisso de Pagamento</h1>
+    <h1>{{t "payment_commitment_contract.title"}}</h1>
     <br />
-    <h3>PARTES CONTRATANTES</h3>
-    <p><strong>CREDOR:</strong><br />
+    <h3>{{t "payment_commitment_contract.parties_title"}}</h3>
+    <p><strong>{{t "payment_commitment_contract.creditor"}}</strong><br />
       {{church.name}}<br />
       {{church.address}}<br />
       {{church.taxId}}<br />
-      Representada legalmente por:
+      {{t "payment_commitment_contract.represented_by"}}
       {{church.legalRepresentative.name}}
       ({{church.legalRepresentative.role}})
     </p>
 
-    <p><strong>DEVEDOR:</strong><br />
+    <p><strong>{{t "payment_commitment_contract.debtor"}}</strong><br />
       {{debtor.name}}<br />
-      Documento de Identidade:
+      {{t "payment_commitment_contract.identity_document"}}
       {{debtor.dni}}<br />
-      Endereço:
+      {{t "payment_commitment_contract.address"}}
       {{debtor.address}}<br />
-      Telefone:
+      {{t "payment_commitment_contract.phone"}}
       {{debtor.phone}}<br />
-      E-mail:
+      {{t "payment_commitment_contract.email"}}
       {{debtor.email}}
     </p>
 
-    <h2>CLÁUSULAS CONTRATUAIS</h2>
+    <h2>{{t "payment_commitment_contract.clauses_title"}}</h2>
 
-    <p><strong>PRIMEIRA - OBJETO DO CONTRATO</strong><br />
-      Por meio do presente instrumento particular, o DEVEDOR reconhece
-      expressamente assumir o compromisso de pagamento referente a:
+    <p><strong>{{t
+          "payment_commitment_contract.first_clause_title"
+        }}</strong><br />
+      {{t "payment_commitment_contract.first_clause_text_intro"}}
       {{concept}}
-      pela quantia de
+      {{t "payment_commitment_contract.first_clause_text_amount"}}
       {{amountLiteral}}
       ({{symbol}}
-      {{amount}}), valor que deverá ser quitado em sua totalidade conforme
-      estabelecido no presente contrato.
+      {{amount}}),
+      {{t "payment_commitment_contract.first_clause_text_end"}}
     </p>
 
-    <p><strong>SEGUNDA - MODALIDADE DE PAGAMENTO</strong><br />
-      O DEVEDOR compromete-se a pagar a totalidade do compromisso descrito na
-      primeira cláusula em
+    <p><strong>{{t
+          "payment_commitment_contract.second_clause_title"
+        }}</strong><br />
+      {{t "payment_commitment_contract.second_clause_text_intro"}}
       {{installments.length}}
       {{#ifEquals installments.length 1}}
-        parcela única{{else}}parcelas{{/ifEquals}}, de acordo com o seguinte
-      detalhamento:
+        {{t "payment_commitment_contract.second_clause_single"}}
+      {{else}}
+        {{t "payment_commitment_contract.second_clause_multiple"}}
+      {{/ifEquals}},
+      {{t "payment_commitment_contract.second_clause_text_end"}}
     </p>
 
     <table>
       <thead>
         <tr>
-          <th>N° Parcela</th>
-          <th>Valor</th>
-          <th>Data de Vencimento</th>
-          <th>Status</th>
+          <th>{{t "payment_commitment_contract.table_installment_number"}}</th>
+          <th>{{t "payment_commitment_contract.table_value"}}</th>
+          <th>{{t "payment_commitment_contract.table_due_date"}}</th>
+          <th>{{t "payment_commitment_contract.table_status"}}</th>
         </tr>
       </thead>
       <tbody>
@@ -129,11 +134,14 @@
       </tbody>
     </table>
 
-    <p><strong>TERCEIRA - LOCAL E FORMA DE PAGAMENTO</strong><br />
-      O pagamento deverá ser realizado em dinheiro nas instalações da
+    <p><strong>{{t
+          "payment_commitment_contract.third_clause_title"
+        }}</strong><br />
+      {{t "payment_commitment_contract.third_clause_text_start"}}
       {{church.name}}
-      localizadas em
-      {{church.address}}, ou mediante depósito/transferência.
+      {{t "payment_commitment_contract.third_clause_text_mid"}}
+      {{church.address}},
+      {{t "payment_commitment_contract.third_clause_text_end"}}
       <!--  para a conta-->
       <!--  bancária:<br /><br />-->
       <!--  Banco:-->
@@ -148,19 +156,17 @@
     <p>
       {{instantPayment}}
     </p>
-    <p><strong>QUARTA - DECLARAÇÃO DE CONSENTIMENTO</strong><br />
-      O DEVEDOR declara que assume esta obrigação de maneira livre, voluntária e
-      sem qualquer coação, encontrando-se em pleno uso de suas faculdades
-      mentais e com pleno conhecimento das implicações legais que este
-      compromisso acarreta.
+    <p><strong>{{t
+          "payment_commitment_contract.fourth_clause_title"
+        }}</strong><br />
+      {{t "payment_commitment_contract.fourth_clause_text"}}
     </p>
 
-    <p>Em sinal de conformidade, as partes assinam o presente documento em duas
-      vias, aos
+    <p>{{t "payment_commitment_contract.signing_text_start"}}
       {{day}}
-      dias do mês
+      {{t "payment_commitment_contract.signing_text_mid"}}
       {{month}}
-      do ano de
+      {{t "payment_commitment_contract.signing_text_end"}}
       {{year}}.</p>
 
     <br />
@@ -170,12 +176,12 @@
         {{church.legalRepresentative.role}}:<span
           class="signature-name"
         >{{church.legalRepresentative.name}}</span><br />
-        CPF:
+        {{t "payment_commitment_contract.cpf_label"}}
         {{church.legalRepresentative.dni}}
       </div>
       <div class="signature">
         <span class="signature-name">{{debtor.name}}</span><br />
-        CPF:
+        {{t "payment_commitment_contract.cpf_label"}}
         {{debtor.dni}}
       </div>
     </div>

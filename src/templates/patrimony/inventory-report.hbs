@@ -1,7 +1,7 @@
-<html lang="pt-BR">
+<html lang="{{i18nLang}}">
   <head>
     <meta charset="UTF-8" />
-    <title>Inventário Patrimonial</title>
+    <title>{{t "inventory_report.title"}}</title>
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -79,28 +79,32 @@
     </style>
   </head>
   <body>
-    <h1>Inventário Patrimonial</h1>
+    <h1>{{t "inventory_report.title"}}</h1>
     <div class="meta">
-      <p><strong>Gerado em:</strong> {{formatDate generatedAt}}</p>
+      <p><strong>{{t "inventory_report.generated_at"}}</strong>
+        {{formatDate generatedAt}}</p>
       {{#if filters.church}}
-        <p><strong>Congregação:</strong> {{filters.church}}</p>
+        <p><strong>{{t "inventory_report.congregation"}}</strong>
+          {{filters.church}}</p>
       {{/if}}
       {{#if filters.categoryLabel}}
-        <p><strong>Categoria:</strong> {{filters.categoryLabel}}</p>
+        <p><strong>{{t "inventory_report.category"}}</strong>
+          {{filters.categoryLabel}}</p>
       {{/if}}
       {{#if filters.status}}
-        <p><strong>Status:</strong> {{filters.status}}</p>
+        <p><strong>{{t "inventory_report.status"}}</strong>
+          {{filters.status}}</p>
       {{/if}}
     </div>
     <br /><br />
 
     <div class="summary">
       <div class="summary-card">
-        <h2>Total de bens</h2>
+        <h2>{{t "inventory_report.summary_total_assets"}}</h2>
         <strong>{{summary.totalAssets}}</strong>
       </div>
       <div class="summary-card">
-        <h2>Valor estimado</h2>
+        <h2>{{t "inventory_report.summary_estimated_value"}}</h2>
         <strong>{{summary.totalValueFormatted}}</strong>
       </div>
 
@@ -109,15 +113,15 @@
     <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Código</th>
-          <th>Nome</th>
-          <th>Categoria</th>
-          <th>Status</th>
-          <th>Valor</th>
-          <th>Responsável</th>
-          <th>Localização</th>
-          <th>Aquisição</th>
+          <th>{{t "inventory_report.table.index"}}</th>
+          <th>{{t "inventory_report.table.code"}}</th>
+          <th>{{t "inventory_report.table.name"}}</th>
+          <th>{{t "inventory_report.table.category"}}</th>
+          <th>{{t "inventory_report.table.status"}}</th>
+          <th>{{t "inventory_report.table.value"}}</th>
+          <th>{{t "inventory_report.table.responsible"}}</th>
+          <th>{{t "inventory_report.table.location"}}</th>
+          <th>{{t "inventory_report.table.acquisition"}}</th>
         </tr>
       </thead>
       <tbody>
@@ -139,7 +143,7 @@
         {{else}}
           <tr>
             <td colspan="11">
-              Nenhum bem cadastrado para os filtros informados.
+              {{t "inventory_report.empty"}}
             </td>
           </tr>
         {{/if}}

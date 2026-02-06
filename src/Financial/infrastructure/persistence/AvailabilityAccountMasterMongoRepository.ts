@@ -273,7 +273,7 @@ export class AvailabilityAccountMasterMongoRepository
         },
       ])
       .toArray()
-    console.log(result)
+
     return result.map((r) => AvailabilityAccountMaster.fromPrimitives(r))
   }
 
