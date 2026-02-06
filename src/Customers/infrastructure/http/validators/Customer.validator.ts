@@ -15,11 +15,11 @@ export default async (req, res, next) => {
     "representative.rol": "required|string",
     name: "required|string",
     lang: "string|in:pt-BR,es,en",
-    "address.street": "required|string",
-    "address.number": "string",
-    "address.city": "required|string",
-    "address.postalCode": "string",
-    "address.country": "required|string|maxLength:2",
+    // "address.street": "required|string",
+    // "address.number": "string",
+    // "address.city": "required|string",
+    // "address.postalCode": "string",
+    // "address.country": "required|string|maxLength:2",
   }
 
   const v = new Validator(payload, rule)
