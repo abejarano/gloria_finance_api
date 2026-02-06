@@ -12,12 +12,19 @@ const handlebars =
 type Translations = Record<string, unknown>
 const DEFAULT_LOCALE = "pt-BR"
 
-const brlFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
+const DEFAULT_SYMBOL = "R$"
+const numberFormatter = new Intl.NumberFormat("pt-BR", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 })
+
+const resolveSymbol = (symbol?: string): string => {
+  if (typeof symbol === "string" && symbol.trim().length > 0) {
+    return symbol.trim()
+  }
+
+  return DEFAULT_SYMBOL
+}
 
 export class HandlebarsHTMLAdapter implements IHTMLAdapter {
   private logger = Logger(HandlebarsHTMLAdapter.name)
@@ -38,7 +45,13 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
     handlebars.registerHelper("inc", (value: number) => value + 1)
 
     handlebars.registerHelper("formatDate", (date: string) => {
-      return new Intl.DateTimeFormat("es-ES").format(new Date(date))
+      return new Intl.DateTimeFormat("es-ES", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+        .format(new Date(date))
+        .replace(/\//g, "-")
     })
 
     handlebars.registerHelper("subtract", (a: number, b: number) => {
@@ -48,31 +61,43 @@ export class HandlebarsHTMLAdapter implements IHTMLAdapter {
       return (left - right).toFixed(2)
     })
 
-    handlebars.registerHelper("formatCurrency", (value: unknown) => {
-      const numericValue = Number(value)
-      const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+    handlebars.registerHelper(
+      "formatCurrency",
+      (value: unknown, symbol?: string) => {
+        const numericValue = Number(value)
+        const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+        const resolvedSymbol = resolveSymbol(symbol)
+        const formattedValue = numberFormatter.format(Math.abs(safeValue))
+        const withSymbol = `${resolvedSymbol} ${formattedValue}`
 
-      if (safeValue < 0) {
-        return `(${brlFormatter.format(Math.abs(safeValue))})`
+        if (safeValue < 0) {
+          return `(${withSymbol})`
+        }
+
+        return withSymbol
       }
+    )
 
-      return brlFormatter.format(safeValue)
-    })
+    handlebars.registerHelper(
+      "formatExpense",
+      (value: unknown, symbol?: string) => {
+        const numericValue = Number(value)
+        const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+        const resolvedSymbol = resolveSymbol(symbol)
+        const formattedValue = numberFormatter.format(Math.abs(safeValue))
+        const withSymbol = `${resolvedSymbol} ${formattedValue}`
 
-    handlebars.registerHelper("formatExpense", (value: unknown) => {
-      const numericValue = Number(value)
-      const safeValue = Number.isFinite(numericValue) ? numericValue : 0
+        // For expenses, always show with minus sign
+        if (safeValue > 0) {
+          return `- ${withSymbol}`
+        } else if (safeValue < 0) {
+          // If already negative (edge case), show as positive with minus
+          return `- ${withSymbol}`
+        }
 
-      // For expenses, always show with minus sign
-      if (safeValue > 0) {
-        return `- ${brlFormatter.format(safeValue)}`
-      } else if (safeValue < 0) {
-        // If already negative (edge case), show as positive with minus
-        return `- ${brlFormatter.format(Math.abs(safeValue))}`
+        return withSymbol
       }
-
-      return brlFormatter.format(0)
-    })
+    )
 
     handlebars.registerHelper("isNegative", (value: unknown) => {
       const numericValue = Number(value)

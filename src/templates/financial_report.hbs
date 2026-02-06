@@ -81,6 +81,29 @@
     color: #20364b;
   }
 
+  .currency-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .currency-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: #e4ebf5;
+    color: #334e68;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .section-subtitle {
+    margin: -6px 0 10px;
+    font-size: 11px;
+    color: #7b8794;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -149,57 +172,63 @@
   {{#if summary}}
     <section>
       <h2>{{t "financial_report.summary.title"}}</h2>
-      <div class="summary-grid">
-        {{#with (lookup summary 0)}}
+      {{#each summary}}
+        <div class="currency-heading">
+          <span class="currency-tag">{{symbol}}</span>
+        </div>
+        <div class="summary-grid">
           {{#if summary}}
             <div class="summary-card">
               <span class="label">{{t "financial_report.summary.net_revenue"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.revenue)}}negative{{/if}}">
-                {{formatCurrency summary.revenue}}
+                {{formatCurrency summary.revenue symbol}}
               </span>
               <span class="caption">{{t "financial_report.summary.caption.net_revenue"}}</span>
             </div>
             <div class="summary-card">
               <span class="label">{{t "financial_report.summary.operating_expenses"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.operatingExpenses)}}negative{{/if}}">
-                {{formatCurrency summary.operatingExpenses}}
+                {{formatCurrency summary.operatingExpenses symbol}}
               </span>
               <span class="caption">{{t "financial_report.summary.caption.operating_expenses"}}</span>
             </div>
             <div class="summary-card">
               <span class="label">{{t "financial_report.summary.operating_income"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.operatingIncome)}}negative{{/if}}">
-                {{formatCurrency summary.operatingIncome}}
+                {{formatCurrency summary.operatingIncome symbol}}
               </span>
               <span class="caption">{{t "financial_report.summary.caption.operating_income"}}</span>
             </div>
             <div class="summary-card">
               <span class="label">{{t "financial_report.summary.net_income"}} ({{symbol}})</span>
               <span class="value {{#if (isNegative summary.netIncome)}}negative{{/if}}">
-                {{formatCurrency summary.netIncome}}
+                {{formatCurrency summary.netIncome symbol}}
               </span>
               <span class="caption">{{t "financial_report.summary.caption.net_income"}}</span>
             </div>
           {{/if}}
-        {{/with}}
-      </div>
+        </div>
+      {{/each}}
     </section>
   {{/if}}
 
   {{#if breakdown}}
     <section>
       <h2>{{t "financial_report.breakdown.title"}}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>{{t "financial_report.breakdown.headers.category"}}</th>
-            <th>{{t "financial_report.breakdown.headers.income"}}</th>
-            <th>{{t "financial_report.breakdown.headers.expenses"}}</th>
-            <th>{{t "financial_report.breakdown.headers.net"}}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{#with (lookup breakdown 0)}}
+      {{#each breakdown}}
+        <div class="currency-heading">
+          <span class="currency-tag">{{symbol}}</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>{{t "financial_report.breakdown.headers.category"}}</th>
+              <th>{{t "financial_report.breakdown.headers.income"}}</th>
+              <th>{{t "financial_report.breakdown.headers.expenses"}}</th>
+              <th>{{t "financial_report.breakdown.headers.net"}}</th>
+            </tr>
+          </thead>
+          <tbody>
             {{#each breakdown}}
               <tr>
                 <td>
@@ -211,90 +240,106 @@
                   {{/if}}
                 </td>
                 <td class="number-cell {{#if (isNegative income)}}negative{{/if}}">
-                  {{formatCurrency income}}
+                  {{formatCurrency income ../symbol}}
                 </td>
                 <td class="number-cell {{#if (isNegative expenses)}}negative{{/if}}">
-                  {{formatCurrency expenses}}
+                  {{formatCurrency expenses ../symbol}}
                 </td>
                 <td class="number-cell {{#if (isNegative net)}}negative{{/if}}">
-                  {{formatCurrency net}}
+                  {{formatCurrency net ../symbol}}
                 </td>
               </tr>
             {{/each}}
-          {{/with}}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      {{/each}}
     </section>
   {{/if}}
 
   {{#with cashFlowSnapshot.availabilityAccounts}}
-    <section>
-      <h2>{{t "financial_report.cash_flow.title"}}</h2>
-      <p class="totals">
-        {{t "financial_report.cash_flow.totals.income"}}
-        {{formatCurrency income}}
-        | {{t "financial_report.cash_flow.totals.expenses"}}
-        {{formatCurrency expenses}}
-        | {{t "financial_report.cash_flow.totals.total"}}
-        {{formatCurrency total}}
-      </p>
-      {{#if accounts}}
-        <table>
-          <thead>
-            <tr>
-              <th>{{t "financial_report.cash_flow.headers.account"}}</th>
-              <th>{{t "financial_report.cash_flow.headers.income"}}</th>
-              <th>{{t "financial_report.cash_flow.headers.expenses"}}</th>
-              <th>{{t "financial_report.cash_flow.headers.period_balance"}}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each accounts}}
-              <tr>
-                <td>{{availabilityAccount.accountName}}</td>
-                <td class="number-cell {{#if (isNegative totalInput)}}negative{{/if}}">
-                  {{formatCurrency totalInput}}
-                </td>
-                <td class="number-cell {{#if (isNegative totalOutput)}}negative{{/if}}">
-                  {{formatCurrency totalOutput}}
-                </td>
-                <td class="number-cell {{#if (isNegative (subtract totalInput totalOutput))}}negative{{/if}}">
-                  {{formatCurrency (subtract totalInput totalOutput)}}
-                </td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      {{/if}}
-    </section>
+    {{#if totals}}
+      {{#each totals}}
+        <section>
+          <div class="currency-heading">
+            <h2>{{t "financial_report.cash_flow.title"}}</h2>
+            <span class="currency-tag">{{symbol}}</span>
+          </div>
+          <p class="totals">
+            {{t "financial_report.cash_flow.totals.income"}}
+            {{formatCurrency income symbol}}
+            | {{t "financial_report.cash_flow.totals.expenses"}}
+            {{formatCurrency expenses symbol}}
+            | {{t "financial_report.cash_flow.totals.total"}}
+            {{formatCurrency total symbol}}
+          </p>
+          {{#if ../accounts}}
+            <table>
+              <thead>
+                <tr>
+                  <th>{{t "financial_report.cash_flow.headers.account"}}</th>
+                  <th>{{t "financial_report.cash_flow.headers.income"}}</th>
+                  <th>{{t "financial_report.cash_flow.headers.expenses"}}</th>
+                  <th>{{t "financial_report.cash_flow.headers.period_balance"}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each ../accounts}}
+                  {{#ifEquals availabilityAccount.symbol ../symbol}}
+                    <tr>
+                      <td>{{availabilityAccount.accountName}}</td>
+                      <td class="number-cell {{#if (isNegative totalInput)}}negative{{/if}}">
+                        {{formatCurrency totalInput availabilityAccount.symbol}}
+                      </td>
+                      <td class="number-cell {{#if (isNegative totalOutput)}}negative{{/if}}">
+                        {{formatCurrency totalOutput availabilityAccount.symbol}}
+                      </td>
+                      <td class="number-cell {{#if (isNegative (subtract totalInput totalOutput))}}negative{{/if}}">
+                        {{formatCurrency (subtract totalInput totalOutput) availabilityAccount.symbol}}
+                      </td>
+                    </tr>
+                  {{/ifEquals}}
+                {{/each}}
+              </tbody>
+            </table>
+          {{/if}}
+        </section>
+      {{/each}}
+    {{/if}}
   {{/with}}
 
   {{#with cashFlowSnapshot.costCenters}}
-    {{#if costCenters}}
-      <section>
-        <h2>{{t "financial_report.cost_centers.title"}}</h2>
-        <p class="totals">{{t "financial_report.cost_centers.total_label"}} {{formatCurrency total}}</p>
-        <table>
-          <thead>
-            <tr>
-              <th>{{t "financial_report.cost_centers.headers.cost_center"}}</th>
-              <th>{{t "financial_report.cost_centers.headers.total_applied"}}</th>
-              <th>{{t "financial_report.cost_centers.headers.last_move"}}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each costCenters}}
+    {{#if totals}}
+      {{#each totals}}
+        <section>
+          <div class="currency-heading">
+            <h2>{{t "financial_report.cost_centers.title"}}</h2>
+            <span class="currency-tag">{{symbol}}</span>
+          </div>
+          <p class="totals">{{t "financial_report.cost_centers.total_label"}} {{formatCurrency total symbol}}</p>
+          <table>
+            <thead>
               <tr>
-                <td>{{costCenter.costCenterName}}</td>
-                <td class="number-cell {{#if (isNegative total)}}negative{{/if}}">
-                  {{formatCurrency total}}
-                </td>
-                <td>{{lastMove}}</td>
+                <th>{{t "financial_report.cost_centers.headers.cost_center"}}</th>
+                <th>{{t "financial_report.cost_centers.headers.total_applied"}}</th>
+                <th>{{t "financial_report.cost_centers.headers.last_move"}}</th>
               </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      </section>
+            </thead>
+            <tbody>
+              {{#each ../costCenters}}
+                {{#ifEquals symbol ../symbol}}
+                  <tr>
+                    <td>{{costCenter.costCenterName}}</td>
+                    <td class="number-cell {{#if (isNegative total)}}negative{{/if}}">
+                      {{formatCurrency total symbol}}
+                    </td>
+                    <td>{{formatDate lastMove}}</td>
+                  </tr>
+                {{/ifEquals}}
+              {{/each}}
+            </tbody>
+          </table>
+        </section>
+      {{/each}}
     {{/if}}
   {{/with}}
 
